@@ -21,6 +21,7 @@ model User {
   comments Comment[]
   friends  Friend[]  @relation("userFriends")
   friendOf Friend[]  @relation("userFriendOf")
+  likes    Like[] 
   profile  Profile?
 
   @@map("users")
@@ -39,13 +40,15 @@ model Friend {
 }
 
 model Post {
-  id       String    @id @default(cuid())
-  userId   String
-  title    String
-  content  String
-  likes    Int       @default(0)
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comments Comment[]
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+  likes     Like[] 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("posts")
 }
@@ -62,11 +65,22 @@ model Comment {
 }
 
 model Profile {
-  id      String   @id @default(cuid())
-  userId  String   @unique
-  bio     String?
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String  @id @default(cuid())
+  userId String  @unique
+  bio    String?
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
 }
 
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId]) // Prevent duplicate likes from same user
+  @@map("likes")
+}
