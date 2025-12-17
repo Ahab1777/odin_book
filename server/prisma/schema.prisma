@@ -5,10 +5,68 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id       String    @id @default(cuid())
+  username String    @unique
+  email    String    @unique
+  password String
+  posts    Post[]
+  comments Comment[]
+  friends  Friend[]  @relation("userFriends")
+  friendOf Friend[]  @relation("userFriendOf")
+  profile  Profile?
+
+  @@map("users")
+}
+
+model Friend {
+  id        String   @id @default(cuid())
+  userId    String
+  friendId  String
+  user      User     @relation("userFriends", fields: [userId], references: [id], onDelete: Cascade)
+  friend    User     @relation("userFriendOf", fields: [friendId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, friendId]) // Prevent duplicate friendships
+  @@map("friends")
+}
+
+model Post {
+  id       String    @id @default(cuid())
+  userId   String
+  title    String
+  content  String
+  likes    Int       @default(0)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments Comment[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id      String @id @default(cuid())
+  content String
+  userId  String
+  postId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Profile {
+  id      String   @id @default(cuid())
+  userId  String   @unique
+  bio     String?
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
