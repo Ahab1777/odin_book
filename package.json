@@ -1,0 +1,15 @@
+{
+  "name": "odin-book",
+  "version": "1.0.0",
+  "description": "Social media site for the final assignment of The Odin Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Leonardo Pinho",
+  "license": "ISC",
+  "workspaces": [
+    "client",
+    "server"
+  ]
+}
