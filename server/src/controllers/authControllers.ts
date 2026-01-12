@@ -32,6 +32,28 @@ export async function signup(req: Request, res: Response): Promise<void>{
     const validationErrors = validationResult(req);
 
     if (!validationErrors.isEmpty()) {
-        
+        res.status(400).json({
+            errors: validationErrors.array()
+        });
+        return;
     }
+
+    const { email, username, password } = req.body;
+
+    //TODO - Hash password
+
+
+    //Create user in DB
+    const user = await prisma.user.create({
+        data: {
+            email,
+            username,
+            password
+        }
+    });
+
+    //Generate JWT
+    
+
+
 }
