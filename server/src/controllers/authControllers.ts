@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma'
 import { body, validationResult } from 'express-validator'
 import { userService } from '../services/userServices';
+import jwt from 'jsonwebtoken';
 
 //Validation array used as middleware for validating info going through a route
 export const validation = [
@@ -53,7 +54,19 @@ export async function signup(req: Request, res: Response): Promise<void>{
     });
 
     //Generate JWT
-    
+    const token = jwt.sign(
+        {
+            userId: user.id,
+            email: user.email,
+            username: user.username
+        },
+        process.env.JWT_SECRET!,
+        { expiresIn: '7d' }
+    );
 
-
+    res.status(201).json({ 
+        token, 
+        userId: user.id,
+        username: user.username 
+    });
 }
