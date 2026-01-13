@@ -4,9 +4,13 @@ import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 
 
-// const databaseUrl = process.env.NODE_ENV === 'test'
-//   ? process.env.TEST_DATABASE_URL
-//   : process.env.DATABASE_URL;
+const connectionString = process.env.NODE_ENV === 'test' 
+  ? process.env.TEST_DATABASE_URL 
+  : process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error('DATABASE_URL or TEST_DATABASE_URL not set');
+}
 
 
 export default defineConfig({
@@ -15,6 +19,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: env('DATABASE_URL'),
+    url: connectionString,
   },
 });
