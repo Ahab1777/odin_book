@@ -11,7 +11,7 @@ export const userService = {
     });
     },
 
-    // Get user by username
+  // Get user by username
   async findByUsernameForSignUp(username: string) {
     return await prisma.user.findUnique({
       where: { username },
@@ -21,4 +21,16 @@ export const userService = {
     });
   },    
 
+  //Get username and password for login
+  async findByEmailForLogin(email: string) {
+    return await prisma.user.findUnique({
+      where: { email },
+      select: {
+        email: true,
+        password: true,
+        username: true,
+        id: true
+      }
+    });
+  },
 }
