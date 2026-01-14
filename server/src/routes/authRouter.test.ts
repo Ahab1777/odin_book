@@ -118,8 +118,6 @@ test("signup fails with weak password", (done: jest.DoneCallback) => {
     .end(done);
 });
 
-//TODO - create more sign-up test fo incorrect credentials
-
 test("login works", done => {
     request(app)
         .post('/login')
@@ -141,7 +139,70 @@ test("login works", done => {
         .end(done);
 })
 
+test("login fails with invalid email format", (done: jest.DoneCallback) => {
+  request(app)
+    .post("/login")
+    .send({
+      email: "not-an-email",
+      password: password,
+    })
+    .expect(400)
+    .expect((res) => {
+      expect(res.body.errors).toBeDefined();
+      expect(Array.isArray(res.body.errors)).toBe(true);
+      
+      const emailError = res.body.errors.find((e: any) => e.path === "email");
+      expect(emailError).toBeDefined();
+      expect(emailError.msg).toBe("Invalid email format");
+    })
+    .end(done);
+});
 
+test("login fails with missing password", (done: jest.DoneCallback) => {
+  request(app)
+    .post("/login")
+    .send({
+      email: email,
+      // password is missing
+    })
+    .expect(400)
+    .expect((res) => {
+      expect(res.body.errors).toBeDefined();
+      
+      const passwordError = res.body.errors.find((e: any) => e.path === "password");
+      expect(passwordError).toBeDefined();
+      expect(passwordError.msg).toBe("Password is required");
+    })
+    .end(done);
+});
+
+test("login fails with incorrect password", (done: jest.DoneCallback) => {
+  request(app)
+    .post("/login")
+    .send({
+      email: email,
+      password: "WrongPassword123",
+    })
+    .expect(401)
+    .expect((res) => {
+      expect(res.body.error).toBe("Invalid email or password");
+    })
+    .end(done);
+});
+
+test("login fails with nonexistent email", (done: jest.DoneCallback) => {
+  request(app)
+    .post("/login")
+    .send({
+      email: "doesnotexist@example.com",
+      password: "SomePassword123",
+    })
+    .expect(401)
+    .expect((res) => {
+      expect(res.body.error).toBe("Invalid email or password");
+    })
+    .end(done);
+});
 
 
 //Close prisma client so Jest doesn't complain

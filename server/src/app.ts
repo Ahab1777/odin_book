@@ -12,7 +12,8 @@ app.use(express.urlencoded({ extended: true }));
 
 
 //Routes
-app.use('/auth', routes.auth)
+app.use('/auth', routes.auth);
+app.use('/post', routes.post)
 
 //Network settings
 const PORT: number = parseInt(process.env.PORT || '9001', 10);
