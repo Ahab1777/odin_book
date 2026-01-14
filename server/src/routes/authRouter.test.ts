@@ -1,6 +1,7 @@
 import authRouter from "./authRouter";
 import request from 'supertest';
 import express from 'express';
+import { prisma } from "../lib/prisma";
 
 const app = express();
 app.use(express.json()); 
@@ -27,4 +28,8 @@ test("sign-up works", (done: jest.DoneCallback) => {
         expect(typeof res.body.userId).toBe('string');
     })
     .end(done);
+});
+
+afterAll(async () => {
+  await prisma.$disconnect();
 });
