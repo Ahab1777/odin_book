@@ -394,6 +394,74 @@ test('only post owner can delete it', (done: jest.DoneCallback) => {
     });
 });
 
+//Get post
+test('function return correct post', (done: jest.DoneCallback) => {
+  const unique = Date.now().toString(36);
+
+  request(app)
+    .post('/auth/signup')
+    .send({
+      email: `test_${unique}@example.com`,
+      username: `user_${unique}`,
+      password: 'Password1'
+    })
+    .expect(201)
+    .end((err, signupRes) => {
+      if (err) return done(err);
+
+      const token = signupRes.body.token;
+      const userId = signupRes.body.userId;
+
+      // Create a post first
+      request(app)
+        .post('/post/create')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          title,
+          content,
+          userId,
+        })
+        .expect(201)
+        .end((err, postRes) => {
+          if (err) return done(err);
+
+          const postId = postRes.body.id;
+
+          // Get the post
+          request(app)
+            .get(`/post/${postId}`)
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.id).toBe(postId);
+              expect(res.body.title).toBe(title);
+              expect(res.body.content).toBe(content);
+              expect(res.body.userId).toBe(userId);
+              expect(res.body.user).toBeDefined();
+              expect(res.body.user.id).toBe(userId);
+              expect(res.body.user.username).toBeDefined();
+              expect(res.body.comments).toBeDefined();
+              expect(Array.isArray(res.body.comments)).toBe(true);
+              expect(res.body.likes).toBeDefined();
+              expect(Array.isArray(res.body.likes)).toBe(true);
+              expect(res.body.createdAt).toBeDefined();
+            })
+            .end(done);
+        });
+    });
+});
+
+test('function return 404 if the post does not exist', (done: jest.DoneCallback) => {
+  const fakePostId = 'nonexistent-post-id';
+
+  request(app)
+    .get(`/post/${fakePostId}`)
+    .expect(404)
+    .expect((res) => {
+      expect(res.body.error).toBeDefined();
+      expect(res.body.error).toBe('Post not found');
+    })
+    .end(done);
+});
 
 afterAll(async () => {
   await prisma.$disconnect();

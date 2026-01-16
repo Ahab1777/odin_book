@@ -9,9 +9,15 @@ TODOs
 [] Post controllers
     [x] create post
     [x] delete post
-    [] get post
+    [x] get post
     [] get all posts from user
     [] update post
+
+[] User
+    [] Friend user
+    [] Unfriend user
+
+
 
 [] Miscellaneous 
     [] Route validation for admin
