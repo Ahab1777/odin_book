@@ -10,7 +10,7 @@ TODOs
 
 [] Post controllers
     [x] create post
-    [] delete post
+    [x] delete post
     [] get post
     [] get all posts from user
     [] update post

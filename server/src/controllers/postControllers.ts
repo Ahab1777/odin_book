@@ -74,3 +74,35 @@ export async function deletePost(req: Request, res: Response): Promise<void> {
 
     res.status(200).json({ message: 'Post deleted successfully' });
 }
+
+export async function getPost(req: Request, res: Response): Promise<void> {
+    const { postId } = req.params;
+
+    // Check if post exists
+    const post = await prisma.post.findUnique({
+        where: { id: postId },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    username: true,
+                }
+            }
+        }
+    });
+
+    if (!post) {
+        res.status(404).json({ error: 'Post not found' });
+        return;
+    }
+
+    res.status(200).json({
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        userId: post.userId,
+        user: post.user,
+        createdAt: post.createdAt,
+    });
+}
+
