@@ -128,4 +128,66 @@ export async function getPost(req: Request, res: Response): Promise<void> {
     });
 }
 
+export async function getPostIndex(req: Request, res: Response): Promise < void> {
+    const { userId } = req.user as { userId: string };
+
+    // Get current user with their friends and posts
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+            posts: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                        }
+                    }
+                }
+            },
+            friends: {
+                include: {
+                    user: {
+                        include: {
+                            posts: {
+                                include: {
+                                    user: {
+                                        select: {
+                                            id: true,
+                                            username: true,
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+    }
+
+    // Collect all posts: user's posts + friends' posts
+    const allPosts = [...(user.posts || [])];
+
+    // Add posts from users that are friends with current user
+    if (user.friends) {
+        user.friends.forEach((friendship) => {
+            if (friendship.user.posts) {
+                allPosts.push(...friendship.user.posts);
+            }
+        });
+    }
+
+    // Sort by createdAt in descending order (newest first)
+    allPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    res.status(200).json({
+        posts: allPosts
+    });
+}
 

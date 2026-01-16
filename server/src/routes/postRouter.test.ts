@@ -463,6 +463,9 @@ test('function return 404 if the post does not exist', (done: jest.DoneCallback)
     .end(done);
 });
 
+//Get post index
+
+
 afterAll(async () => {
   await prisma.$disconnect();
 });

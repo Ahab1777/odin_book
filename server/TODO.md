@@ -10,12 +10,13 @@ TODOs
     [x] create post
     [x] delete post
     [x] get post
-    [] get all posts from user
+    [x] get post index ( posts from current user + friends) (done within 'posts' branch and unmerged)
     [] update post
+    [] test if getPostIndex works
 
 [] User
-    [] Friend user
-    [] Unfriend user
+    [x] Friend user
+    [x] Unfriend user
 
 
 
