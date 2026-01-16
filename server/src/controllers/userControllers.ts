@@ -45,3 +45,46 @@ export async function befriend(req: Request, res: Response): Promise <void> {
         createdAt: friendship.createdAt
     });
 }
+
+export async function unfriend(req: Request, res: Response): Promise <void> {
+    const { userId: friendId } = req.params;
+    const { userId } = req.user as { userId: string };
+
+    // Check if target user exists
+    const targetUser = await prisma.user.findUnique({
+        where: { id: friendId }
+    });
+
+    if (!targetUser) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+    }
+
+    // Check if they are friends
+    const existingFriendship = await prisma.friend.findUnique({
+        where: {
+            userId_friendId: {
+                userId,
+                friendId
+            }
+        }
+    });
+
+    if (!existingFriendship) {
+        res.status(400).json({ error: 'You are not friends with this user' });
+        return;
+    }
+
+    // Remove friendship
+    await prisma.friend.delete({
+        where: {
+            userId_friendId: {
+                userId,
+                friendId
+            }
+        }
+    });
+
+    res.status(200).json({ message: 'Successfully unfriended user' });
+}
+
