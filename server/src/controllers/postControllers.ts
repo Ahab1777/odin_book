@@ -87,6 +87,26 @@ export async function getPost(req: Request, res: Response): Promise<void> {
                     id: true,
                     username: true,
                 }
+            },
+            comments: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                        }
+                    }
+                }
+            },
+            likes: {
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            username: true,
+                        }
+                    }
+                }
             }
         }
     });
@@ -102,6 +122,8 @@ export async function getPost(req: Request, res: Response): Promise<void> {
         content: post.content,
         userId: post.userId,
         user: post.user,
+        comments: post.comments,
+        likes: post.likes,
         createdAt: post.createdAt,
     });
 }

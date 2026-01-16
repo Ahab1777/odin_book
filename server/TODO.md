@@ -3,8 +3,6 @@ TODOs
 [] Likes
     [] add likes schema for posts and comments
     [] create likeRouter
-    [] like comment
-    [] unlike comment
     [] like post
     [] unlike post
 

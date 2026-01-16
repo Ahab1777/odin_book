@@ -84,3 +84,4 @@ model Like {
   @@unique([userId, postId]) // Prevent duplicate likes from same user
   @@map("likes")
 }
+
