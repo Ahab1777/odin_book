@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { prisma } from '../lib/prisma'
+import { prisma } from '../lib/prisma';
 
 
 export async function addLike(req: Request, res: Response): Promise<void> {
@@ -42,3 +42,37 @@ export async function addLike(req: Request, res: Response): Promise<void> {
     }
 }
 
+export async function deleteLike(req: Request, res: Response): Promise<void> {
+    try {
+        const { postId } = req.params;
+        const { userId } = req.user as { userId: string };
+
+        // Verify post exists
+        const post = await prisma.post.findUnique({
+            where: { id: postId }
+        });
+
+        if (!post) {
+            res.status(404).json({ error: 'Post not found' });
+            return;
+        }
+
+        // Try to delete the like for this user/post
+        const deleted = await prisma.like.deleteMany({
+            where: { userId, postId }
+        });
+
+        if (deleted.count === 0) {
+            res.status(404).json({ error: 'Like not found' });
+            return;
+        }
+
+        res.status(200).json({
+            message: 'Like removed successfully',
+            postId,
+            userId,
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to remove like' });
+    }
+}

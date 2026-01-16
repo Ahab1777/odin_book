@@ -99,6 +99,30 @@ it('does not create a second like for the same user and post', (done: jest.DoneC
     });
 });
 
+// 3) deleteLike removes the like for current user and post
+it('removes an existing like for the current user on the target post', (done: jest.DoneCallback) => {
+  // A like already exists from the first test
+  request(app)
+    .delete(`/like/${postId}`)
+    .set('Authorization', `Bearer ${token}`)
+    .expect(200)
+    .end(async (err, res) => {
+      if (err) return done(err);
+
+      expect(res.body.message).toBe('Like removed successfully');
+      expect(res.body.postId).toBe(postId);
+      expect(res.body.userId).toBe(userId);
+
+      try {
+        const likeCount = await prisma.like.count({ where: { userId, postId } });
+        expect(likeCount).toBe(0);
+        done();
+      } catch (dbErr) {
+        done(dbErr as Error);
+      }
+    });
+});
+
 afterAll(async () => {
   // Optional cleanup to keep test DB tidy
   await prisma.like.deleteMany({ where: { postId } });
