@@ -47,3 +47,30 @@ export async function createPost(req: Request, res: Response): Promise<void>{
         createdAt: post.createdAt,
     });
 }
+
+export async function deletePost(req: Request, res: Response): Promise<void> {
+    const { postId } = req.params;
+    const { userId } = req.user as { userId: string };
+
+    // Check if post exists and user owns it
+    const post = await prisma.post.findUnique({
+        where: { id: postId }
+    });
+
+    if (!post) {
+        res.status(404).json({ error: 'Post not found' });
+        return;
+    }
+
+    if (post.userId !== userId) {
+        res.status(403).json({ error: 'Unauthorized to delete this post' });
+        return;
+    }
+
+    // Delete the post
+    await prisma.post.delete({
+        where: { id: postId }
+    });
+
+    res.status(200).json({ message: 'Post deleted successfully' });
+}

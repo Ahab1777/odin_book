@@ -30,6 +30,8 @@ beforeAll(() => {
 
 });
 
+
+//Post creation
 test('creates post via JWT from /auth', (done: jest.DoneCallback) => {
   const unique = Date.now().toString(36);
 
@@ -283,6 +285,115 @@ test('deny post creation - missing content', (done: jest.DoneCallback) => {
       .end(done);
     });
 });
+
+//Post deletion
+test('post is deleted', (done: jest.DoneCallback) => {
+  const unique = Date.now().toString(36);
+
+  request(app)
+    .post('/auth/signup')
+    .send({
+      email: `test_${unique}@example.com`,
+      username: `user_${unique}`,
+      password: 'Password1'
+    })
+    .expect(201)
+    .end((err, signupRes) => {
+      if (err) return done(err);
+
+      const token = signupRes.body.token;
+      const userId = signupRes.body.userId;
+
+      // Create a post first
+      request(app)
+        .post('/post/create')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          title,
+          content,
+          userId,
+        })
+        .expect(201)
+        .end((err, postRes) => {
+          if (err) return done(err);
+
+          const postId = postRes.body.id;
+
+          // Delete the post
+          request(app)
+            .delete(`/post/${postId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200)
+            .expect((res) => {
+              expect(res.body.message).toBeDefined();
+            })
+            .end(done);
+        });
+    });
+});
+
+test('only post owner can delete it', (done: jest.DoneCallback) => {
+  const unique1 = Date.now().toString(36);
+  const unique2 = (Date.now() + 1).toString(36);
+
+  // Create first user and post
+  request(app)
+    .post('/auth/signup')
+    .send({
+      email: `test_${unique1}@example.com`,
+      username: `user_${unique1}`,
+      password: 'Password1'
+    })
+    .expect(201)
+    .end((err, signupRes1) => {
+      if (err) return done(err);
+
+      const token1 = signupRes1.body.token;
+      const userId1 = signupRes1.body.userId;
+
+      // Create post with first user
+      request(app)
+        .post('/post/create')
+        .set('Authorization', `Bearer ${token1}`)
+        .send({
+          title,
+          content,
+          userId: userId1,
+        })
+        .expect(201)
+        .end((err, postRes) => {
+          if (err) return done(err);
+
+          const postId = postRes.body.id;
+
+          // Create second user
+          request(app)
+            .post('/auth/signup')
+            .send({
+              email: `test_${unique2}@example.com`,
+              username: `user_${unique2}`,
+              password: 'Password1'
+            })
+            .expect(201)
+            .end((err, signupRes2) => {
+              if (err) return done(err);
+
+              const token2 = signupRes2.body.token;
+
+              // Try to delete post with second user (should fail)
+              request(app)
+                .delete(`/post/${postId}`)
+                .set('Authorization', `Bearer ${token2}`)
+                .expect(403)
+                .expect((res) => {
+                  expect(res.body.error).toBeDefined();
+                })
+                .end(done);
+            });
+        });
+    });
+});
+
 
 afterAll(async () => {
   await prisma.$disconnect();
