@@ -11,7 +11,7 @@ TODOs
     [x] get post
     [x] get post index ( posts from current user + friends) (done within 'posts' branch and unmerged)
     [] update post
-    [] test if getPostIndex works
+    [x] test if getPostIndex works
 
 [] User
     [x] Friend user

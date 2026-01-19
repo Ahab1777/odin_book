@@ -75,6 +75,53 @@ export async function deletePost(req: Request, res: Response): Promise<void> {
     res.status(200).json({ message: 'Post deleted successfully' });
 }
 
+export async function updatePost(req: Request, res: Response): Promise<void> {
+    const { postId } = req.params;
+    const { title, content } = req.body;
+    const { userId } = req.user as { userId: string };
+
+    // Validate incoming data using the same rules as createPost
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {
+        res.status(400).json({
+            errors: validationErrors.array()
+        });
+        return;
+    }
+
+    // Check if post exists and user owns it
+    const existingPost = await prisma.post.findUnique({
+        where: { id: postId }
+    });
+
+    if (!existingPost) {
+        res.status(404).json({ error: 'Post not found' });
+        return;
+    }
+
+    if (existingPost.userId !== userId) {
+        res.status(403).json({ error: 'Unauthorized to update this post' });
+        return;
+    }
+
+    const updatedPost = await prisma.post.update({
+        where: { id: postId },
+        data: {
+            title,
+            content,
+        },
+    });
+
+    res.status(200).json({
+        id: updatedPost.id,
+        title: updatedPost.title,
+        content: updatedPost.content,
+        userId: updatedPost.userId,
+        createdAt: updatedPost.createdAt,
+        updatedAt: updatedPost.updatedAt,
+    });
+}
+
 export async function getPost(req: Request, res: Response): Promise<void> {
     const { postId } = req.params;
 
@@ -190,4 +237,6 @@ export async function getPostIndex(req: Request, res: Response): Promise < void>
         posts: allPosts
     });
 }
+
+
 

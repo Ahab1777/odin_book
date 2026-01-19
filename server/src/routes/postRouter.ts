@@ -1,6 +1,6 @@
 import express from 'express';
 import { authentication } from '../middlewares/authMiddleware';
-import { createPost, createPostValidation, deletePost, getPost, getPostIndex } from '../controllers/postControllers';
+import { createPost, createPostValidation, deletePost, getPost, getPostIndex, updatePost } from '../controllers/postControllers';
 
 
 const postRouter = express.Router();
@@ -13,6 +13,11 @@ postRouter.post('/create',
 postRouter.delete('/:postId',
     authentication,
     deletePost
+)
+postRouter.put('/:postId',
+    authentication,
+    createPostValidation,
+    updatePost
 )
 postRouter.get('/index',
     authentication,

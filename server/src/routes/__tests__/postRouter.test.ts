@@ -497,6 +497,76 @@ test('only post owner can delete it', (done: jest.DoneCallback) => {
     });
 });
 
+//Post update
+test('updates post title and content', (done: jest.DoneCallback) => {
+  const unique = Date.now().toString(36);
+
+  const originalTitle = `Orig_${unique}`.slice(0, 20); // ensure < 24 chars
+  const originalContent = `Original content ${unique} more text`;
+  const newTitle = `New_${unique}`.slice(0, 20);
+  const newContent = `Updated content ${unique} even more text`;
+
+  request(app)
+    .post('/auth/signup')
+    .send({
+      email: `update_test_${unique}@example.com`,
+      username: `update_user_${unique}`,
+      password: 'Password1',
+    })
+    .expect(201)
+    .end((err, signupRes) => {
+      if (err) return done(err);
+
+      const token = signupRes.body.token;
+      const userId = signupRes.body.userId;
+
+      // Create a post first
+      request(app)
+        .post('/post/create')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          title: originalTitle,
+          content: originalContent,
+          userId,
+        })
+        .expect(201)
+        .end((createErr, postRes) => {
+          if (createErr) return done(createErr);
+
+          const postId = postRes.body.id;
+
+          // Update the post
+          request(app)
+            .put(`/post/${postId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+              title: newTitle,
+              content: newContent,
+              userId,
+            })
+            .expect(200)
+            .end(async (updateErr, updateRes) => {
+              if (updateErr) return done(updateErr);
+
+              expect(updateRes.body.id).toBe(postId);
+              expect(updateRes.body.title).toBe(newTitle);
+              expect(updateRes.body.content).toBe(newContent);
+              expect(updateRes.body.userId).toBe(userId);
+
+              try {
+                const updated = await prisma.post.findUnique({ where: { id: postId } });
+                expect(updated).not.toBeNull();
+                expect(updated!.title).toBe(newTitle);
+                expect(updated!.content).toBe(newContent);
+                done();
+              } catch (dbErr) {
+                done(dbErr as Error);
+              }
+            });
+        });
+    });
+});
+
 //Get post
 test('function return correct post', (done: jest.DoneCallback) => {
   const unique = Date.now().toString(36);
