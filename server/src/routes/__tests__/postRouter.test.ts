@@ -18,6 +18,17 @@ let shortContent: string;
 let bigTitle: string;
 let bigContent: string
 
+// Data for getPostIndex tests
+let indexToken: string;
+let indexUserId: string;
+let friendUserId: string;
+let strangerUserId: string;
+let friendToken: string;
+let strangerToken: string;
+let ownPostId: string;
+let friendPostId: string;
+let strangerPostId: string;
+
 beforeAll(() => {
     const suffix = Math.random().toString(36).substring(2, 6);
     title = suffix.repeat(2);
@@ -28,6 +39,98 @@ beforeAll(() => {
     bigContent = suffix.repeat(1000);
     
 
+});
+
+// Setup users, friendships, and posts for getPostIndex tests
+beforeAll(async () => {
+  const base = Date.now().toString(36);
+
+  // Create main user (whose index we will query)
+  const mainRes = await request(app)
+    .post('/auth/signup')
+    .send({
+      email: `index_main_${base}@example.com`,
+      username: `index_main_${base}`,
+      password: 'Password1',
+    })
+    .expect(201);
+
+  indexToken = mainRes.body.token;
+  
+  indexUserId = mainRes.body.userId;
+
+  // Create friend user
+  const friendRes = await request(app)
+    .post('/auth/signup')
+    .send({
+      email: `index_friend_${base}@example.com`,
+      username: `index_friend_${base}`,
+      password: 'Password1',
+    })
+    .expect(201);
+
+  friendToken = friendRes.body.token;
+  friendUserId = friendRes.body.userId;
+
+  // Create stranger user (not a friend)
+  const strangerRes = await request(app)
+    .post('/auth/signup')
+    .send({
+      email: `index_stranger_${base}@example.com`,
+      username: `index_stranger_${base}`,
+      password: 'Password1',
+    })
+    .expect(201);
+
+  strangerToken = strangerRes.body.token;
+  strangerUserId = strangerRes.body.userId;
+
+  // Make friendUser a friend of indexUser by inserting Friend row
+  await prisma.friend.create({
+    data: {
+      userId: indexUserId,
+      friendId: friendUserId,
+    },
+  });
+
+  // Create a post for the main user
+  const ownPostRes = await request(app)
+    .post('/post/create')
+    .set('Authorization', `Bearer ${indexToken}`)
+    .send({
+      title: 'Index main',
+      content: `Index main content ${base} more text`,
+      userId: indexUserId,
+    })
+    .expect(201);
+
+  ownPostId = ownPostRes.body.id;
+
+  // Create a post for the friend user
+  const friendPostRes = await request(app)
+    .post('/post/create')
+    .set('Authorization', `Bearer ${friendToken}`)
+    .send({
+      title: 'Index friend',
+      content: `Index friend content ${base} more text`,
+      userId: friendUserId,
+    })
+    .expect(201);
+
+  friendPostId = friendPostRes.body.id;
+
+  // Create a post for the stranger user (should NOT appear in index)
+  const strangerPostRes = await request(app)
+    .post('/post/create')
+    .set('Authorization', `Bearer ${strangerToken}`)
+    .send({
+      title: 'Index stranger',
+      content: `Index stranger content ${base} more text`,
+      userId: strangerUserId,
+    })
+    .expect(201);
+
+  strangerPostId = strangerPostRes.body.id;
 });
 
 
@@ -464,6 +567,26 @@ test('function return 404 if the post does not exist', (done: jest.DoneCallback)
 });
 
 //Get post index
+
+test('getPostIndex returns posts from current user and their friends only', async () => {
+  
+  const res = await request(app)
+    .get('/post/index')
+    .set('Authorization', `Bearer ${indexToken}`)
+    .expect(200);
+
+  expect(res.body.posts).toBeDefined();
+  expect(Array.isArray(res.body.posts)).toBe(true);
+
+  const returnedIds = res.body.posts.map((p: any) => p.id);
+
+  // Should include main user's post and friend's post
+  expect(returnedIds).toContain(ownPostId);
+  expect(returnedIds).toContain(friendPostId);
+
+  // Should NOT include stranger's post
+  expect(returnedIds).not.toContain(strangerPostId);
+});
 
 
 afterAll(async () => {

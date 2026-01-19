@@ -147,7 +147,7 @@ export async function getPostIndex(req: Request, res: Response): Promise < void>
             },
             friends: {
                 include: {
-                    user: {
+                    friend: {
                         include: {
                             posts: {
                                 include: {
@@ -177,8 +177,8 @@ export async function getPostIndex(req: Request, res: Response): Promise < void>
     // Add posts from users that are friends with current user
     if (user.friends) {
         user.friends.forEach((friendship) => {
-            if (friendship.user.posts) {
-                allPosts.push(...friendship.user.posts);
+            if (friendship.friend.posts) {
+                allPosts.push(...friendship.friend.posts);
             }
         });
     }
