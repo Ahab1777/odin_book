@@ -15,6 +15,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/auth', routes.auth);
 app.use('/post', routes.post);
 app.use('/user', routes.user);
+app.use('/like', routes.like);
+app.use('/comment', routes.comment)
 
 //Network settings
 const PORT: number = parseInt(process.env.PORT || '9001', 10);

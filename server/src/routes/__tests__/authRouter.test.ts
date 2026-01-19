@@ -1,7 +1,7 @@
-import authRouter from "./authRouter";
+import authRouter from "../authRouter";
 import request from 'supertest';
 import express from 'express';
-import { prisma } from "../lib/prisma";
+import { prisma } from "../../lib/prisma";
 
 const app = express();
 app.use(express.json()); 

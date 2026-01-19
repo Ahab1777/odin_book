@@ -1,8 +1,8 @@
 import express from 'express';
 import request from 'supertest';
-import authRouter from './authRouter';
-import postRouter from './postRouter';
-import { prisma } from '../lib/prisma';
+import authRouter from '../authRouter';
+import postRouter from '../postRouter';
+import { prisma } from '../../lib/prisma';
 
 const app = express();
 app.use(express.json());
