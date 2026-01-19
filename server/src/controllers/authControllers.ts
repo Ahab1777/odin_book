@@ -75,7 +75,6 @@ export async function signup(req: Request, res: Response): Promise<void>{
     });
 }
 
-
 //Login
 export const loginValidation = [
   body('email')
