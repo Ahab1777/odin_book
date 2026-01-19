@@ -18,9 +18,8 @@ TODOs
     [x] Unfriend user
 
 [] Comment
- [] Add comment
- [] Delete comment
- [] Edit comment
+ [X] Add comment
+ [X] Delete comment
 
 
 [] Miscellaneous 
