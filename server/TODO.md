@@ -1,10 +1,10 @@
 TODOs
 
 [] Likes
-    [] add likes schema for posts and comments
-    [] create likeRouter
-    [] like post
-    [] unlike post
+    [x] add likes schema for posts and comments
+    [x] create likeRouter
+    [x] like post
+    [x] unlike post
 
     [x] create post
     [x] delete post
@@ -17,6 +17,10 @@ TODOs
     [x] Friend user
     [x] Unfriend user
 
+[] Comment
+ [] Add comment
+ [] Delete comment
+ [] Edit comment
 
 
 [] Miscellaneous 
