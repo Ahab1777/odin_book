@@ -24,10 +24,11 @@ TODOs
 [] Friends
     [x] befriend user
     [x] Unfriend user
-    [] getFriendships
-    [] getFollowers
-    [] getFollowedBy
-    [] getUnknownUsers
+    [x] getFriendships
+    [x] getFollowers
+    [x] getFollowedBy
+    [x] getUnknownUsers
+    [] Implement pending friendship logic
 
 [] User 
     [] Visitor access
