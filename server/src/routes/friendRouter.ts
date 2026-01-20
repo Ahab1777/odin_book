@@ -1,6 +1,6 @@
 import express from 'express';
 import { authentication } from '../middlewares/authMiddleware';
-import { befriend, unfriend } from '../controllers/userControllers';
+import { befriend, unfriend } from '../controllers/friendControllers';
 
     // [] getFriendships
     // [] getFollowers
@@ -8,17 +8,17 @@ import { befriend, unfriend } from '../controllers/userControllers';
     // [] getUnknownUsers
 
 
-const userRouter = express.Router()
+const friendRouter = express.Router()
 
-userRouter.post('/befriend/:userId',
+friendRouter.post('/befriend/:userId',
     authentication,
     befriend
 )
-userRouter.delete('/unfriend/:userId',
+friendRouter.delete('/unfriend/:userId',
     authentication,
     unfriend
 )
 
 
 
-export default userRouter;
+export default friendRouter;

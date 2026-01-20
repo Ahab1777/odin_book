@@ -14,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 //Routes
 app.use('/auth', routes.auth);
 app.use('/post', routes.post);
-app.use('/user', routes.user);
+app.use('/friend', routes.friend);
 app.use('/like', routes.like);
 app.use('/comment', routes.comment)
 
