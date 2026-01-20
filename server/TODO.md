@@ -6,21 +6,37 @@ TODOs
     [x] like post
     [x] unlike post
 
+[] Posts
     [x] create post
     [x] delete post
     [x] get post
     [x] get post index ( posts from current user + friends) (done within 'posts' branch and unmerged)
-    [] update post
+    [] update/edit post
     [x] test if getPostIndex works
+    [] Visitor postIndex
+    [] getUserPosts
+    [] getPostsIndex fetches avatars
 
-[] User
-    [x] Friend user
+[] Profile
+    [] getProfile
+    [] editProfile
+
+[] Friends
+    [x] befriend user
     [x] Unfriend user
+    [] getFriendships
+    [] getFollowers
+    [] getFollowedBy
+    [] getUnknownUsers
+
+[] User 
+    [] Visitor access
+    [] Password recovery
+    [] logOut
 
 [] Comment
  [X] Add comment
  [X] Delete comment
-
 
 [] Miscellaneous 
     [] Route validation for admin
