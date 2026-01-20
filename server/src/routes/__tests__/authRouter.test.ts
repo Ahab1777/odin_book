@@ -54,6 +54,8 @@ test("sign-up works", (done: jest.DoneCallback) => {
         expect(typeof res.body.token).toBe('string');
         expect(res.body.userId).toBeDefined();
         expect(typeof res.body.userId).toBe('string');
+        expect(res.body.avatar).toBeDefined();
+        expect(typeof res.body.avatar).toBe('string');
     })
     .end(done);
 });
@@ -134,6 +136,8 @@ test("login works", done => {
             expect(res.body.username).toBeDefined();
             expect(typeof res.body.username).toBe('string');
             expect(res.body.email).toBeDefined();
+            expect(typeof res.body.email).toBe('string');
+            expect(res.body.avatar).toBeDefined();
             expect(typeof res.body.email).toBe('string');
         })
         .end(done);
