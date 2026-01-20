@@ -88,3 +88,6 @@ export async function unfriend(req: Request, res: Response): Promise <void> {
     res.status(200).json({ message: 'Successfully unfriended user' });
 }
 
+export async function getFriendships(req: Request, res: Response): Promise<void>{
+    
+}
