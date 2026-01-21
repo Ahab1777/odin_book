@@ -1,8 +1,8 @@
 import express from "express";
 import request from "supertest";
-import authRouter from "./authRouter";
-import { prisma } from "../lib/prisma";
-import friendRouter from "./friendRouter";
+import authRouter from "../authRouter";
+import { prisma } from "../../lib/prisma";
+import friendRouter from "../friendRouter";
 import type { Response } from "supertest";
 
 const app = express();
@@ -81,7 +81,7 @@ async function unfriend(
   return res;
 }
 
-const testUtils = {
+const friendUtils = {
   signupUser,
   createFriendRequest,
   createFriendship,
@@ -89,4 +89,4 @@ const testUtils = {
   unfriend,
 };
 
-export default testUtils;
+export default friendUtils;

@@ -1,22 +1,24 @@
-import express from 'express';
-import request from 'supertest';
-import authRouter from '../authRouter';
-import postRouter from '../postRouter';
-import { prisma } from '../../lib/prisma';
+import express from "express";
+import request from "supertest";
+import authRouter from "../authRouter";
+import postRouter from "../postRouter";
+import { prisma } from "../../lib/prisma";
+import friendTestUtils from "../testUtils/friendUtils";
+import postTestUtils from "../testUtils/postUtils";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use('/auth', authRouter);
-app.use('/post', postRouter);
+app.use("/auth", authRouter);
+app.use("/post", postRouter);
 
 let title: string;
 let content: string;
 let shortTitle: string;
 let shortContent: string;
 let bigTitle: string;
-let bigContent: string
+let bigContent: string;
 
 // Data for getPostIndex tests
 let indexToken: string;
@@ -30,15 +32,13 @@ let friendPostId: string;
 let strangerPostId: string;
 
 beforeAll(() => {
-    const suffix = Math.random().toString(36).substring(2, 6);
-    title = suffix.repeat(2);
-    content = suffix.repeat(4);
-    shortTitle = 'a';
-    shortContent = 'b';
-    bigTitle = suffix.repeat(1000);
-    bigContent = suffix.repeat(1000);
-    
-
+  const suffix = Math.random().toString(36).substring(2, 6);
+  title = suffix.repeat(2);
+  content = suffix.repeat(4);
+  shortTitle = "a";
+  shortContent = "b";
+  bigTitle = suffix.repeat(1000);
+  bigContent = suffix.repeat(1000);
 });
 
 // Setup users, friendships, and posts for getPostIndex tests
@@ -47,25 +47,25 @@ beforeAll(async () => {
 
   // Create main user (whose index we will query)
   const mainRes = await request(app)
-    .post('/auth/signup')
+    .post("/auth/signup")
     .send({
       email: `index_main_${base}@example.com`,
       username: `index_main_${base}`,
-      password: 'Password1',
+      password: "Password1",
     })
     .expect(201);
 
   indexToken = mainRes.body.token;
-  
+
   indexUserId = mainRes.body.userId;
 
   // Create friend user
   const friendRes = await request(app)
-    .post('/auth/signup')
+    .post("/auth/signup")
     .send({
       email: `index_friend_${base}@example.com`,
       username: `index_friend_${base}`,
-      password: 'Password1',
+      password: "Password1",
     })
     .expect(201);
 
@@ -74,11 +74,11 @@ beforeAll(async () => {
 
   // Create stranger user (not a friend)
   const strangerRes = await request(app)
-    .post('/auth/signup')
+    .post("/auth/signup")
     .send({
       email: `index_stranger_${base}@example.com`,
       username: `index_stranger_${base}`,
-      password: 'Password1',
+      password: "Password1",
     })
     .expect(201);
 
@@ -95,10 +95,10 @@ beforeAll(async () => {
 
   // Create a post for the main user
   const ownPostRes = await request(app)
-    .post('/post/create')
-    .set('Authorization', `Bearer ${indexToken}`)
+    .post("/post/create")
+    .set("Authorization", `Bearer ${indexToken}`)
     .send({
-      title: 'Index main',
+      title: "Index main",
       content: `Index main content ${base} more text`,
       userId: indexUserId,
     })
@@ -108,10 +108,10 @@ beforeAll(async () => {
 
   // Create a post for the friend user
   const friendPostRes = await request(app)
-    .post('/post/create')
-    .set('Authorization', `Bearer ${friendToken}`)
+    .post("/post/create")
+    .set("Authorization", `Bearer ${friendToken}`)
     .send({
-      title: 'Index friend',
+      title: "Index friend",
       content: `Index friend content ${base} more text`,
       userId: friendUserId,
     })
@@ -121,10 +121,10 @@ beforeAll(async () => {
 
   // Create a post for the stranger user (should NOT appear in index)
   const strangerPostRes = await request(app)
-    .post('/post/create')
-    .set('Authorization', `Bearer ${strangerToken}`)
+    .post("/post/create")
+    .set("Authorization", `Bearer ${strangerToken}`)
     .send({
-      title: 'Index stranger',
+      title: "Index stranger",
       content: `Index stranger content ${base} more text`,
       userId: strangerUserId,
     })
@@ -133,184 +133,99 @@ beforeAll(async () => {
   strangerPostId = strangerPostRes.body.id;
 });
 
-
 //Post creation
-test('creates post via JWT from /auth', (done: jest.DoneCallback) => {
-  const unique = Date.now().toString(36);
+test("creates post via JWT from /auth", async () => {
+  const user = await friendTestUtils.signupUser("post_create");
 
-  // 1) Sign up a user and get a real JWT
-  request(app)
-    .post('/auth/signup')
-    .send({
-      email: `test_${unique}@example.com`,
-      username: `user_${unique}`,
-      password: 'Password1'
-    })
-    .expect(201)
-    .end((err, signupRes) => {
-      if (err) return done(err);
-
-      const token = signupRes.body.token;
-      const userId = signupRes.body.userId; // if you still need it in body for validation
-
-      // 2) Call protected create-post route with Authorization header
-      request(app)
-        .post('/post/create')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          title,
-          content,
-          // include userId only if your validation still requires it
-          userId,
-        })
-        .expect(201)
-        .expect((postRes) => {
-          expect(postRes.body.title).toBe(title);
-          expect(postRes.body.content).toBe(content);
-          expect(postRes.body.userId).toBe(userId);
-          expect(postRes.body.id).toBeDefined();
-          expect(postRes.body.createdAt).toBeDefined();
-        })
-        .end(done);
-    });
-});
-
-test('deny post creation - incorrect formatting', (done: jest.DoneCallback) => {
-  const unique = Date.now().toString(36);
-
-  // 1) Sign up a user and get a real JWT
-  request(app)
-    .post('/auth/signup')
-    .send({
-      email: `test_${unique}@example.com`,
-      username: `user_${unique}`,
-      password: 'Password1'
-    })
-    .expect(201)
-    .end((err, signupRes) => {
-      if (err) return done(err);
-
-      const token = signupRes.body.token;
-    const userId = signupRes.body.userId;
-
-    // 2) Call protected create-post route with invalid data
-    request(app)
-      .post('/post/create')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        title: shortTitle,
-        content: shortContent,
-        userId,
-      })
-      .expect(400)
-      .expect((res) => {
-        expect(res.body.errors).toBeDefined();
-        expect(Array.isArray(res.body.errors)).toBe(true);
-        expect(res.body.errors.length).toBeGreaterThan(0);
-        // Both title and content should have errors
-        const titleError = res.body.errors.find((e: any) => e.path === 'title');
-        const contentError = res.body.errors.find((e: any) => e.path === 'content');
-        expect(titleError).toBeDefined();
-        expect(contentError).toBeDefined();
-      })
-      .end(done);
-    });
-});
-
-test('deny post creation - title too long', (done: jest.DoneCallback) => {
-  const unique = Date.now().toString(36);
-
-  request(app)
-    .post('/auth/signup')
-    .send({
-    email: `test_${unique}@example.com`,
-    username: `user_${unique}`,
-    password: 'Password1'
-    })
-    .expect(201)
-    .end((err, signupRes) => {
-    if (err) return done(err);
-
-    const token = signupRes.body.token;
-    const userId = signupRes.body.userId;
-
-    request(app)
-      .post('/post/create')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        title: bigTitle,
-        content,
-        userId,
-      })
-      .expect(400)
-      .expect((res) => {
-        expect(res.body.errors).toBeDefined();
-        const titleError = res.body.errors.find((e: any) => e.path === 'title');
-        expect(titleError).toBeDefined();
-        expect(titleError.msg).toBe('Title must be between 3 and 24 characters');
-      })
-      .end(done);
-    });
-});
-
-test('deny post creation - content too long', (done: jest.DoneCallback) => {
-  const unique = Date.now().toString(36);
-
-  request(app)
-    .post('/auth/signup')
-    .send({
-    email: `test_${unique}@example.com`,
-    username: `user_${unique}`,
-    password: 'Password1'
-    })
-    .expect(201)
-    .end((err, signupRes) => {
-    if (err) return done(err);
-
-    const token = signupRes.body.token;
-    const userId = signupRes.body.userId;
-
-    request(app)
-      .post('/post/create')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        title,
-        content: bigContent,
-        userId,
-      })
-      .expect(400)
-      .expect((res) => {
-        expect(res.body.errors).toBeDefined();
-        const contentError = res.body.errors.find((e: any) => e.path === 'content');
-        expect(contentError).toBeDefined();
-        expect(contentError.msg).toBe('Content must be between 10 and 240 characters');
-      })
-      .end(done);
-    });
-});
-
-test('deny post creation - missing authorization token', (done: jest.DoneCallback) => {
-  request(app)
-    .post('/post/create')
-    .send({
+  const res = await postTestUtils.createPost(user, {
     title,
     content,
+    userId: user.id,
+  });
+
+  expect(res.status).toBe(201);
+  expect(res.body.title).toBe(title);
+  expect(res.body.content).toBe(content);
+  expect(res.body.userId).toBe(user.id);
+  expect(res.body.id).toBeDefined();
+  expect(res.body.createdAt).toBeDefined();
+});
+
+test("deny post creation - incorrect formatting", async () => {
+  const user = await friendTestUtils.signupUser("post_bad_fmt");
+
+  const res = await postTestUtils.createPost(user, {
+    title: shortTitle,
+    content: shortContent,
+    userId: user.id,
+  });
+
+  expect(res.status).toBe(400);
+  expect(res.body.errors).toBeDefined();
+  expect(Array.isArray(res.body.errors)).toBe(true);
+  expect(res.body.errors.length).toBeGreaterThan(0);
+  const titleError = res.body.errors.find((e: any) => e.path === "title");
+  const contentError = res.body.errors.find((e: any) => e.path === "content");
+  expect(titleError).toBeDefined();
+  expect(contentError).toBeDefined();
+});
+
+test("deny post creation - title too long", async () => {
+  const user = await friendTestUtils.signupUser("post_title_long");
+
+  const res = await postTestUtils.createPost(user, {
+    title: bigTitle,
+    content,
+    userId: user.id,
+  });
+
+  expect(res.status).toBe(400);
+  expect(res.body.errors).toBeDefined();
+  const titleError = res.body.errors.find((e: any) => e.path === "title");
+  expect(titleError).toBeDefined();
+  expect(titleError.msg).toBe("Title must be between 3 and 24 characters");
+});
+
+test("deny post creation - content too long", async () => {
+  const user = await friendTestUtils.signupUser("post_content_long");
+
+  const res = await postTestUtils.createPost(user, {
+    title,
+    content: bigContent,
+    userId: user.id,
+  });
+
+  expect(res.status).toBe(400);
+  expect(res.body.errors).toBeDefined();
+  const contentError = res.body.errors.find((e: any) => e.path === "content");
+  expect(contentError).toBeDefined();
+  expect(contentError.msg).toBe(
+    "Content must be between 10 and 240 characters",
+  );
+});
+
+test("deny post creation - missing authorization token", (done: jest.DoneCallback) => {
+  request(app)
+    .post("/post/create")
+    .send({
+      title,
+      content,
     })
     .expect(401)
     .expect((res) => {
       expect(res.body.error).toBeDefined();
-      expect(res.body.error).toBe('Access token required');
+      expect(res.body.error).toBe("Access token required");
     })
     .end(done);
 });
 
-test('deny post creation - invalid authorization token', (done: jest.DoneCallback) => {
+test("deny post creation - invalid authorization token", (done: jest.DoneCallback) => {
   request(app)
-    .post('/post/create')
-    .set('Authorization', 'Bearer invalid_token')
+    .post("/post/create")
+    .set("Authorization", "Bearer invalid_token")
     .send({
-    title,
-    content,
+      title,
+      content,
     })
     .expect(403)
     .expect((res) => {
@@ -319,264 +234,123 @@ test('deny post creation - invalid authorization token', (done: jest.DoneCallbac
     .end(done);
 });
 
-test('deny post creation - missing title', (done: jest.DoneCallback) => {
-  const unique = Date.now().toString(36);
+test("deny post creation - missing title", async () => {
+  const user = await friendTestUtils.signupUser("post_missing_title");
 
-  request(app)
-    .post('/auth/signup')
-    .send({
-    email: `test_${unique}@example.com`,
-    username: `user_${unique}`,
-    password: 'Password1'
-    })
-    .expect(201)
-    .end((err, signupRes) => {
-    if (err) return done(err);
+  const res = await postTestUtils.createPost(user, {
+    content,
+    userId: user.id,
+  } as any);
 
-    const token = signupRes.body.token;
-    const userId = signupRes.body.userId;
-
-    request(app)
-      .post('/post/create')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        content,
-        userId,
-      })
-      .expect(400)
-      .expect((res) => {
-        expect(res.body.errors).toBeDefined();
-        const titleError = res.body.errors.find((e: any) => e.path === 'title');
-        expect(titleError).toBeDefined();
-        expect(titleError.msg).toBe('Title must be between 3 and 24 characters');
-      })
-      .end(done);
-    });
+  expect(res.status).toBe(400);
+  expect(res.body.errors).toBeDefined();
+  const titleError = res.body.errors.find((e: any) => e.path === "title");
+  expect(titleError).toBeDefined();
+  expect(titleError.msg).toBe("Title must be between 3 and 24 characters");
 });
 
-test('deny post creation - missing content', (done: jest.DoneCallback) => {
-  const unique = Date.now().toString(36);
+test("deny post creation - missing content", async () => {
+  const user = await friendTestUtils.signupUser("post_missing_content");
 
-  request(app)
-    .post('/auth/signup')
-    .send({
-    email: `test_${unique}@example.com`,
-    username: `user_${unique}`,
-    password: 'Password1'
-    })
-    .expect(201)
-    .end((err, signupRes) => {
-    if (err) return done(err);
+  const res = await postTestUtils.createPost(user, {
+    title,
+    userId: user.id,
+  } as any);
 
-    const token = signupRes.body.token;
-    const userId = signupRes.body.userId;
-
-    request(app)
-      .post('/post/create')
-      .set('Authorization', `Bearer ${token}`)
-      .send({
-        title,
-        userId,
-      })
-      .expect(400)
-      .expect((res) => {
-        expect(res.body.errors).toBeDefined();
-        const contentError = res.body.errors.find((e: any) => e.path === 'content');
-        expect(contentError).toBeDefined();
-        expect(contentError.msg).toBe('Content must be between 10 and 240 characters');
-      })
-      .end(done);
-    });
+  expect(res.status).toBe(400);
+  expect(res.body.errors).toBeDefined();
+  const contentError = res.body.errors.find((e: any) => e.path === "content");
+  expect(contentError).toBeDefined();
+  expect(contentError.msg).toBe(
+    "Content must be between 10 and 240 characters",
+  );
 });
 
 //Post deletion
-test('post is deleted', (done: jest.DoneCallback) => {
-  const unique = Date.now().toString(36);
+test("post is deleted", async () => {
+  const user = await friendTestUtils.signupUser("post_delete");
 
-  request(app)
-    .post('/auth/signup')
-    .send({
-      email: `test_${unique}@example.com`,
-      username: `user_${unique}`,
-      password: 'Password1'
-    })
-    .expect(201)
-    .end((err, signupRes) => {
-      if (err) return done(err);
+  const createRes = await postTestUtils.createPost(user, {
+    title,
+    content,
+    userId: user.id,
+  });
 
-      const token = signupRes.body.token;
-      const userId = signupRes.body.userId;
+  expect(createRes.status).toBe(201);
+  const postId = createRes.body.id;
 
-      // Create a post first
-      request(app)
-        .post('/post/create')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          title,
-          content,
-          userId,
-        })
-        .expect(201)
-        .end((err, postRes) => {
-          if (err) return done(err);
-
-          const postId = postRes.body.id;
-
-          // Delete the post
-          request(app)
-            .delete(`/post/${postId}`)
-            .set('Authorization', `Bearer ${token}`)
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.message).toBeDefined();
-            })
-            .end(done);
-        });
-    });
+  const deleteRes = await postTestUtils.deletePost(user, postId);
+  expect(deleteRes.status).toBe(200);
+  expect(deleteRes.body.message).toBeDefined();
 });
 
-test('only post owner can delete it', (done: jest.DoneCallback) => {
-  const unique1 = Date.now().toString(36);
-  const unique2 = (Date.now() + 1).toString(36);
+test("only post owner can delete it", async () => {
+  const owner = await friendTestUtils.signupUser("post_owner");
+  const other = await friendTestUtils.signupUser("post_other");
 
-  // Create first user and post
-  request(app)
-    .post('/auth/signup')
-    .send({
-      email: `test_${unique1}@example.com`,
-      username: `user_${unique1}`,
-      password: 'Password1'
-    })
-    .expect(201)
-    .end((err, signupRes1) => {
-      if (err) return done(err);
+  const createRes = await postTestUtils.createPost(owner, {
+    title,
+    content,
+    userId: owner.id,
+  });
 
-      const token1 = signupRes1.body.token;
-      const userId1 = signupRes1.body.userId;
+  expect(createRes.status).toBe(201);
+  const postId = createRes.body.id;
 
-      // Create post with first user
-      request(app)
-        .post('/post/create')
-        .set('Authorization', `Bearer ${token1}`)
-        .send({
-          title,
-          content,
-          userId: userId1,
-        })
-        .expect(201)
-        .end((err, postRes) => {
-          if (err) return done(err);
+  const res = await postTestUtils.deletePost(other, postId);
 
-          const postId = postRes.body.id;
-
-          // Create second user
-          request(app)
-            .post('/auth/signup')
-            .send({
-              email: `test_${unique2}@example.com`,
-              username: `user_${unique2}`,
-              password: 'Password1'
-            })
-            .expect(201)
-            .end((err, signupRes2) => {
-              if (err) return done(err);
-
-              const token2 = signupRes2.body.token;
-
-              // Try to delete post with second user (should fail)
-              request(app)
-                .delete(`/post/${postId}`)
-                .set('Authorization', `Bearer ${token2}`)
-                .expect(403)
-                .expect((res) => {
-                  expect(res.body.error).toBeDefined();
-                })
-                .end(done);
-            });
-        });
-    });
+  expect(res.status).toBe(403);
+  expect(res.body.error).toBeDefined();
 });
 
 //Post update
-test('updates post title and content', (done: jest.DoneCallback) => {
+test("updates post title and content", async () => {
   const unique = Date.now().toString(36);
 
-  const originalTitle = `Orig_${unique}`.slice(0, 20); // ensure < 24 chars
+  const originalTitle = `Orig_${unique}`.slice(0, 20);
   const originalContent = `Original content ${unique} more text`;
   const newTitle = `New_${unique}`.slice(0, 20);
   const newContent = `Updated content ${unique} even more text`;
 
-  request(app)
-    .post('/auth/signup')
-    .send({
-      email: `update_test_${unique}@example.com`,
-      username: `update_user_${unique}`,
-      password: 'Password1',
-    })
-    .expect(201)
-    .end((err, signupRes) => {
-      if (err) return done(err);
+  const user = await friendTestUtils.signupUser("post_update");
 
-      const token = signupRes.body.token;
-      const userId = signupRes.body.userId;
+  const createRes = await postTestUtils.createPost(user, {
+    title: originalTitle,
+    content: originalContent,
+    userId: user.id,
+  });
 
-      // Create a post first
-      request(app)
-        .post('/post/create')
-        .set('Authorization', `Bearer ${token}`)
-        .send({
-          title: originalTitle,
-          content: originalContent,
-          userId,
-        })
-        .expect(201)
-        .end((createErr, postRes) => {
-          if (createErr) return done(createErr);
+  expect(createRes.status).toBe(201);
+  const postId = createRes.body.id;
 
-          const postId = postRes.body.id;
+  const updateRes = await postTestUtils.updatePost(user, postId, {
+    title: newTitle,
+    content: newContent,
+    userId: user.id,
+  });
 
-          // Update the post
-          request(app)
-            .put(`/post/${postId}`)
-            .set('Authorization', `Bearer ${token}`)
-            .send({
-              title: newTitle,
-              content: newContent,
-              userId,
-            })
-            .expect(200)
-            .end(async (updateErr, updateRes) => {
-              if (updateErr) return done(updateErr);
+  expect(updateRes.status).toBe(200);
+  expect(updateRes.body.id).toBe(postId);
+  expect(updateRes.body.title).toBe(newTitle);
+  expect(updateRes.body.content).toBe(newContent);
+  expect(updateRes.body.userId).toBe(user.id);
 
-              expect(updateRes.body.id).toBe(postId);
-              expect(updateRes.body.title).toBe(newTitle);
-              expect(updateRes.body.content).toBe(newContent);
-              expect(updateRes.body.userId).toBe(userId);
-
-              try {
-                const updated = await prisma.post.findUnique({ where: { id: postId } });
-                expect(updated).not.toBeNull();
-                expect(updated!.title).toBe(newTitle);
-                expect(updated!.content).toBe(newContent);
-                done();
-              } catch (dbErr) {
-                done(dbErr as Error);
-              }
-            });
-        });
-    });
+  const updated = await prisma.post.findUnique({ where: { id: postId } });
+  expect(updated).not.toBeNull();
+  expect(updated!.title).toBe(newTitle);
+  expect(updated!.content).toBe(newContent);
 });
 
 //Get post
-test('function return correct post', (done: jest.DoneCallback) => {
+test("function return correct post", (done: jest.DoneCallback) => {
   const unique = Date.now().toString(36);
 
   request(app)
-    .post('/auth/signup')
+    .post("/auth/signup")
     .send({
       email: `test_${unique}@example.com`,
       username: `user_${unique}`,
-      password: 'Password1'
+      password: "Password1",
     })
     .expect(201)
     .end((err, signupRes) => {
@@ -587,8 +361,8 @@ test('function return correct post', (done: jest.DoneCallback) => {
 
       // Create a post first
       request(app)
-        .post('/post/create')
-        .set('Authorization', `Bearer ${token}`)
+        .post("/post/create")
+        .set("Authorization", `Bearer ${token}`)
         .send({
           title,
           content,
@@ -623,26 +397,25 @@ test('function return correct post', (done: jest.DoneCallback) => {
     });
 });
 
-test('function return 404 if the post does not exist', (done: jest.DoneCallback) => {
-  const fakePostId = 'nonexistent-post-id';
+test("function return 404 if the post does not exist", (done: jest.DoneCallback) => {
+  const fakePostId = "nonexistent-post-id";
 
   request(app)
     .get(`/post/${fakePostId}`)
     .expect(404)
     .expect((res) => {
       expect(res.body.error).toBeDefined();
-      expect(res.body.error).toBe('Post not found');
+      expect(res.body.error).toBe("Post not found");
     })
     .end(done);
 });
 
 //Get post index
 
-test('getPostIndex returns posts from current user and their friends only', async () => {
-  
+test("getPostIndex returns posts from current user and their friends only", async () => {
   const res = await request(app)
-    .get('/post/index')
-    .set('Authorization', `Bearer ${indexToken}`)
+    .get("/post/index")
+    .set("Authorization", `Bearer ${indexToken}`)
     .expect(200);
 
   expect(res.body.posts).toBeDefined();
@@ -657,7 +430,6 @@ test('getPostIndex returns posts from current user and their friends only', asyn
   // Should NOT include stranger's post
   expect(returnedIds).not.toContain(strangerPostId);
 });
-
 
 afterAll(async () => {
   await prisma.$disconnect();

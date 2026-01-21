@@ -3,7 +3,7 @@ import request from "supertest";
 import authRouter from "../authRouter";
 import { prisma } from "../../lib/prisma";
 import friendRouter from "../friendRouter";
-import testUtils from "../testUtils";
+import friendUtils from "../testUtils/friendUtils";
 
 const app = express();
 app.use(express.json());
@@ -14,10 +14,10 @@ app.use("/friend", friendRouter);
 
 // FriendRequest tests
 test("successfully create a friend request", async () => {
-  const requester = await testUtils.signupUser("req");
-  const receiver = await testUtils.signupUser("rec");
+  const requester = await friendUtils.signupUser("req");
+  const receiver = await friendUtils.signupUser("rec");
 
-  const res = await testUtils.createFriendRequest(requester, receiver);
+  const res = await friendUtils.createFriendRequest(requester, receiver);
 
   expect(res.status).toBe(201);
 
@@ -27,11 +27,11 @@ test("successfully create a friend request", async () => {
 });
 
 test("deny friend request when there is already a pending request", async () => {
-  const requester = await testUtils.signupUser("req");
-  const receiver = await testUtils.signupUser("rec");
+  const requester = await friendUtils.signupUser("req");
+  const receiver = await friendUtils.signupUser("rec");
 
   //Create pendingRequest
-  const pendingRequest = await testUtils.createFriendRequest(
+  const pendingRequest = await friendUtils.createFriendRequest(
     requester,
     receiver,
   );
@@ -39,7 +39,7 @@ test("deny friend request when there is already a pending request", async () => 
   expect(pendingRequest.status).toBe(201);
 
   //Make request again
-  const repeatedRequest = await testUtils.createFriendRequest(
+  const repeatedRequest = await friendUtils.createFriendRequest(
     requester,
     receiver,
   );
@@ -50,10 +50,10 @@ test("deny friend request when there is already a pending request", async () => 
 
 // Befriend (accept request) tests
 test("successfully accept a friend request and create friendship", async () => {
-  const requester = await testUtils.signupUser("req");
-  const receiver = await testUtils.signupUser("rec");
+  const requester = await friendUtils.signupUser("req");
+  const receiver = await friendUtils.signupUser("rec");
 
-  const { requestRes, befriendRes } = await testUtils.createFriendship(
+  const { requestRes, befriendRes } = await friendUtils.createFriendship(
     requester,
     receiver,
   );
@@ -63,10 +63,10 @@ test("successfully accept a friend request and create friendship", async () => {
 });
 
 test("deny befriend when there is no pending friend request from the given user", async () => {
-  const requester = await testUtils.signupUser("bef_nopend_req");
-  const receiver = await testUtils.signupUser("bef_nopend_rec");
+  const requester = await friendUtils.signupUser("bef_nopend_req");
+  const receiver = await friendUtils.signupUser("bef_nopend_rec");
 
-  const res = await testUtils.befriend(requester, receiver);
+  const res = await friendUtils.befriend(requester, receiver);
 
   expect(res.status).toBe(400);
 
@@ -75,10 +75,10 @@ test("deny befriend when there is no pending friend request from the given user"
 });
 
 test("deny befriend when trying to accept an already accepted request", async () => {
-  const requester = await testUtils.signupUser("bef_dupe_req");
-  const receiver = await testUtils.signupUser("bef_dupe_rec");
+  const requester = await friendUtils.signupUser("bef_dupe_req");
+  const receiver = await friendUtils.signupUser("bef_dupe_rec");
 
-  const { requestRes, befriendRes } = await testUtils.createFriendship(
+  const { requestRes, befriendRes } = await friendUtils.createFriendship(
     requester,
     receiver,
   );
@@ -86,7 +86,7 @@ test("deny befriend when trying to accept an already accepted request", async ()
   expect(requestRes.status).toBe(201);
   expect(befriendRes.status).toBe(201);
 
-  const res = await testUtils.befriend(requester, receiver);
+  const res = await friendUtils.befriend(requester, receiver);
 
   expect(res.status).toBe(400);
 
@@ -96,25 +96,25 @@ test("deny befriend when trying to accept an already accepted request", async ()
 
 //Unfriend tests
 test("successfully unfriend user", async () => {
-  const user1 = await testUtils.signupUser("unf_req");
-  const user2 = await testUtils.signupUser("unf_rec");
+  const user1 = await friendUtils.signupUser("unf_req");
+  const user2 = await friendUtils.signupUser("unf_rec");
 
-  const { requestRes, befriendRes } = await testUtils.createFriendship(
+  const { requestRes, befriendRes } = await friendUtils.createFriendship(
     user1,
     user2,
   );
   expect(requestRes.status).toBe(201);
   expect(befriendRes.status).toBe(201);
 
-  const res = await testUtils.unfriend(user1, user2.id);
+  const res = await friendUtils.unfriend(user1, user2.id);
   expect(res.status).toBe(200);
 });
 
 test("deny unfriend - target user does not exist", async () => {
-  const user = await testUtils.signupUser("unf_notfound");
+  const user = await friendUtils.signupUser("unf_notfound");
   const fakeUserId = "nonexistent-user-id";
 
-  const res = await testUtils.unfriend(user, fakeUserId);
+  const res = await friendUtils.unfriend(user, fakeUserId);
 
   expect(res.status).toBe(404);
 
@@ -123,10 +123,10 @@ test("deny unfriend - target user does not exist", async () => {
 });
 
 test("deny unfriend - not friends with user", async () => {
-  const user1 = await testUtils.signupUser("unf_notfriend1");
-  const user2 = await testUtils.signupUser("unf_notfriend2");
+  const user1 = await friendUtils.signupUser("unf_notfriend1");
+  const user2 = await friendUtils.signupUser("unf_notfriend2");
 
-  const res = await testUtils.unfriend(user1, user2.id);
+  const res = await friendUtils.unfriend(user1, user2.id);
 
   expect(res.status).toBe(400);
 
@@ -136,10 +136,10 @@ test("deny unfriend - not friends with user", async () => {
 
 // Get following / followers / friendships / unknown users
 test("getWhoCurrentUserFollows returns users current user follows", async () => {
-  const current = await testUtils.signupUser("fol_cur");
-  const target = await testUtils.signupUser("fol_tgt");
+  const current = await friendUtils.signupUser("fol_cur");
+  const target = await friendUtils.signupUser("fol_tgt");
 
-  const { requestRes, befriendRes } = await testUtils.createFriendship(
+  const { requestRes, befriendRes } = await friendUtils.createFriendship(
     current,
     target,
   );
@@ -157,10 +157,10 @@ test("getWhoCurrentUserFollows returns users current user follows", async () => 
 });
 
 test("getWhoFollowsCurrentUser returns users who follow current user", async () => {
-  const current = await testUtils.signupUser("fol2_cur");
-  const follower = await testUtils.signupUser("fol2_fol");
+  const current = await friendUtils.signupUser("fol2_cur");
+  const follower = await friendUtils.signupUser("fol2_fol");
 
-  const { requestRes, befriendRes } = await testUtils.createFriendship(
+  const { requestRes, befriendRes } = await friendUtils.createFriendship(
     follower,
     current,
   );
@@ -178,13 +178,13 @@ test("getWhoFollowsCurrentUser returns users who follow current user", async () 
 });
 
 test("getFriendships returns only mutual friendships", async () => {
-  const userA = await testUtils.signupUser("mut_a");
-  const userB = await testUtils.signupUser("mut_b");
-  const userC = await testUtils.signupUser("mut_c");
+  const userA = await friendUtils.signupUser("mut_a");
+  const userB = await friendUtils.signupUser("mut_b");
+  const userC = await friendUtils.signupUser("mut_c");
 
-  await testUtils.createFriendship(userA, userB);
-  await testUtils.createFriendship(userB, userA);
-  await testUtils.createFriendship(userC, userA);
+  await friendUtils.createFriendship(userA, userB);
+  await friendUtils.createFriendship(userB, userA);
+  await friendUtils.createFriendship(userC, userA);
 
   const res = await request(app)
     .get("/friend/friendships")
@@ -198,11 +198,11 @@ test("getFriendships returns only mutual friendships", async () => {
 });
 
 test("getUnknownUsers returns users with no relation to current user", async () => {
-  const current = await testUtils.signupUser("unk_cur");
-  const friend = await testUtils.signupUser("unk_friend");
-  const unknown = await testUtils.signupUser("unk_unknown");
+  const current = await friendUtils.signupUser("unk_cur");
+  const friend = await friendUtils.signupUser("unk_friend");
+  const unknown = await friendUtils.signupUser("unk_unknown");
 
-  await testUtils.createFriendship(current, friend);
+  await friendUtils.createFriendship(current, friend);
 
   const res = await request(app)
     .get("/friend/unknown")
