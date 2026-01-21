@@ -98,10 +98,9 @@ export async function sendFriendRequest(
     return;
   }
 
-  
-  //Check if request need to be created or updated
   let request;
-  if (existingRequest!) {
+  //Check if request need to be created or updated
+  if (!existingRequest) {
     // Add pending request
     request = await prisma.friendRequest.create({
       data: {
@@ -133,47 +132,64 @@ export async function sendFriendRequest(
 }
 
 export async function befriend(req: Request, res: Response): Promise<void> {
-  const { userId: friendId } = req.params;
-  const { userId } = req.user as { userId: string };
+  // :userId is the one who sent the request (requester)
+  const { userId: requesterId } = req.params;
+  // current logged-in user is the receiver
+  const { userId: receiverId } = req.user as { userId: string };
 
-  // Check if target user exists
-  const targetUser = await prisma.user.findUnique({
-    where: { id: friendId },
+  // Confirm request exists
+  const existingRequest = await prisma.friendRequest.findUnique({
+    where: {
+      requesterId_receiverId: {
+        requesterId,
+        receiverId,
+      },
+    },
   });
 
-  if (!targetUser) {
-    res.status(404).json({ error: "User not found" });
+  if (!existingRequest || existingRequest.status !== "PENDING") {
+    res.status(400).json({ error: "no pending friend request from this user" });
     return;
   }
 
-  // Check if already friends
+  // Ensure they are not already friends
   const existingFriendship = await prisma.friend.findUnique({
     where: {
       userId_friendId: {
-        userId,
-        friendId,
+        userId: requesterId,
+        friendId: receiverId,
       },
     },
   });
 
   if (existingFriendship) {
-    res.status(400).json({ error: "Already friends with this user" });
+    res.status(400).json({ error: "already friends" });
     return;
   }
 
-  // Add as friends
-  const friendship = await prisma.friend.create({
-    data: {
-      userId,
-      friendId,
-    },
-  });
+  // Accept the request + create friendship atomically
+  const [updatedRequest, friendship] = await prisma.$transaction([
+    prisma.friendRequest.update({
+      where: { id: existingRequest.id },
+      data: {
+        status: "ACCEPTED",
+        respondedAt: new Date(),
+      },
+    }),
+    prisma.friend.create({
+      data: {
+        userId: requesterId,
+        friendId: receiverId,
+      },
+    }),
+  ]);
 
   res.status(201).json({
     id: friendship.id,
     userId: friendship.userId,
     friendId: friendship.friendId,
     createdAt: friendship.createdAt,
+    requestStatus: updatedRequest.status,
   });
 }
 
