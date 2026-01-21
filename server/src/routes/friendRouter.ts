@@ -14,7 +14,7 @@ const friendRouter = express.Router();
 
 friendRouter.post("/befriend/:userId", authentication, befriend);
 
-friendRouter.post("/request", authentication, sendFriendRequest);
+friendRouter.post("/request/:userId", authentication, sendFriendRequest);
 
 friendRouter.delete("/unfriend/:userId", authentication, unfriend);
 
