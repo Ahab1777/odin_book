@@ -78,7 +78,7 @@ export async function sendFriendRequest(
     return;
   }
 
-  // Check if friendship already requested
+  // Check if friendship already requested or accepted
   const existingRequest = await prisma.friendRequest.findUnique({
     where: {
       requesterId_receiverId: {
@@ -98,8 +98,9 @@ export async function sendFriendRequest(
     return;
   }
 
+  
+  //Check if request need to be created or updated
   let request;
-
   if (existingRequest!) {
     // Add pending request
     request = await prisma.friendRequest.create({
