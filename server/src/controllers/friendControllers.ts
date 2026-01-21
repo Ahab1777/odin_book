@@ -128,6 +128,7 @@ export async function sendFriendRequest(
     requesterId: request.requesterId,
     receiverId: request.receiverId,
     createdAt: request.createdAt,
+    status: request.status
   });
 }
 

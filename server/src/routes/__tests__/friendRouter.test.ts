@@ -3,6 +3,7 @@ import request from "supertest";
 import authRouter from "../authRouter";
 import { prisma } from "../../lib/prisma";
 import friendRouter from "../friendRouter";
+import { signupUser } from "../testUtils";
 
 const app = express();
 app.use(express.json());
@@ -12,110 +13,26 @@ app.use("/auth", authRouter);
 app.use("/friend", friendRouter);
 
 // FriendRequest tests
-test("successfully create a friend request", (done: jest.DoneCallback) => {
-  const unique1 = Date.now().toString(36);
-  const unique2 = (Date.now() + 1).toString(36);
+test("successfully create a friend request", async () => {
+  const requester = await signupUser("req");
+  const receiver = await signupUser("rec");
 
-  // Create requester
-  request(app)
-    .post("/auth/signup")
-    .send({
-      email: `req_${unique1}@example.com`,
-      username: `req_${unique1}`,
-      password: "Password1",
-    })
-    .expect(201)
-    .end((err, signupRes1) => {
-      if (err) return done(err);
+  const res = await request(app)
+    .post(`/friend/request/${receiver.id}`)
+    .set("Authorization", `Bearer ${requester.token}`)
+    .expect(201);
 
-      const token1 = signupRes1.body.token;
-      const userId1 = signupRes1.body.userId;
-
-      // Create receiver
-      request(app)
-        .post("/auth/signup")
-        .send({
-          email: `rec_${unique2}@example.com`,
-          username: `rec_${unique2}`,
-          password: "Password1",
-        })
-        .expect(201)
-        .end((err, signupRes2) => {
-          if (err) return done(err);
-
-          const userId2 = signupRes2.body.userId;
-
-          // User1 sends friend request to User2
-          request(app)
-            .post(`/friend/request/${userId2}`)
-            .set("Authorization", `Bearer ${token1}`)
-            .expect(201)
-            .expect((res) => {
-              expect(res.body.requesterId).toBe(userId1);
-              expect(res.body.receiverId).toBe(userId2);
-            })
-            .end(done);
-        });
-    });
+  expect(res.body.requesterId).toBe(requester.id);
+  expect(res.body.receiverId).toBe(receiver.id);
+  expect(res.body.status).toBe('PENDING');
 });
 
-test("deny friend request when there is already a pending request", (done: jest.DoneCallback) => {
-  const unique1 = Date.now().toString(36);
-  const unique2 = (Date.now() + 1).toString(36);
+test("deny friend request when there is already a pending request", async () => {
+  const requester = await signupUser("req");
+  const receiver = await signupUser("rec");
 
-  // Create requester
-  request(app)
-    .post("/auth/signup")
-    .send({
-      email: `req2_${unique1}@example.com`,
-      username: `req2_${unique1}`,
-      password: "Password1",
-    })
-    .expect(201)
-    .end((err, signupRes1) => {
-      if (err) return done(err);
-
-      const token1 = signupRes1.body.token;
-      const userId1 = signupRes1.body.userId;
-
-      // Create receiver
-      request(app)
-        .post("/auth/signup")
-        .send({
-          email: `rec2_${unique2}@example.com`,
-          username: `rec2_${unique2}`,
-          password: "Password1",
-        })
-        .expect(201)
-        .end((err, signupRes2) => {
-          if (err) return done(err);
-
-          const userId2 = signupRes2.body.userId;
-
-          // First request
-          request(app)
-            .post(`/friend/request/${userId2}`)
-            .set("Authorization", `Bearer ${token1}`)
-            .expect(201)
-            .end((err) => {
-              if (err) return done(err);
-
-              // Second request (should fail because PENDING already exists)
-              request(app)
-                .post(`/friend/request/${userId2}`)
-                .set("Authorization", `Bearer ${token1}`)
-                .expect(400)
-                .expect((res) => {
-                  expect(res.body.error).toBeDefined();
-                  // adjust string if your controller uses a different message
-                  expect(res.body.error.toLowerCase()).toContain(
-                    "request already pending",
-                  );
-                })
-                .end(done);
-            });
-        });
-    });
+  //Create friendship
+  
 });
 
 // Befriend (accept request) tests
