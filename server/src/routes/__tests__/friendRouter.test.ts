@@ -17,10 +17,9 @@ test("successfully create a friend request", async () => {
   const requester = await testUtils.signupUser("req");
   const receiver = await testUtils.signupUser("rec");
 
-  const res = await request(app)
-    .post(`/friend/request/${receiver.id}`)
-    .set("Authorization", `Bearer ${requester.token}`)
-    .expect(201);
+  const res = await testUtils.createFriendRequest(requester, receiver);
+
+  expect(res.status).toBe(201);
 
   expect(res.body.requesterId).toBe(requester.id);
   expect(res.body.receiverId).toBe(receiver.id);
@@ -67,10 +66,9 @@ test("deny befriend when there is no pending friend request from the given user"
   const requester = await testUtils.signupUser("bef_nopend_req");
   const receiver = await testUtils.signupUser("bef_nopend_rec");
 
-  const res = await request(app)
-    .post(`/friend/befriend/${requester.id}`)
-    .set("Authorization", `Bearer ${receiver.token}`)
-    .expect(400);
+  const res = await testUtils.befriend(requester, receiver);
+
+  expect(res.status).toBe(400);
 
   expect(res.body.error).toBeDefined();
   expect(res.body.error).toBe("no pending friend request from this user");
@@ -88,10 +86,9 @@ test("deny befriend when trying to accept an already accepted request", async ()
   expect(requestRes.status).toBe(201);
   expect(befriendRes.status).toBe(201);
 
-  const res = await request(app)
-    .post(`/friend/befriend/${requester.id}`)
-    .set("Authorization", `Bearer ${receiver.token}`)
-    .expect(400);
+  const res = await testUtils.befriend(requester, receiver);
+
+  expect(res.status).toBe(400);
 
   expect(res.body.error).toBeDefined();
   expect(res.body.error).toBe("no pending friend request from this user");
@@ -109,20 +106,17 @@ test("successfully unfriend user", async () => {
   expect(requestRes.status).toBe(201);
   expect(befriendRes.status).toBe(201);
 
-  await request(app)
-    .delete(`/friend/unfriend/${user2.id}`)
-    .set("Authorization", `Bearer ${user1.token}`)
-    .expect(200);
+  const res = await testUtils.unfriend(user1, user2.id);
+  expect(res.status).toBe(200);
 });
 
 test("deny unfriend - target user does not exist", async () => {
   const user = await testUtils.signupUser("unf_notfound");
   const fakeUserId = "nonexistent-user-id";
 
-  const res = await request(app)
-    .delete(`/friend/unfriend/${fakeUserId}`)
-    .set("Authorization", `Bearer ${user.token}`)
-    .expect(404);
+  const res = await testUtils.unfriend(user, fakeUserId);
+
+  expect(res.status).toBe(404);
 
   expect(res.body.error).toBeDefined();
   expect(res.body.error).toBe("User not found");
@@ -132,10 +126,9 @@ test("deny unfriend - not friends with user", async () => {
   const user1 = await testUtils.signupUser("unf_notfriend1");
   const user2 = await testUtils.signupUser("unf_notfriend2");
 
-  const res = await request(app)
-    .delete(`/friend/unfriend/${user2.id}`)
-    .set("Authorization", `Bearer ${user1.token}`)
-    .expect(400);
+  const res = await testUtils.unfriend(user1, user2.id);
+
+  expect(res.status).toBe(400);
 
   expect(res.body.error).toBeDefined();
   expect(res.body.error).toBe("You are not friends with this user");

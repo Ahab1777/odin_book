@@ -59,20 +59,33 @@ async function createFriendship(
   };
 }
 
-async function unfriend(
+async function befriend(
   requester: TestUser,
   receiver: TestUser,
 ): Promise<Response> {
   const res = await request(app)
-    .delete(`/friend/unfriend/${receiver.id}`)
+    .post(`/friend/befriend/${requester.id}`)
+    .set("Authorization", `Bearer ${receiver.token}`);
+
+  return res;
+}
+
+async function unfriend(
+  requester: TestUser,
+  receiverId: string,
+): Promise<Response> {
+  const res = await request(app)
+    .delete(`/friend/unfriend/${receiverId}`)
     .set("Authorization", `Bearer ${requester.token}`);
 
   return res;
 }
+
 const testUtils = {
   signupUser,
   createFriendRequest,
   createFriendship,
+  befriend,
   unfriend,
 };
 

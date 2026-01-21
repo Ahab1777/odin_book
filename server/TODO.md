@@ -28,7 +28,7 @@ TODOs
     [x] getFollowers
     [x] getFollowedBy
     [x] getUnknownUsers
-    [] Implement pending friendship logic
+    [x] Implement pending friendship logic
 
 [] User 
     [] Visitor access
