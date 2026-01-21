@@ -11,7 +11,7 @@ TODOs
     [x] delete post
     [x] get post
     [x] get post index ( posts from current user + friends) (done within 'posts' branch and unmerged)
-    [] update/edit post
+    [x] update/edit post
     [x] test if getPostIndex works
     [] Visitor postIndex
     [] getUserPosts
