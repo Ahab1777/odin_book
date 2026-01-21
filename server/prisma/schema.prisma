@@ -4,6 +4,15 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+//Enums
+enum FriendRequestStatus {
+  PENDING // Request sent, waiting for receiver to act
+  ACCEPTED // Receiver accepted; app should create Friend row(s)
+  REJECTED // Receiver rejected
+  CANCELED // Requester canceled before receiver responded
+}
+
+//Models
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,16 +22,19 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(cuid())
-  username String    @unique
-  email    String    @unique
-  password String
-  posts    Post[]
-  comments Comment[]
-  friends  Friend[]  @relation("userFriends")
-  friendOf Friend[]  @relation("userFriendOf")
-  likes    Like[] 
-  profile  Profile?
+  id             String          @id @default(cuid())
+  username       String          @unique
+  email          String          @unique
+  password       String
+  posts          Post[]
+  comments       Comment[]
+  friends        Friend[]        @relation("userFriends")
+  friendOf       Friend[]        @relation("userFriendOf")
+  likes          Like[]
+  profile        Profile?
+  sentRequests     FriendRequest[] @relation("sentRequests")
+  receivedRequests FriendRequest[] @relation("receivedRequests")
+
 
   @@map("users")
 }
@@ -39,6 +51,27 @@ model Friend {
   @@map("friends")
 }
 
+model FriendRequest {
+  id String @id @default(cuid())
+
+  requesterId String
+  receiverId  String
+
+  requester User @relation("sentRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver  User @relation("receivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  status FriendRequestStatus @default(PENDING)
+
+  createdAt   DateTime  @default(now())
+  respondedAt DateTime? // Set when status becomes ACCEPTED / REJECTED / CANCELED
+
+  // Ensure only one request per pair in a given direction.
+  // Application logic should prevent creating a new PENDING request if a
+  // previous one is still active or a Friend already exists.
+  @@unique([requesterId, receiverId])
+  @@map("friend_requests")
+}
+
 model Post {
   id        String    @id @default(cuid())
   userId    String
@@ -46,7 +79,7 @@ model Post {
   content   String
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments  Comment[]
-  likes     Like[] 
+  likes     Like[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -54,12 +87,12 @@ model Post {
 }
 
 model Comment {
-  id      String @id @default(cuid())
-  content String
-  userId  String
-  postId  String
-  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  postId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@map("comments")
@@ -85,4 +118,3 @@ model Like {
   @@unique([userId, postId]) // Prevent duplicate likes from same user
   @@map("likes")
 }
-
