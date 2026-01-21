@@ -30,7 +30,7 @@ export async function signupUser(prefix: string): Promise<TestUser> {
   return { id: res.body.userId, token: res.body.token };
 }
 
-export async function createFriendRequest(
+async function createFriendRequest(
   requester: TestUser,
   receiver: TestUser,
 ): Promise<any> {
@@ -41,7 +41,7 @@ export async function createFriendRequest(
   return res;
 }
 
-export async function createFriendship(
+async function createFriendship(
   requester: TestUser,
   receiver: TestUser,
 ): Promise<{ requestRes: Response; befriendRes: Response }> {
@@ -58,3 +58,22 @@ export async function createFriendship(
     befriendRes,
   };
 }
+
+async function unfriend(
+  requester: TestUser,
+  receiver: TestUser,
+): Promise<Response> {
+  const res = await request(app)
+    .delete(`/friend/unfriend/${receiver.id}`)
+    .set("Authorization", `Bearer ${requester.token}`);
+
+  return res;
+}
+const testUtils = {
+  signupUser,
+  createFriendRequest,
+  createFriendship,
+  unfriend,
+};
+
+export default testUtils;
