@@ -7,11 +7,14 @@ import {
   getWhoFollowsCurrentUser,
   getFriendships,
   getUnknownUsers,
+  sendFriendRequest,
 } from "../controllers/friendControllers";
 
 const friendRouter = express.Router();
 
 friendRouter.post("/befriend/:userId", authentication, befriend);
+
+friendRouter.post("/request", authentication, sendFriendRequest);
 
 friendRouter.delete("/unfriend/:userId", authentication, unfriend);
 
@@ -22,5 +25,6 @@ friendRouter.get("/followers", authentication, getWhoFollowsCurrentUser);
 friendRouter.get("/friendships", authentication, getFriendships);
 
 friendRouter.get("/unknown", authentication, getUnknownUsers);
+
 
 export default friendRouter;

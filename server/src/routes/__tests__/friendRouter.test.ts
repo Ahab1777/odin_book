@@ -565,6 +565,8 @@ test("getUnknownUsers returns users with no relation to current user", (done: je
     });
 });
 
+
+
 afterAll(async () => {
   await prisma.$disconnect();
 });
