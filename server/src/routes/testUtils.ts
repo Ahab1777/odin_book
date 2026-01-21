@@ -3,6 +3,7 @@ import request from "supertest";
 import authRouter from "./authRouter";
 import { prisma } from "../lib/prisma";
 import friendRouter from "./friendRouter";
+import type { Response } from "supertest";
 
 const app = express();
 app.use(express.json());
@@ -35,25 +36,25 @@ export async function createFriendRequest(
 ): Promise<any> {
   const res = await request(app)
     .post(`/friend/request/${receiver.id}`)
-    .set("Authorization", `Bearer ${requester.token}`)
-    .expect(201);
+    .set("Authorization", `Bearer ${requester.token}`);
 
-  return res.body;
+  return res;
 }
 
 export async function createFriendship(
   requester: TestUser,
   receiver: TestUser,
-): Promise<void> {
-  // requester sends friend request to receiver
-  await request(app)
+): Promise<{ requestRes: Response; befriendRes: Response }> {
+  const requestRes = await request(app)
     .post(`/friend/request/${receiver.id}`)
-    .set("Authorization", `Bearer ${requester.token}`)
-    .expect(201);
+    .set("Authorization", `Bearer ${requester.token}`);
 
-  // receiver accepts request from requester
-  await request(app)
+  const befriendRes = await request(app)
     .post(`/friend/befriend/${requester.id}`)
-    .set("Authorization", `Bearer ${receiver.token}`)
-    .expect(201);
+    .set("Authorization", `Bearer ${receiver.token}`);
+
+  return {
+    requestRes,
+    befriendRes,
+  };
 }

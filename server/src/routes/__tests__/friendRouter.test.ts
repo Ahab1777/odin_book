@@ -3,7 +3,7 @@ import request from "supertest";
 import authRouter from "../authRouter";
 import { prisma } from "../../lib/prisma";
 import friendRouter from "../friendRouter";
-import { signupUser } from "../testUtils";
+import { createFriendRequest, signupUser } from "../testUtils";
 
 const app = express();
 app.use(express.json());
@@ -31,8 +31,22 @@ test("deny friend request when there is already a pending request", async () => 
   const requester = await signupUser("req");
   const receiver = await signupUser("rec");
 
-  //Create friendship
-  
+  //Create pendingRequest
+  const pendingRequest = await createFriendRequest(
+    requester,
+    receiver
+  );
+  expect(pendingRequest.body.status).toBe('PENDING');
+  expect(pendingRequest.status).toBe(201);
+
+  //Make request again
+  const repeatedRequest = await createFriendRequest(
+    requester,
+    receiver
+  );
+
+  expect(repeatedRequest.status).toBe(400);
+  expect(repeatedRequest.body.error).toBe('request already pending');
 });
 
 // Befriend (accept request) tests
