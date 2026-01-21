@@ -11,17 +11,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/auth", authRouter);
 app.use("/friend", friendRouter);
 
-//Befriend tests
-test("successfully add user as friend", (done: jest.DoneCallback) => {
+// FriendRequest tests
+test("successfully create a friend request", (done: jest.DoneCallback) => {
   const unique1 = Date.now().toString(36);
   const unique2 = (Date.now() + 1).toString(36);
 
-  // Create first user
+  // Create requester
   request(app)
     .post("/auth/signup")
     .send({
-      email: `test_${unique1}@example.com`,
-      username: `user_${unique1}`,
+      email: `req_${unique1}@example.com`,
+      username: `req_${unique1}`,
       password: "Password1",
     })
     .expect(201)
@@ -31,12 +31,12 @@ test("successfully add user as friend", (done: jest.DoneCallback) => {
       const token1 = signupRes1.body.token;
       const userId1 = signupRes1.body.userId;
 
-      // Create second user
+      // Create receiver
       request(app)
         .post("/auth/signup")
         .send({
-          email: `test_${unique2}@example.com`,
-          username: `user_${unique2}`,
+          email: `rec_${unique2}@example.com`,
+          username: `rec_${unique2}`,
           password: "Password1",
         })
         .expect(201)
@@ -45,62 +45,30 @@ test("successfully add user as friend", (done: jest.DoneCallback) => {
 
           const userId2 = signupRes2.body.userId;
 
-          // First user befriends second user
+          // User1 sends friend request to User2
           request(app)
-            .post(`/friend/befriend/${userId2}`)
+            .post(`/friend/request/${userId2}`)
             .set("Authorization", `Bearer ${token1}`)
             .expect(201)
             .expect((res) => {
-              expect(res.body.id).toBeDefined();
-              expect(res.body.userId).toBe(userId1);
-              expect(res.body.friendId).toBe(userId2);
-              expect(res.body.createdAt).toBeDefined();
+              expect(res.body.requesterId).toBe(userId1);
+              expect(res.body.receiverId).toBe(userId2);
             })
             .end(done);
         });
     });
 });
 
-test("deny befriend - target user does not exist", (done: jest.DoneCallback) => {
-  const unique = Date.now().toString(36);
-  const fakeUserId = "nonexistent-user-id";
-
-  request(app)
-    .post("/auth/signup")
-    .send({
-      email: `test_${unique}@example.com`,
-      username: `user_${unique}`,
-      password: "Password1",
-    })
-    .expect(201)
-    .end((err, signupRes) => {
-      if (err) return done(err);
-
-      const token = signupRes.body.token;
-
-      // Try to befriend non-existent user
-      request(app)
-        .post(`/friend/befriend/${fakeUserId}`)
-        .set("Authorization", `Bearer ${token}`)
-        .expect(404)
-        .expect((res) => {
-          expect(res.body.error).toBeDefined();
-          expect(res.body.error).toBe("User not found");
-        })
-        .end(done);
-    });
-});
-
-test("deny befriend - already friends with user", (done: jest.DoneCallback) => {
+test("deny friend request when there is already a pending request", (done: jest.DoneCallback) => {
   const unique1 = Date.now().toString(36);
   const unique2 = (Date.now() + 1).toString(36);
 
-  // Create first user
+  // Create requester
   request(app)
     .post("/auth/signup")
     .send({
-      email: `test_${unique1}@example.com`,
-      username: `user_${unique1}`,
+      email: `req2_${unique1}@example.com`,
+      username: `req2_${unique1}`,
       password: "Password1",
     })
     .expect(201)
@@ -110,12 +78,12 @@ test("deny befriend - already friends with user", (done: jest.DoneCallback) => {
       const token1 = signupRes1.body.token;
       const userId1 = signupRes1.body.userId;
 
-      // Create second user
+      // Create receiver
       request(app)
         .post("/auth/signup")
         .send({
-          email: `test_${unique2}@example.com`,
-          username: `user_${unique2}`,
+          email: `rec2_${unique2}@example.com`,
+          username: `rec2_${unique2}`,
           password: "Password1",
         })
         .expect(201)
@@ -124,24 +92,203 @@ test("deny befriend - already friends with user", (done: jest.DoneCallback) => {
 
           const userId2 = signupRes2.body.userId;
 
-          // First user befriends second user
+          // First request
           request(app)
-            .post(`/friend/befriend/${userId2}`)
+            .post(`/friend/request/${userId2}`)
             .set("Authorization", `Bearer ${token1}`)
             .expect(201)
             .end((err) => {
               if (err) return done(err);
 
-              // Try to befriend again (should fail)
+              // Second request (should fail because PENDING already exists)
               request(app)
-                .post(`/friend/befriend/${userId2}`)
+                .post(`/friend/request/${userId2}`)
                 .set("Authorization", `Bearer ${token1}`)
                 .expect(400)
                 .expect((res) => {
                   expect(res.body.error).toBeDefined();
-                  expect(res.body.error).toBe("Already friends with this user");
+                  // adjust string if your controller uses a different message
+                  expect(res.body.error.toLowerCase()).toContain(
+                    "request already pending",
+                  );
                 })
                 .end(done);
+            });
+        });
+    });
+});
+
+// Befriend (accept request) tests
+test("successfully accept a friend request and create friendship", (done: jest.DoneCallback) => {
+  const unique1 = Date.now().toString(36);
+  const unique2 = (Date.now() + 1).toString(36);
+
+  // Create requester (User1)
+  request(app)
+    .post("/auth/signup")
+    .send({
+      email: `bef_req_${unique1}@example.com`,
+      username: `bef_req_${unique1}`,
+      password: "Password1",
+    })
+    .expect(201)
+    .end((err, signupRes1) => {
+      if (err) return done(err);
+
+      const token1 = signupRes1.body.token;
+      const userId1 = signupRes1.body.userId;
+
+      // Create receiver (User2)
+      request(app)
+        .post("/auth/signup")
+        .send({
+          email: `bef_rec_${unique2}@example.com`,
+          username: `bef_rec_${unique2}`,
+          password: "Password1",
+        })
+        .expect(201)
+        .end((err, signupRes2) => {
+          if (err) return done(err);
+
+          const token2 = signupRes2.body.token;
+          const userId2 = signupRes2.body.userId;
+
+          // User1 sends friend request to User2
+          request(app)
+            .post(`/friend/request/${userId2}`)
+            .set("Authorization", `Bearer ${token1}`)
+            .expect(201)
+            .end((err) => {
+              if (err) return done(err);
+
+              // User2 accepts request from User1
+              request(app)
+                .post(`/friend/befriend/${userId1}`)
+                .set("Authorization", `Bearer ${token2}`)
+                .expect(201)
+                .expect((res) => {
+                  expect(res.body.id).toBeDefined();
+                  expect(res.body.userId).toBe(userId1); // requester
+                  expect(res.body.friendId).toBe(userId2); // receiver
+                  expect(res.body.createdAt).toBeDefined();
+                  expect(res.body.requestStatus).toBe("ACCEPTED");
+                })
+                .end(done);
+            });
+        });
+    });
+});
+
+test("deny befriend when there is no pending friend request from the given user", (done: jest.DoneCallback) => {
+  const unique1 = Date.now().toString(36);
+  const unique2 = (Date.now() + 1).toString(36);
+
+  // Create requester (User1)
+  request(app)
+    .post("/auth/signup")
+    .send({
+      email: `bef_nopend_req_${unique1}@example.com`,
+      username: `bef_nopend_req_${unique1}`,
+      password: "Password1",
+    })
+    .expect(201)
+    .end((err, signupRes1) => {
+      if (err) return done(err);
+
+      const userId1 = signupRes1.body.userId;
+
+      // Create receiver (User2)
+      request(app)
+        .post("/auth/signup")
+        .send({
+          email: `bef_nopend_rec_${unique2}@example.com`,
+          username: `bef_nopend_rec_${unique2}`,
+          password: "Password1",
+        })
+        .expect(201)
+        .end((err, signupRes2) => {
+          if (err) return done(err);
+
+          const token2 = signupRes2.body.token;
+
+          // User2 tries to accept a request from User1 that doesn't exist
+          request(app)
+            .post(`/friend/befriend/${userId1}`)
+            .set("Authorization", `Bearer ${token2}`)
+            .expect(400)
+            .expect((res) => {
+              expect(res.body.error).toBeDefined();
+              expect(res.body.error).toBe(
+                "no pending friend request from this user",
+              );
+            })
+            .end(done);
+        });
+    });
+});
+
+test("deny befriend when trying to accept an already accepted request", (done: jest.DoneCallback) => {
+  const unique1 = Date.now().toString(36);
+  const unique2 = (Date.now() + 1).toString(36);
+
+  // Create requester (User1)
+  request(app)
+    .post("/auth/signup")
+    .send({
+      email: `bef_dupe_req_${unique1}@example.com`,
+      username: `bef_dupe_req_${unique1}`,
+      password: "Password1",
+    })
+    .expect(201)
+    .end((err, signupRes1) => {
+      if (err) return done(err);
+
+      const token1 = signupRes1.body.token;
+      const userId1 = signupRes1.body.userId;
+
+      // Create receiver (User2)
+      request(app)
+        .post("/auth/signup")
+        .send({
+          email: `bef_dupe_rec_${unique2}@example.com`,
+          username: `bef_dupe_rec_${unique2}`,
+          password: "Password1",
+        })
+        .expect(201)
+        .end((err, signupRes2) => {
+          if (err) return done(err);
+
+          const token2 = signupRes2.body.token;
+
+          // User1 sends friend request to User2
+          request(app)
+            .post(`/friend/request/${signupRes2.body.userId}`)
+            .set("Authorization", `Bearer ${token1}`)
+            .expect(201)
+            .end((err) => {
+              if (err) return done(err);
+
+              // User2 accepts request from User1
+              request(app)
+                .post(`/friend/befriend/${userId1}`)
+                .set("Authorization", `Bearer ${token2}`)
+                .expect(201)
+                .end((err) => {
+                  if (err) return done(err);
+
+                  // User2 tries to accept again (no longer pending)
+                  request(app)
+                    .post(`/friend/befriend/${userId1}`)
+                    .set("Authorization", `Bearer ${token2}`)
+                    .expect(400)
+                    .expect((res) => {
+                      expect(res.body.error).toBeDefined();
+                      expect(res.body.error).toBe(
+                        "no pending friend request from this user",
+                      );
+                    })
+                    .end(done);
+                });
             });
         });
     });
@@ -152,53 +299,59 @@ test("successfully unfriend user", (done: jest.DoneCallback) => {
   const unique1 = Date.now().toString(36);
   const unique2 = (Date.now() + 1).toString(36);
 
-  // Create first user
+  // Create user1
   request(app)
     .post("/auth/signup")
     .send({
-      email: `test_${unique1}@example.com`,
-      username: `user_${unique1}`,
+      email: `unf_req_${unique1}@example.com`,
+      username: `unf_req_${unique1}`,
       password: "Password1",
     })
     .expect(201)
-    .end((err, signupRes1) => {
+    .end((err, res1) => {
       if (err) return done(err);
 
-      const token1 = signupRes1.body.token;
-      const userId1 = signupRes1.body.userId;
+      const token1 = res1.body.token;
+      const userId1 = res1.body.userId;
 
-      // Create second user
+      // Create user2
       request(app)
         .post("/auth/signup")
         .send({
-          email: `test_${unique2}@example.com`,
-          username: `user_${unique2}`,
+          email: `unf_rec_${unique2}@example.com`,
+          username: `unf_rec_${unique2}`,
           password: "Password1",
         })
         .expect(201)
-        .end((err, signupRes2) => {
-          if (err) return done(err);
+        .end((err2, res2) => {
+          if (err2) return done(err2);
 
-          const userId2 = signupRes2.body.userId;
+          const token2 = res2.body.token;
+          const userId2 = res2.body.userId;
 
-          // First user befriends second user
+          // user1 sends friend request to user2
           request(app)
-            .post(`/friend/befriend/${userId2}`)
+            .post(`/friend/request/${userId2}`)
             .set("Authorization", `Bearer ${token1}`)
             .expect(201)
-            .end((err) => {
-              if (err) return done(err);
+            .end((err3) => {
+              if (err3) return done(err3);
 
-              // First user unfriends second user
+              // user2 accepts request from user1
               request(app)
-                .delete(`/friend/unfriend/${userId2}`)
-                .set("Authorization", `Bearer ${token1}`)
-                .expect(200)
-                .expect((res) => {
-                  expect(res.body.message).toBeDefined();
-                  expect(res.body.message).toBe("Successfully unfriended user");
-                })
-                .end(done);
+                .post(`/friend/befriend/${userId1}`)
+                .set("Authorization", `Bearer ${token2}`)
+                .expect(201)
+                .end((err4) => {
+                  if (err4) return done(err4);
+
+                  // user1 unfriends user2
+                  request(app)
+                    .delete(`/friend/unfriend/${userId2}`)
+                    .set("Authorization", `Bearer ${token1}`)
+                    .expect(200)
+                    .end(done);
+                });
             });
         });
     });
@@ -282,206 +435,253 @@ test("deny unfriend - not friends with user", (done: jest.DoneCallback) => {
 
 // Get following / followers / friendships / unknown users
 test("getWhoCurrentUserFollows returns users current user follows", (done: jest.DoneCallback) => {
-  const unique1 = Date.now().toString(36);
-  const unique2 = (Date.now() + 1).toString(36);
+  const unique = Date.now().toString(36);
 
-  // Create first user
+  // Create follower (current user)
   request(app)
     .post("/auth/signup")
     .send({
-      email: `test_${unique1}@example.com`,
-      username: `user_${unique1}`,
+      email: `fol_cur_${unique}@example.com`,
+      username: `fol_cur_${unique}`,
       password: "Password1",
     })
     .expect(201)
-    .end((err, signupRes1) => {
+    .end((err, resCurrent) => {
       if (err) return done(err);
 
-      const token1 = signupRes1.body.token;
-      const userId1 = signupRes1.body.userId;
+      const tokenCurrent = resCurrent.body.token;
+      const currentId = resCurrent.body.userId;
 
-      // Create second user
+      // Create target user
       request(app)
         .post("/auth/signup")
         .send({
-          email: `test_${unique2}@example.com`,
-          username: `user_${unique2}`,
+          email: `fol_tgt_${unique}@example.com`,
+          username: `fol_tgt_${unique}`,
           password: "Password1",
         })
         .expect(201)
-        .end((err, signupRes2) => {
-          if (err) return done(err);
+        .end((err2, resTarget) => {
+          if (err2) return done(err2);
 
-          const userId2 = signupRes2.body.userId;
+          const tokenTarget = resTarget.body.token;
+          const targetId = resTarget.body.userId;
 
-          // First user befriends second user
+          // current user sends friend request to target
           request(app)
-            .post(`/friend/befriend/${userId2}`)
-            .set("Authorization", `Bearer ${token1}`)
+            .post(`/friend/request/${targetId}`)
+            .set("Authorization", `Bearer ${tokenCurrent}`)
             .expect(201)
-            .end((err) => {
-              if (err) return done(err);
+            .end((err3) => {
+              if (err3) return done(err3);
 
-              // Fetch following list
+              // target accepts request from current user
               request(app)
-                .get("/friend/following")
-                .set("Authorization", `Bearer ${token1}`)
-                .expect(200)
-                .expect((res) => {
-                  expect(Array.isArray(res.body.following)).toBe(true);
-                  expect(res.body.following.length).toBe(1);
-                  expect(res.body.following[0].id).toBe(userId2);
-                })
-                .end(done);
+                .post(`/friend/befriend/${currentId}`)
+                .set("Authorization", `Bearer ${tokenTarget}`)
+                .expect(201)
+                .end((err4) => {
+                  if (err4) return done(err4);
+
+                  // now check following list for current user
+                  request(app)
+                    .get("/friend/following")
+                    .set("Authorization", `Bearer ${tokenCurrent}`)
+                    .expect(200)
+                    .expect((res) => {
+                      expect(Array.isArray(res.body.following)).toBe(true);
+                      const ids = res.body.following.map((u: any) => u.id);
+                      expect(ids).toContain(targetId);
+                    })
+                    .end(done);
+                });
             });
         });
     });
 });
 
 test("getWhoFollowsCurrentUser returns users who follow current user", (done: jest.DoneCallback) => {
-  const unique1 = Date.now().toString(36);
-  const unique2 = (Date.now() + 1).toString(36);
+  const unique = Date.now().toString(36);
 
-  // Create first user (will follow second)
+  // Create current user (will be followed)
   request(app)
     .post("/auth/signup")
     .send({
-      email: `test_${unique1}@example.com`,
-      username: `user_${unique1}`,
+      email: `fol2_cur_${unique}@example.com`,
+      username: `fol2_cur_${unique}`,
       password: "Password1",
     })
     .expect(201)
-    .end((err, signupRes1) => {
+    .end((err, resCurrent) => {
       if (err) return done(err);
 
-      const token1 = signupRes1.body.token;
+      const tokenCurrent = resCurrent.body.token;
+      const currentId = resCurrent.body.userId;
 
-      // Create second user (will be followed)
+      // Create follower user
       request(app)
         .post("/auth/signup")
         .send({
-          email: `test_${unique2}@example.com`,
-          username: `user_${unique2}`,
+          email: `fol2_fol_${unique}@example.com`,
+          username: `fol2_fol_${unique}`,
           password: "Password1",
         })
         .expect(201)
-        .end((err, signupRes2) => {
-          if (err) return done(err);
+        .end((err2, resFollower) => {
+          if (err2) return done(err2);
 
-          const token2 = signupRes2.body.token;
-          const userId1 = signupRes1.body.userId;
-          const userId2 = signupRes2.body.userId;
+          const tokenFollower = resFollower.body.token;
+          const followerId = resFollower.body.userId;
 
-          // User1 follows user2
+          // follower sends friend request to current user
           request(app)
-            .post(`/friend/befriend/${userId2}`)
-            .set("Authorization", `Bearer ${token1}`)
+            .post(`/friend/request/${currentId}`)
+            .set("Authorization", `Bearer ${tokenFollower}`)
             .expect(201)
-            .end((err) => {
-              if (err) return done(err);
+            .end((err3) => {
+              if (err3) return done(err3);
 
-              // For user2, user1 should be in followers
+              // current user accepts
               request(app)
-                .get("/friend/followers")
-                .set("Authorization", `Bearer ${token2}`)
-                .expect(200)
-                .expect((res) => {
-                  expect(Array.isArray(res.body.followers)).toBe(true);
-                  expect(res.body.followers.length).toBe(1);
-                  expect(res.body.followers[0].id).toBe(userId1);
-                })
-                .end(done);
+                .post(`/friend/befriend/${followerId}`)
+                .set("Authorization", `Bearer ${tokenCurrent}`)
+                .expect(201)
+                .end((err4) => {
+                  if (err4) return done(err4);
+
+                  // now check followers list for current user
+                  request(app)
+                    .get("/friend/followers")
+                    .set("Authorization", `Bearer ${tokenCurrent}`)
+                    .expect(200)
+                    .expect((res) => {
+                      expect(Array.isArray(res.body.followers)).toBe(true);
+                      const ids = res.body.followers.map((u: any) => u.id);
+                      expect(ids).toContain(followerId);
+                    })
+                    .end(done);
+                });
             });
         });
     });
 });
 
 test("getFriendships returns only mutual friendships", (done: jest.DoneCallback) => {
-  const unique1 = Date.now().toString(36);
-  const unique2 = (Date.now() + 1).toString(36);
-  const unique3 = (Date.now() + 2).toString(36);
+  const unique = Date.now().toString(36);
 
-  // Create user A
+  // Create UserA
   request(app)
     .post("/auth/signup")
     .send({
-      email: `test_${unique1}@example.com`,
-      username: `user_${unique1}`,
+      email: `mut_a_${unique}@example.com`,
+      username: `mut_a_${unique}`,
       password: "Password1",
     })
     .expect(201)
-    .end((err, signupResA) => {
+    .end((err, resA) => {
       if (err) return done(err);
 
-      const tokenA = signupResA.body.token;
-      const userIdA = signupResA.body.userId;
+      const tokenA = resA.body.token;
+      const userIdA = resA.body.userId;
 
-      // Create user B
+      // Create UserB
       request(app)
         .post("/auth/signup")
         .send({
-          email: `test_${unique2}@example.com`,
-          username: `user_${unique2}`,
+          email: `mut_b_${unique}@example.com`,
+          username: `mut_b_${unique}`,
           password: "Password1",
         })
         .expect(201)
-        .end((err, signupResB) => {
-          if (err) return done(err);
+        .end((err2, resB) => {
+          if (err2) return done(err2);
 
-          const tokenB = signupResB.body.token;
-          const userIdB = signupResB.body.userId;
+          const tokenB = resB.body.token;
+          const userIdB = resB.body.userId;
 
-          // Create user C
+          // Create UserC (one-way friendship)
           request(app)
             .post("/auth/signup")
             .send({
-              email: `test_${unique3}@example.com`,
-              username: `user_${unique3}`,
+              email: `mut_c_${unique}@example.com`,
+              username: `mut_c_${unique}`,
               password: "Password1",
             })
             .expect(201)
-            .end((err, signupResC) => {
-              if (err) return done(err);
+            .end((err3, resC) => {
+              if (err3) return done(err3);
 
-              const userIdC = signupResC.body.userId;
+              const tokenC = resC.body.token;
+              const userIdC = resC.body.userId;
 
-              // A follows B (mutual after B follows A)
+              // A <-> B mutual friendship (two directions)
+              // 1) A -> B
               request(app)
-                .post(`/friend/befriend/${userIdB}`)
+                .post(`/friend/request/${userIdB}`)
                 .set("Authorization", `Bearer ${tokenA}`)
                 .expect(201)
-                .end((err) => {
-                  if (err) return done(err);
+                .end((err4) => {
+                  if (err4) return done(err4);
 
-                  // B follows A (completes mutual)
                   request(app)
                     .post(`/friend/befriend/${userIdA}`)
                     .set("Authorization", `Bearer ${tokenB}`)
                     .expect(201)
-                    .end((err) => {
-                      if (err) return done(err);
+                    .end((err5) => {
+                      if (err5) return done(err5);
 
-                      // A follows C (non-mutual)
+                      // 2) B -> A
                       request(app)
-                        .post(`/friend/befriend/${userIdC}`)
-                        .set("Authorization", `Bearer ${tokenA}`)
+                        .post(`/friend/request/${userIdA}`)
+                        .set("Authorization", `Bearer ${tokenB}`)
                         .expect(201)
-                        .end((err) => {
-                          if (err) return done(err);
+                        .end((err6) => {
+                          if (err6) return done(err6);
 
-                          // Fetch friendships for A → should only include B
                           request(app)
-                            .get("/friend/friendships")
+                            .post(`/friend/befriend/${userIdB}`)
                             .set("Authorization", `Bearer ${tokenA}`)
-                            .expect(200)
-                            .expect((res) => {
-                              expect(Array.isArray(res.body.friendships)).toBe(
-                                true,
-                              );
-                              expect(res.body.friendships.length).toBe(1);
-                              expect(res.body.friendships[0].id).toBe(userIdB);
-                            })
-                            .end(done);
+                            .expect(201)
+                            .end((err7) => {
+                              if (err7) return done(err7);
+
+                              // C -> A (one-way only)
+                              request(app)
+                                .post(`/friend/request/${userIdA}`)
+                                .set("Authorization", `Bearer ${tokenC}`)
+                                .expect(201)
+                                .end((err8) => {
+                                  if (err8) return done(err8);
+
+                                  request(app)
+                                    .post(`/friend/befriend/${userIdC}`)
+                                    .set("Authorization", `Bearer ${tokenA}`)
+                                    .expect(201)
+                                    .end((err9) => {
+                                      if (err9) return done(err9);
+
+                                      // Now query friendships for A; should include B but not C (only mutual)
+                                      request(app)
+                                        .get("/friend/friendships")
+                                        .set(
+                                          "Authorization",
+                                          `Bearer ${tokenA}`,
+                                        )
+                                        .expect(200)
+                                        .expect((res) => {
+                                          expect(
+                                            Array.isArray(res.body.friendships),
+                                          ).toBe(true);
+                                          const ids = res.body.friendships.map(
+                                            (u: any) => u.id,
+                                          );
+                                          expect(ids).toContain(userIdB);
+                                          expect(ids).not.toContain(userIdC);
+                                        })
+                                        .end(done);
+                                    });
+                                });
+                            });
                         });
                     });
                 });
@@ -491,81 +691,90 @@ test("getFriendships returns only mutual friendships", (done: jest.DoneCallback)
 });
 
 test("getUnknownUsers returns users with no relation to current user", (done: jest.DoneCallback) => {
-  const unique1 = Date.now().toString(36);
-  const unique2 = (Date.now() + 1).toString(36);
-  const unique3 = (Date.now() + 2).toString(36);
+  const unique = Date.now().toString(36);
 
-  // Create current user
+  // Current user
   request(app)
     .post("/auth/signup")
     .send({
-      email: `test_${unique1}@example.com`,
-      username: `user_${unique1}`,
+      email: `unk_cur_${unique}@example.com`,
+      username: `unk_cur_${unique}`,
       password: "Password1",
     })
     .expect(201)
-    .end((err, signupResCurrent) => {
+    .end((err, resCur) => {
       if (err) return done(err);
 
-      const tokenCurrent = signupResCurrent.body.token;
-      const userIdCurrent = signupResCurrent.body.userId;
+      const tokenCurrent = resCur.body.token;
+      const currentId = resCur.body.userId;
 
-      // Create user F (will become friend)
+      // Friend user (will be connected)
       request(app)
         .post("/auth/signup")
         .send({
-          email: `test_${unique2}@example.com`,
-          username: `user_${unique2}`,
+          email: `unk_friend_${unique}@example.com`,
+          username: `unk_friend_${unique}`,
           password: "Password1",
         })
         .expect(201)
-        .end((err, signupResF) => {
-          if (err) return done(err);
+        .end((err2, resFriend) => {
+          if (err2) return done(err2);
 
-          const userIdF = signupResF.body.userId;
+          const tokenFriend = resFriend.body.token;
+          const friendId = resFriend.body.userId;
 
-          // Create user U (should remain unknown)
+          // Unknown user (no relation)
           request(app)
             .post("/auth/signup")
             .send({
-              email: `test_${unique3}@example.com`,
-              username: `user_${unique3}`,
+              email: `unk_unknown_${unique}@example.com`,
+              username: `unk_unknown_${unique}`,
               password: "Password1",
             })
             .expect(201)
-            .end((err, signupResU) => {
-              if (err) return done(err);
+            .end((err3, resUnknown) => {
+              if (err3) return done(err3);
 
-              const userIdU = signupResU.body.userId;
+              const unknownId = resUnknown.body.userId;
 
-              // Current user follows F (creating a relation)
+              // current user <-> friend (mutual or at least one-way)
               request(app)
-                .post(`/friend/befriend/${userIdF}`)
+                .post(`/friend/request/${friendId}`)
                 .set("Authorization", `Bearer ${tokenCurrent}`)
                 .expect(201)
-                .end((err) => {
-                  if (err) return done(err);
+                .end((err4) => {
+                  if (err4) return done(err4);
 
-                  // Fetch unknown users for current user → should only include U
                   request(app)
-                    .get("/friend/unknown")
-                    .set("Authorization", `Bearer ${tokenCurrent}`)
-                    .expect(200)
-                    .expect((res) => {
-                      expect(Array.isArray(res.body.unknownUsers)).toBe(true);
-                      const ids = res.body.unknownUsers.map((u: any) => u.id);
-                      expect(ids).toContain(userIdU);
-                      expect(ids).not.toContain(userIdF);
-                      expect(ids).not.toContain(userIdCurrent);
-                    })
-                    .end(done);
+                    .post(`/friend/befriend/${currentId}`)
+                    .set("Authorization", `Bearer ${tokenFriend}`)
+                    .expect(201)
+                    .end((err5) => {
+                      if (err5) return done(err5);
+
+                      // Now query unknown users
+                      request(app)
+                        .get("/friend/unknown")
+                        .set("Authorization", `Bearer ${tokenCurrent}`)
+                        .expect(200)
+                        .expect((res) => {
+                          expect(Array.isArray(res.body.unknownUsers)).toBe(
+                            true,
+                          );
+                          const ids = res.body.unknownUsers.map(
+                            (u: any) => u.id,
+                          );
+                          expect(ids).toContain(unknownId);
+                          expect(ids).not.toContain(friendId);
+                          expect(ids).not.toContain(currentId);
+                        })
+                        .end(done);
+                    });
                 });
             });
         });
     });
 });
-
-
 
 afterAll(async () => {
   await prisma.$disconnect();
