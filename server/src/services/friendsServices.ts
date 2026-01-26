@@ -58,15 +58,15 @@ export const friendsService = {
   //   ];
   // },
 
-  async unknownUsers(currentUserId: string) {
+  async unknownUsers(userId: string) {
     const unknownUsers = await prisma.user.findMany({
       where: {
-        id: { not: currentUserId },
+        id: { not: userId },
         friendshipsAsUser1: {
-          none: { user2Id: currentUserId },
+          none: { user2Id: userId },
         },
         friendshipsAsUser2: {
-          none: { user1Id: currentUserId },
+          none: { user1Id: userId },
         },
       },
     });
