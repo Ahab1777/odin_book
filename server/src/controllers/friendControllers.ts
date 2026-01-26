@@ -31,7 +31,7 @@ export async function getFriendships(
 ): Promise<void> {
   const { userId } = req.user as { userId: string };
 
-  const friendships = await friendsService.mutualFriendships(userId);
+  const friendships = await friendsService.currentFriendships(userId);
 
   res.status(200).json({ friendships });
 }
