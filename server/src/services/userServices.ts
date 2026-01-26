@@ -1,4 +1,6 @@
+import { env } from "node:process";
 import { prisma } from "../lib/prisma";
+import bcrypt from "bcrypt";
 
 export const userService = {
   // Get user by email
@@ -7,9 +9,9 @@ export const userService = {
       where: { email },
       select: {
         email: true,
-      }
+      },
     });
-    },
+  },
 
   // Get user by username
   async findByUsernameForSignUp(username: string) {
@@ -17,9 +19,9 @@ export const userService = {
       where: { username },
       select: {
         username: true,
-      }
+      },
     });
-  },    
+  },
 
   //Get username and password for login
   async findByEmailForLogin(email: string) {
@@ -29,8 +31,45 @@ export const userService = {
         email: true,
         password: true,
         username: true,
-        id: true
-      }
+        id: true,
+      },
     });
   },
-}
+
+  //Get/create demo user
+  async getOrCreateDemoUser() {
+    const demoEmail = env.DEMO_USER_EMAIL as string;
+    const demoUsername = env.DEMO_USER_USERNAME as string;
+    const demoPassword = env.DEMO_USER_PASSWORD as string;
+
+    //Check if environment variables are set
+    if (!demoEmail || !demoUsername || !demoPassword) {
+      throw new Error(
+        "One or more demo user environment variables  are missing",
+      );
+    }
+
+    //Fetch demoUser, if it exists
+    let demoUser = await prisma.user.findUnique({
+      where: { email: demoEmail },
+    });
+  
+    //If demoUser does not exist, create it
+    if (!demoUser) {
+      const hashedPassword: string = await bcrypt.hash(demoPassword, 10);
+      demoUser = await prisma.user.create({
+        data: {
+          email: demoEmail,
+          username: demoUsername,
+          password: hashedPassword,
+        },
+      });
+    }
+
+    return {
+      id: demoUser.id,
+      email: demoUser.email,
+      username: demoUser.username
+    };
+  },
+};

@@ -42,3 +42,4 @@ TODOs
 [] Miscellaneous 
     [] Route validation for admin
     [] test - admin can CRUD anything
+    [] Prevent bad words
