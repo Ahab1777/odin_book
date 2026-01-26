@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { friendsService } from "../services/friendsServices";
+import { normalizeUserPair } from "../lib/friendship";
 
 export async function getWhoCurrentUserFollows(
   req: Request,
@@ -138,6 +139,8 @@ export async function befriend(req: Request, res: Response): Promise<void> {
   // current logged-in user is the receiver
   const { userId: receiverId } = req.user as { userId: string };
 
+
+
   // Confirm request exists
   const existingRequest = await prisma.friendRequest.findUnique({
     where: {
@@ -153,12 +156,16 @@ export async function befriend(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  // Ensure they are not already friends
-  const existingFriendship = await prisma.friend.findUnique({
+  //Normalize user for db
+  const [user1Id, user2Id] = normalizeUserPair(requesterId, receiverId);
+
+  //X Ensure they are not already friends 
+  
+  const existingFriendship = await prisma.friendship.findUnique({
     where: {
-      userId_friendId: {
-        userId: requesterId,
-        friendId: receiverId,
+      user1Id_user2Id: {
+        user1Id,
+        user2Id,
       },
     },
   });
@@ -177,18 +184,18 @@ export async function befriend(req: Request, res: Response): Promise<void> {
         respondedAt: new Date(),
       },
     }),
-    prisma.friend.create({
+    prisma.friendship.create({
       data: {
-        userId: requesterId,
-        friendId: receiverId,
+        user1Id,
+        user2Id,
       },
     }),
   ]);
 
   res.status(201).json({
     id: friendship.id,
-    userId: friendship.userId,
-    friendId: friendship.friendId,
+    user1Id: friendship.user1Id,
+    user2Id: friendship.user2Id,
     createdAt: friendship.createdAt,
     requestStatus: updatedRequest.status,
   });
