@@ -46,7 +46,7 @@ export async function getUnknownUsers(
 
   res.status(200).json({ unknownUsers });
 }
-
+//Done
 export async function sendFriendRequest(
   req: Request,
   res: Response,
@@ -64,12 +64,16 @@ export async function sendFriendRequest(
     return;
   }
 
-  // Check if already friends
-  const existingFriendship = await prisma.friend.findUnique({
+
+  //Normalize users for friendship check
+  const [user1Id, user2Id] = normalizeUserPair(friendId, userId)
+
+  //Ensure they are friends
+  const existingFriendship = await prisma.friendship.findUnique({
     where: {
-      userId_friendId: {
-        userId,
-        friendId,
+      user1Id_user2Id: {
+        user1Id,
+        user2Id,
       },
     },
   });
@@ -132,7 +136,7 @@ export async function sendFriendRequest(
     status: request.status,
   });
 }
-
+//Done
 export async function befriend(req: Request, res: Response): Promise<void> {
   // :userId is the one who sent the request (requester)
   const { userId: requesterId } = req.params;
@@ -197,7 +201,7 @@ export async function befriend(req: Request, res: Response): Promise<void> {
     requestStatus: updatedRequest.status,
   });
 }
-
+//Done
 export async function unfriend(req: Request, res: Response): Promise<void> {
   const { userId: friendId } = req.params;
   const { userId } = req.user as { userId: string };
