@@ -12,6 +12,12 @@ enum FriendRequestStatus {
   CANCELED // Requester canceled before receiver responded
 }
 
+enum UserClasses {
+  NORMAL
+  ADMIN
+  DEMO
+}
+
 //Models
 generator client {
   provider = "prisma-client-js"
@@ -26,6 +32,7 @@ model User {
   username           String          @unique
   email              String          @unique
   password           String
+  class              UserClasses     @default(NORMAL)
   posts              Post[]
   comments           Comment[]
   friendshipsAsUser1 Friendship[]    @relation("FriendshipUser1")

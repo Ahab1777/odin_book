@@ -25,15 +25,16 @@ TODOs
     [x] befriend user
     [x] Unfriend user
     [x] getFriendships
-    [x] getFollowers
-    [x] getFollowedBy
     [x] getUnknownUsers
     [x] Implement pending friendship logic
 
 [] User 
-    [] Visitor access
+    [x] Demo access
     [] Password recovery
     [] logOut
+    [] Limit demo requests
+    [] Add flag to demo content
+    [] Add periodic wipe of demo-created content
 
 [] Comment
  [X] Add comment

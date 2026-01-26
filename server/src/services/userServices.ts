@@ -62,6 +62,7 @@ export const userService = {
           email: demoEmail,
           username: demoUsername,
           password: hashedPassword,
+          class: 'DEMO'
         },
       });
     }
@@ -69,7 +70,7 @@ export const userService = {
     return {
       id: demoUser.id,
       email: demoUser.email,
-      username: demoUser.username
+      username: demoUser.username,
     };
   },
 };
