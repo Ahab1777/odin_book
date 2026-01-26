@@ -1,13 +1,12 @@
 import authRouter from "../authRouter";
-import request from 'supertest';
-import express from 'express';
+import request from "supertest";
+import express from "express";
 import { prisma } from "../../lib/prisma";
 
 const app = express();
-app.use(express.json()); 
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/", authRouter);
-
 
 //Test users
 type TestUser = {
@@ -17,8 +16,6 @@ type TestUser = {
   password: string; // plain, for login tests
 };
 
-let validUser: TestUser;
-let invalidUser: TestUser;
 let username: string;
 let email: string;
 let password: string;
@@ -26,36 +23,43 @@ let invalidUsername: string;
 let invalidEmail: string;
 let invalidPassword: string;
 
-
 beforeAll(() => {
-    const suffix = Date.now().toString(36); // simple unique-ish string
-    username = `ahab_${suffix}`;
-    email = `user_${suffix}@example.com`;
-    password = `Q1w2e3r4_${suffix}`;
+  const suffix = Date.now().toString(36); // simple unique-ish string
+  username = `ahab_${suffix}`;
+  email = `user_${suffix}@example.com`;
+  password = `Q1w2e3r4_${suffix}`;
 
-    const invalidSuffix = Date.now().toString(36); // simple unique-ish string
-    invalidUsername = `ahab_${invalidSuffix}`;
-    invalidEmail = `user_${invalidSuffix}@example.com`;
-    invalidPassword = `Q1w2e3r4_${invalidSuffix}`;
-    
+  const invalidSuffix = Date.now().toString(36); // simple unique-ish string
+  invalidUsername = `ahab_${invalidSuffix}`;
+  invalidEmail = `user_${invalidSuffix}@example.com`;
+  invalidPassword = `Q1w2e3r4_${invalidSuffix}`;
+});
 
-})
+beforeAll(async () => {
+  const demoSuffix = Date.now().toString(36);
+  const demoEmail = `demo_${demoSuffix}@example.com`;
+  const demoUsername = `demo_user_${demoSuffix}`;
 
+  process.env.DEMO_USER_EMAIL = demoEmail;
+  process.env.DEMO_USER_USERNAME = demoUsername;
+  process.env.DEMO_USER_PASSWORD = "DemoPassword123";
+
+  await prisma.user.deleteMany({ where: { email: demoEmail } });
+});
 
 test("sign-up works", (done: jest.DoneCallback) => {
-
   request(app)
     .post("/signup")
     .send({ password, username, email })
     .expect(201)
     .expect((res) => {
-        expect(res.body.username).toBe(username);
-        expect(res.body.token).toBeDefined();
-        expect(typeof res.body.token).toBe('string');
-        expect(res.body.userId).toBeDefined();
-        expect(typeof res.body.userId).toBe('string');
-        expect(res.body.avatar).toBeDefined();
-        expect(typeof res.body.avatar).toBe('string');
+      expect(res.body.username).toBe(username);
+      expect(res.body.token).toBeDefined();
+      expect(typeof res.body.token).toBe("string");
+      expect(res.body.userId).toBeDefined();
+      expect(typeof res.body.userId).toBe("string");
+      expect(res.body.avatar).toBeDefined();
+      expect(typeof res.body.avatar).toBe("string");
     })
     .end(done);
 });
@@ -64,7 +68,7 @@ test("signup fails with invalid email", (done: jest.DoneCallback) => {
   request(app)
     .post("/signup")
     .send({
-      email: "invalid-email",  // Invalid format
+      email: "invalid-email", // Invalid format
       username,
       password,
     })
@@ -84,14 +88,14 @@ test("signup fails if email already taken", (done: jest.DoneCallback) => {
   request(app)
     .post("/signup")
     .send({
-      email: email,  // Using email from beforeAll (already exists)
+      email: email, // Using email from beforeAll (already exists)
       username,
       password,
     })
     .expect(400)
     .expect((res) => {
       expect(res.body.errors).toBeDefined();
-      
+
       // Find the email error
       const emailError = res.body.errors.find((e: any) => e.path === "email");
       expect(emailError).toBeDefined();
@@ -106,12 +110,12 @@ test("signup fails with weak password", (done: jest.DoneCallback) => {
     .send({
       email: "newuser@example.com",
       username: "signupfailweakpassword",
-      password: "weak",  // Too short, no uppercase, no number
+      password: "weak", // Too short, no uppercase, no number
     })
     .expect(400)
     .expect((res) => {
       expect(res.body.errors.length).toBeGreaterThanOrEqual(3);
-      
+
       const messages = res.body.errors.map((e: any) => e.msg);
       expect(messages).toContain("Password must be at least 8 characters");
       expect(messages).toContain("Password must contain an uppercase letter");
@@ -120,28 +124,28 @@ test("signup fails with weak password", (done: jest.DoneCallback) => {
     .end(done);
 });
 
-test("login works", done => {
-    request(app)
-        .post('/login')
-        .send({
-            email,
-            password
-        })
-        .expect(200)
-        .expect((res) => {
-            expect(res.body.token).toBeDefined();
-            expect(typeof res.body.token).toBe('string');
-            expect(res.body.userId).toBeDefined();
-            expect(typeof res.body.userId).toBe('string');
-            expect(res.body.username).toBeDefined();
-            expect(typeof res.body.username).toBe('string');
-            expect(res.body.email).toBeDefined();
-            expect(typeof res.body.email).toBe('string');
-            expect(res.body.avatar).toBeDefined();
-            expect(typeof res.body.email).toBe('string');
-        })
-        .end(done);
-})
+test("login works", (done) => {
+  request(app)
+    .post("/login")
+    .send({
+      email,
+      password,
+    })
+    .expect(200)
+    .expect((res) => {
+      expect(res.body.token).toBeDefined();
+      expect(typeof res.body.token).toBe("string");
+      expect(res.body.userId).toBeDefined();
+      expect(typeof res.body.userId).toBe("string");
+      expect(res.body.username).toBeDefined();
+      expect(typeof res.body.username).toBe("string");
+      expect(res.body.email).toBeDefined();
+      expect(typeof res.body.email).toBe("string");
+      expect(res.body.avatar).toBeDefined();
+      expect(typeof res.body.email).toBe("string");
+    })
+    .end(done);
+});
 
 test("login fails with invalid email format", (done: jest.DoneCallback) => {
   request(app)
@@ -154,7 +158,7 @@ test("login fails with invalid email format", (done: jest.DoneCallback) => {
     .expect((res) => {
       expect(res.body.errors).toBeDefined();
       expect(Array.isArray(res.body.errors)).toBe(true);
-      
+
       const emailError = res.body.errors.find((e: any) => e.path === "email");
       expect(emailError).toBeDefined();
       expect(emailError.msg).toBe("Invalid email format");
@@ -172,8 +176,10 @@ test("login fails with missing password", (done: jest.DoneCallback) => {
     .expect(400)
     .expect((res) => {
       expect(res.body.errors).toBeDefined();
-      
-      const passwordError = res.body.errors.find((e: any) => e.path === "password");
+
+      const passwordError = res.body.errors.find(
+        (e: any) => e.path === "password",
+      );
       expect(passwordError).toBeDefined();
       expect(passwordError.msg).toBe("Password is required");
     })
@@ -208,6 +214,38 @@ test("login fails with nonexistent email", (done: jest.DoneCallback) => {
     .end(done);
 });
 
+test("demo-login creates demo user and returns token", async () => {
+  const demoEmail = process.env.DEMO_USER_EMAIL as string;
+  const demoUsername = process.env.DEMO_USER_USERNAME as string;
+
+  const res = await request(app).post("/demo-login").send().expect(200);
+
+  expect(res.body.token).toBeDefined();
+  expect(typeof res.body.token).toBe("string");
+  expect(res.body.userId).toBeDefined();
+  expect(typeof res.body.userId).toBe("string");
+  expect(res.body.username).toBe(demoUsername);
+  expect(res.body.email).toBe(demoEmail);
+  expect(res.body.avatar).toBeDefined();
+  expect(typeof res.body.avatar).toBe("string");
+
+  const demoUserInDb = await prisma.user.findUnique({
+    where: { email: demoEmail },
+  });
+  expect(demoUserInDb).not.toBeNull();
+  expect(demoUserInDb?.username).toBe(demoUsername);
+});
+
+test("demo-login reuses the same demo user", async () => {
+  const first = await request(app).post("/demo-login").send().expect(200);
+  const second = await request(app).post("/demo-login").send().expect(200);
+
+  expect(first.body.userId).toBe(second.body.userId);
+
+  const demoEmail = process.env.DEMO_USER_EMAIL as string;
+  const count = await prisma.user.count({ where: { email: demoEmail } });
+  expect(count).toBe(1);
+});
 
 //Close prisma client so Jest doesn't complain
 afterAll(async () => {
