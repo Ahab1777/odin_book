@@ -3,27 +3,27 @@ import { prisma } from "../lib/prisma";
 import { friendsService } from "../services/friendsServices";
 import { normalizeUserPair } from "../lib/friendship";
 
-export async function getWhoCurrentUserFollows(
-  req: Request,
-  res: Response,
-): Promise<void> {
-  const { userId } = req.user as { userId: string };
+// export async function getWhoCurrentUserFollows(
+//   req: Request,
+//   res: Response,
+// ): Promise<void> {
+//   const { userId } = req.user as { userId: string };
 
-  const following = await friendsService.currentUserFollowing(userId);
+//   const following = await friendsService.currentUserFollowing(userId);
 
-  res.status(200).json({ following });
-}
+//   res.status(200).json({ following });
+// }
 
-export async function getWhoFollowsCurrentUser(
-  req: Request,
-  res: Response,
-): Promise<void> {
-  const { userId } = req.user as { userId: string };
+// export async function getWhoFollowsCurrentUser(
+//   req: Request,
+//   res: Response,
+// ): Promise<void> {
+//   const { userId } = req.user as { userId: string };
 
-  const followers = await friendsService.currentUserFollowedBy(userId);
+//   const followers = await friendsService.currentUserFollowedBy(userId);
 
-  res.status(200).json({ followers });
-}
+//   res.status(200).json({ followers });
+// }
 
 export async function getFriendships(
   req: Request,

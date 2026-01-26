@@ -1,53 +1,76 @@
 import { prisma } from "../lib/prisma";
 
 export const friendsService = {
-  async currentUserFollowing(currentUserId: string) {
-    const following = await prisma.friend.findMany({
-      where: { userId: currentUserId },
-      include: { friend: true }, // returns the followed User
-    });
-
-    return following.map((f) => f.friend);
-  },
-
-  async currentUserFollowedBy(currentUserId: string) {
-    const followers = await prisma.friend.findMany({
-      where: { friendId: currentUserId },
-      include: { user: true },
-    });
-
-    return followers.map((f) => f.user);
-  },
-
-  async mutualFriendships(currentUserId: string) {
-    const mutual = await prisma.friend.findMany({
-      where: {
-        userId: currentUserId,
-        friend: {
-          friends: {
-            some: { friendId: currentUserId },
-          },
-        },
+  async currentFriendships(userId: string) {
+    const friendships = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        friendshipsAsUser1: { include: { user2: true } },
+        friendshipsAsUser2: { include: { user1: true } },
       },
-      include: { friend: true },
     });
 
-    return mutual.map((f) => f.friend);
+    if (!friendships) {
+      return [];
+    }
+
+    return [
+      ...friendships.friendshipsAsUser1.map((f) => f.user2),
+      ...friendships.friendshipsAsUser2.map((f) => f.user1),
+    ];
   },
+
+  // async currentUserFollowedBy(currentUserId: string) {
+  //   const userWithFriendships = await prisma.user.findUnique({
+  //     where: { id: currentUserId },
+  //     include: {
+  //       friendshipsAsUser1: { include: { user2: true } },
+  //       friendshipsAsUser2: { include: { user1: true } },
+  //     },
+  //   });
+
+  //   if (!userWithFriendships) {
+  //     return [];
+  //   }
+
+  //   return [
+  //     ...userWithFriendships.friendshipsAsUser1.map((f) => f.user2),
+  //     ...userWithFriendships.friendshipsAsUser2.map((f) => f.user1),
+  //   ];
+  // },
+
+  // async mutualFriendships(currentUserId: string) {
+  //   const userWithFriendships = await prisma.user.findUnique({
+  //     where: { id: currentUserId },
+  //     include: {
+  //       friendshipsAsUser1: { include: { user2: true } },
+  //       friendshipsAsUser2: { include: { user1: true } },
+  //     },
+  //   });
+
+  //   if (!userWithFriendships) {
+  //     return [];
+  //   }
+
+  //   return [
+  //     ...userWithFriendships.friendshipsAsUser1.map((f) => f.user2),
+  //     ...userWithFriendships.friendshipsAsUser2.map((f) => f.user1),
+  //   ];
+  // },
 
   async unknownUsers(currentUserId: string) {
     const unknownUsers = await prisma.user.findMany({
       where: {
         id: { not: currentUserId },
-        friends: {
-          none: { friendId: currentUserId }, // I do not follow them
+        friendshipsAsUser1: {
+          none: { user2Id: currentUserId },
         },
-        friendOf: {
-          none: { userId: currentUserId }, // they do not follow me
+        friendshipsAsUser2: {
+          none: { user1Id: currentUserId },
         },
       },
     });
-      
-      return unknownUsers;
+
+    return unknownUsers;
   },
 };
