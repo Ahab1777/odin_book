@@ -12,9 +12,9 @@ import {
 
 const friendRouter = express.Router();
 
-friendRouter.post("/befriend/:userId", authentication, befriend);
-
 friendRouter.post("/request/:userId", authentication, sendFriendRequest);
+
+friendRouter.post("/befriend/:userId", authentication, befriend);
 
 friendRouter.delete("/unfriend/:userId", authentication, unfriend);
 
@@ -25,6 +25,5 @@ friendRouter.get("/followers", authentication, getWhoFollowsCurrentUser);
 friendRouter.get("/friendships", authentication, getFriendships);
 
 friendRouter.get("/unknown", authentication, getUnknownUsers);
-
 
 export default friendRouter;
