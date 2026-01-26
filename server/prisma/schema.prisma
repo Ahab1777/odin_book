@@ -22,32 +22,34 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  username       String          @unique
-  email          String          @unique
-  password       String
-  posts          Post[]
-  comments       Comment[]
-  friends        Friend[]        @relation("userFriends")
-  friendOf       Friend[]        @relation("userFriendOf")
-  likes          Like[]
-  profile        Profile?
-  sentRequests     FriendRequest[] @relation("sentRequests")
-  receivedRequests FriendRequest[] @relation("receivedRequests")
-
+  id                 String          @id @default(cuid())
+  username           String          @unique
+  email              String          @unique
+  password           String
+  posts              Post[]
+  comments           Comment[]
+  friendshipsAsUser1 Friendship[]    @relation("FriendshipUser1")
+  friendshipsAsUser2 Friendship[]    @relation("FriendshipUser2")
+  likes              Like[]
+  profile            Profile?
+  sentRequests       FriendRequest[] @relation("sentRequests")
+  receivedRequests   FriendRequest[] @relation("receivedRequests")
 
   @@map("users")
 }
 
-model Friend {
-  id        String   @id @default(cuid())
-  userId    String
-  friendId  String
-  user      User     @relation("userFriends", fields: [userId], references: [id], onDelete: Cascade)
-  friend    User     @relation("userFriendOf", fields: [friendId], references: [id], onDelete: Cascade)
+model Friendship {
+  id      String @id @default(cuid())
+  user1Id String
+  user2Id String
+
+  user1 User @relation("FriendshipUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2 User @relation("FriendshipUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
 
-  @@unique([userId, friendId]) // Prevent duplicate friendships
+  // one row per unordered pair
+  @@unique([user1Id, user2Id])
   @@map("friends")
 }
 
