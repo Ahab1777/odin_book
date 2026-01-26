@@ -1,7 +1,6 @@
 import express from "express";
 import request from "supertest";
 import authRouter from "../authRouter";
-import { prisma } from "../../lib/prisma";
 import friendRouter from "../friendRouter";
 import type { Response } from "supertest";
 

@@ -134,50 +134,8 @@ test("deny unfriend - not friends with user", async () => {
   expect(res.body.error).toBe("You are not friends with this user");
 });
 
-// Get following / followers / friendships / unknown users
-test("getWhoCurrentUserFollows returns users current user follows", async () => {
-  const current = await friendUtils.signupUser("fol_cur");
-  const target = await friendUtils.signupUser("fol_tgt");
-
-  const { requestRes, befriendRes } = await friendUtils.createFriendship(
-    current,
-    target,
-  );
-  expect(requestRes.status).toBe(201);
-  expect(befriendRes.status).toBe(201);
-
-  const res = await request(app)
-    .get("/friend/following")
-    .set("Authorization", `Bearer ${current.token}`)
-    .expect(200);
-
-  expect(Array.isArray(res.body.following)).toBe(true);
-  const ids = res.body.following.map((u: any) => u.id);
-  expect(ids).toContain(target.id);
-});
-
-test("getWhoFollowsCurrentUser returns users who follow current user", async () => {
-  const current = await friendUtils.signupUser("fol2_cur");
-  const follower = await friendUtils.signupUser("fol2_fol");
-
-  const { requestRes, befriendRes } = await friendUtils.createFriendship(
-    follower,
-    current,
-  );
-  expect(requestRes.status).toBe(201);
-  expect(befriendRes.status).toBe(201);
-
-  const res = await request(app)
-    .get("/friend/followers")
-    .set("Authorization", `Bearer ${current.token}`)
-    .expect(200);
-
-  expect(Array.isArray(res.body.followers)).toBe(true);
-  const ids = res.body.followers.map((u: any) => u.id);
-  expect(ids).toContain(follower.id);
-});
-
-test("getFriendships returns only mutual friendships", async () => {
+// Get friendships and unknown users
+test("getFriendships returns correct friendships", async () => {
   const userA = await friendUtils.signupUser("mut_a");
   const userB = await friendUtils.signupUser("mut_b");
   const userC = await friendUtils.signupUser("mut_c");
@@ -193,8 +151,10 @@ test("getFriendships returns only mutual friendships", async () => {
 
   expect(Array.isArray(res.body.friendships)).toBe(true);
   const ids = res.body.friendships.map((u: any) => u.id);
+  // With the new symmetric Friendship model, userA sees both userB and userC as friends
+  expect(res.body.friendships.length).toBe(2);
   expect(ids).toContain(userB.id);
-  expect(ids).not.toContain(userC.id);
+  expect(ids).toContain(userC.id);
 });
 
 test("getUnknownUsers returns users with no relation to current user", async () => {

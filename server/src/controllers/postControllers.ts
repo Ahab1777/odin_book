@@ -175,7 +175,7 @@ export async function getPost(req: Request, res: Response): Promise<void> {
 export async function getPostIndex(req: Request, res: Response): Promise<void> {
   const { userId } = req.user as { userId: string };
 
-  // Get current user with their friends and posts
+  // Get current user with their posts and posts of all friendship partners
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
@@ -189,9 +189,27 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
           },
         },
       },
-      friends: {
+      friendshipsAsUser1: {
         include: {
-          friend: {
+          user2: {
+            include: {
+              posts: {
+                include: {
+                  user: {
+                    select: {
+                      id: true,
+                      username: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      friendshipsAsUser2: {
+        include: {
+          user1: {
             include: {
               posts: {
                 include: {
@@ -215,17 +233,20 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  // Collect all posts: user's posts + friends' posts
+  // Collect all posts: user's posts + posts from all friendship partners
   const allPosts = [...(user.posts || [])];
 
-  // Add posts from users that are friends with current user
-  if (user.friends) {
-    user.friends.forEach((friendship) => {
-      if (friendship.friend.posts) {
-        allPosts.push(...friendship.friend.posts);
-      }
-    });
-  }
+  user.friendshipsAsUser1?.forEach((friendship) => {
+    if (friendship.user2.posts) {
+      allPosts.push(...friendship.user2.posts);
+    }
+  });
+
+  user.friendshipsAsUser2?.forEach((friendship) => {
+    if (friendship.user1.posts) {
+      allPosts.push(...friendship.user1.posts);
+    }
+  });
 
   // Sort by createdAt in descending order (newest first)
   allPosts.sort(

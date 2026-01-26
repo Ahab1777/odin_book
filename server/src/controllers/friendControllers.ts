@@ -25,6 +25,8 @@ import { normalizeUserPair } from "../lib/friendship";
 //   res.status(200).json({ followers });
 // }
 
+
+//Done
 export async function getFriendships(
   req: Request,
   res: Response,
@@ -35,7 +37,7 @@ export async function getFriendships(
 
   res.status(200).json({ friendships });
 }
-
+//Done
 export async function getUnknownUsers(
   req: Request,
   res: Response,

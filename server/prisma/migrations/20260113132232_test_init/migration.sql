@@ -11,8 +11,8 @@ CREATE TABLE "users" (
 -- CreateTable
 CREATE TABLE "friends" (
     "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "friendId" TEXT NOT NULL,
+    "user1Id" TEXT NOT NULL,
+    "user2Id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "friends_pkey" PRIMARY KEY ("id")
@@ -66,7 +66,7 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "friends_userId_friendId_key" ON "friends"("userId", "friendId");
+CREATE UNIQUE INDEX "friends_user1Id_user2Id_key" ON "friends"("user1Id", "user2Id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "profiles_userId_key" ON "profiles"("userId");
@@ -75,10 +75,10 @@ CREATE UNIQUE INDEX "profiles_userId_key" ON "profiles"("userId");
 CREATE UNIQUE INDEX "likes_userId_postId_key" ON "likes"("userId", "postId");
 
 -- AddForeignKey
-ALTER TABLE "friends" ADD CONSTRAINT "friends_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "friends" ADD CONSTRAINT "friends_user1Id_fkey" FOREIGN KEY ("user1Id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "friends" ADD CONSTRAINT "friends_friendId_fkey" FOREIGN KEY ("friendId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "friends" ADD CONSTRAINT "friends_user2Id_fkey" FOREIGN KEY ("user2Id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "posts" ADD CONSTRAINT "posts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
