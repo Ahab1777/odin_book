@@ -129,7 +129,7 @@ export async function sendFriendRequest(
     requesterId: request.requesterId,
     receiverId: request.receiverId,
     createdAt: request.createdAt,
-    status: request.status
+    status: request.status,
   });
 }
 
@@ -138,8 +138,6 @@ export async function befriend(req: Request, res: Response): Promise<void> {
   const { userId: requesterId } = req.params;
   // current logged-in user is the receiver
   const { userId: receiverId } = req.user as { userId: string };
-
-
 
   // Confirm request exists
   const existingRequest = await prisma.friendRequest.findUnique({
@@ -159,8 +157,7 @@ export async function befriend(req: Request, res: Response): Promise<void> {
   //Normalize user for db
   const [user1Id, user2Id] = normalizeUserPair(requesterId, receiverId);
 
-  //X Ensure they are not already friends 
-  
+  //Ensure they are not already friends
   const existingFriendship = await prisma.friendship.findUnique({
     where: {
       user1Id_user2Id: {
@@ -215,12 +212,15 @@ export async function unfriend(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  // Check if they are friends
-  const existingFriendship = await prisma.friend.findUnique({
+  //Normalize user for friendship check
+  const [user1Id, user2Id] = normalizeUserPair(friendId, userId)
+
+  //Ensure they are friends
+  const existingFriendship = await prisma.friendship.findUnique({
     where: {
-      userId_friendId: {
-        userId,
-        friendId,
+      user1Id_user2Id: {
+        user1Id,
+        user2Id,
       },
     },
   });
@@ -231,11 +231,11 @@ export async function unfriend(req: Request, res: Response): Promise<void> {
   }
 
   // Remove friendship
-  await prisma.friend.delete({
+  await prisma.friendship.delete({
     where: {
-      userId_friendId: {
-        userId,
-        friendId,
+      user1Id_user2Id: {
+        user1Id,
+        user2Id,
       },
     },
   });
