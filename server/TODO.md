@@ -33,8 +33,8 @@ TODOs
     [] Password recovery
     [] logOut
     [] Limit demo requests
-    [] Add flag to demo content
-    [] Add periodic wipe of demo-created content
+    [x] Add flag to demo content (Added as User classes)
+    [Current] Add periodic wipe of demo-created content
 
 [] Comment
  [X] Add comment

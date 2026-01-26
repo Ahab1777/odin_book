@@ -247,6 +247,8 @@ test("demo-login reuses the same demo user", async () => {
   expect(count).toBe(1);
 });
 
+
+
 //Close prisma client so Jest doesn't complain
 afterAll(async () => {
   await prisma.$disconnect();
