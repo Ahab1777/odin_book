@@ -148,3 +148,30 @@ export async function login(req: Request, res: Response): Promise<void> {
     res.status(500).json({ message });
   }
 }
+
+//Demo user
+export async function loginDemo(req: Request, res: Response): Promise<void> {
+  const { id, email, username } = await userService.getOrCreateDemoUser();
+
+  // Generate JWT token
+  const token = jwt.sign(
+    {
+      userId: id,
+      email: email,
+      username: username,
+    },
+    process.env.JWT_SECRET!,
+    { expiresIn: "1h" },
+  );
+
+  //Fetch Gravatar profile pic
+  const avatar: string = gravatarUrl(email);
+
+  res.status(200).json({
+    token,
+    userId: id,
+    username,
+    email,
+    avatar,
+  });
+}
