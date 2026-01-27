@@ -3,7 +3,7 @@ import { body, ValidationChain, validationResult } from "express-validator";
 import { prisma } from "../lib/prisma";
 
 export const editBioValidation: ValidationChain[] = [
-  body("profile")
+  body("bio")
     .trim()
     .isLength({ max: 250 })
     .withMessage("Maximum bio size is 250 characters"),
@@ -22,7 +22,7 @@ export async function editBio(req: Request, res: Response): Promise<void> {
 
   try {
     const updatedUser = await prisma.profile.update({
-      where: { id: userId },
+      where: { userId },
       data: { bio },
       select: { id: true, bio: true },
     });
@@ -38,7 +38,7 @@ export async function getBio(req: Request, res: Response): Promise<void> {
 
   try {
     const profile = await prisma.profile.findUnique({
-      where: { id: userId },
+      where: { userId },
       select: { id: true, bio: true },
     });
 

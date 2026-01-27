@@ -17,6 +17,7 @@ app.use('/post', routes.post);
 app.use('/friend', routes.friend);
 app.use('/like', routes.like);
 app.use('/comment', routes.comment)
+app.use('/bio', routes.bio)
 
 //Network settings
 const PORT: number = parseInt(process.env.PORT || '9001', 10);
