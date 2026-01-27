@@ -41,7 +41,6 @@ beforeAll(() => {
   bigContent = suffix.repeat(1000);
 });
 
-// Setup users, friendships, and posts for getPostIndex tests
 beforeAll(async () => {
   const base = Date.now().toString(36);
 
@@ -302,60 +301,33 @@ test("updates post title and content", async () => {
 });
 
 //Get post
-test("function return correct post", (done: jest.DoneCallback) => {
-  const unique = Date.now().toString(36);
+test("function return correct post", async () => {
+  const user = await friendTestUtils.signupUser("post_get_single");
 
-  request(app)
-    .post("/auth/signup")
-    .send({
-      email: `test_${unique}@example.com`,
-      username: `user_${unique}`,
-      password: "Password1",
-    })
-    .expect(201)
-    .end((err, signupRes) => {
-      if (err) return done(err);
+  const createRes = await postTestUtils.createPost(user, {
+    title,
+    content,
+    userId: user.id,
+  });
 
-      const token = signupRes.body.token;
-      const userId = signupRes.body.userId;
+  expect(createRes.status).toBe(201);
+  const postId = createRes.body.id;
 
-      // Create a post first
-      request(app)
-        .post("/post/create")
-        .set("Authorization", `Bearer ${token}`)
-        .send({
-          title,
-          content,
-          userId,
-        })
-        .expect(201)
-        .end((err, postRes) => {
-          if (err) return done(err);
+  const res = await request(app).get(`/post/${postId}`).expect(200);
 
-          const postId = postRes.body.id;
-
-          // Get the post
-          request(app)
-            .get(`/post/${postId}`)
-            .expect(200)
-            .expect((res) => {
-              expect(res.body.id).toBe(postId);
-              expect(res.body.title).toBe(title);
-              expect(res.body.content).toBe(content);
-              expect(res.body.userId).toBe(userId);
-              expect(res.body.user).toBeDefined();
-              expect(res.body.user.id).toBe(userId);
-              expect(res.body.user.username).toBeDefined();
-              expect(res.body.comments).toBeDefined();
-              expect(Array.isArray(res.body.comments)).toBe(true);
-              expect(res.body.likes).toBeDefined();
-              expect(Array.isArray(res.body.likes)).toBe(true);
-              expect(res.body.likes.length).toBe(0);
-              expect(res.body.createdAt).toBeDefined();
-            })
-            .end(done);
-        });
-    });
+  expect(res.body.id).toBe(postId);
+  expect(res.body.title).toBe(title);
+  expect(res.body.content).toBe(content);
+  expect(res.body.userId).toBe(user.id);
+  expect(res.body.user).toBeDefined();
+  expect(res.body.user.id).toBe(user.id);
+  expect(res.body.user.username).toBeDefined();
+  expect(res.body.comments).toBeDefined();
+  expect(Array.isArray(res.body.comments)).toBe(true);
+  expect(res.body.likes).toBeDefined();
+  expect(Array.isArray(res.body.likes)).toBe(true);
+  expect(res.body.likes.length).toBe(0);
+  expect(res.body.createdAt).toBeDefined();
 });
 
 test("function return 404 if the post does not exist", (done: jest.DoneCallback) => {
@@ -371,7 +343,59 @@ test("function return 404 if the post does not exist", (done: jest.DoneCallback)
     .end(done);
 });
 
+//getUserPosts
+test("getUserPosts returns all and only posts from the authenticated user", async () => {
+  const mainUser = await friendTestUtils.signupUser("user_posts_main");
+  const otherUser = await friendTestUtils.signupUser("user_posts_other");
 
+  const mainPostRes1 = await postTestUtils.createPost(mainUser, {
+    title: `${title}_main_1`,
+    content: `${content} main 1`,
+    userId: mainUser.id,
+  });
+
+  const mainPostRes2 = await postTestUtils.createPost(mainUser, {
+    title: `${title}_main_2`,
+    content: `${content} main 2`,
+    userId: mainUser.id,
+  });
+
+  const otherPostRes = await postTestUtils.createPost(otherUser, {
+    title: `${title}_other`,
+    content: `${content} other`,
+    userId: otherUser.id,
+  });
+
+  expect(mainPostRes1.status).toBe(201);
+  expect(mainPostRes2.status).toBe(201);
+  expect(otherPostRes.status).toBe(201);
+
+  const mainPostId1 = mainPostRes1.body.id;
+  const mainPostId2 = mainPostRes2.body.id;
+  const otherPostId = otherPostRes.body.id;
+
+  const res = await request(app)
+    .get("/post/user")
+    .set("Authorization", `Bearer ${mainUser.token}`)
+    .expect(200);
+
+  expect(res.body.posts).toBeDefined();
+  expect(Array.isArray(res.body.posts)).toBe(true);
+
+  const returnedIds = res.body.posts.map((p: any) => p.id);
+
+  // Should include all posts from the main user
+  expect(returnedIds).toContain(mainPostId1);
+  expect(returnedIds).toContain(mainPostId2);
+
+  // Should NOT include posts from other users
+  expect(returnedIds).not.toContain(otherPostId);
+
+  // All returned posts should belong to the main user
+  res.body.posts.forEach((p: any) => {
+    expect(p.userId).toBe(mainUser.id);
+  });
+});
 
 //Get post index
 
