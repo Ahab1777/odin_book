@@ -26,6 +26,7 @@ TODOs
     [x] getFriendships
     [x] getUnknownUsers
     [x] Implement pending friendship logic
+    [] getFriendships and getUnknownUsers also returns avatars
 
 [] User 
     [x] Demo access
