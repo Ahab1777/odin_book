@@ -350,6 +350,7 @@ test("function return correct post", (done: jest.DoneCallback) => {
               expect(Array.isArray(res.body.comments)).toBe(true);
               expect(res.body.likes).toBeDefined();
               expect(Array.isArray(res.body.likes)).toBe(true);
+              expect(res.body.likes.length).toBe(0);
               expect(res.body.createdAt).toBeDefined();
             })
             .end(done);
