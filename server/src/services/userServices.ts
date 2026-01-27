@@ -65,6 +65,13 @@ export const userService = {
           class: 'DEMO'
         },
       });
+      //Create profile for demoUser
+      await prisma.profile.create({
+        data: {
+          bio: "I'm just a visitor here =)",
+          userId: demoUser.id,
+        },
+      });
     }
 
     return {

@@ -71,6 +71,13 @@ export async function signup(req: Request, res: Response): Promise<void> {
     { expiresIn: "7d" },
   );
 
+  //Create blank profile entry for user
+  await prisma.profile.create({
+    data: {
+      userId: user.id,
+    },
+  });
+
   //Fetch Gravatar profile pic
   const avatar: string = gravatarUrl(email);
 
