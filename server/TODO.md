@@ -13,13 +13,12 @@ TODOs
     [x] get post index ( posts from current user + friends) (done within 'posts' branch and unmerged)
     [x] update/edit post
     [x] test if getPostIndex works
-    [] Visitor postIndex
-    [] getUserPosts
-    [] getPostsIndex fetches avatars
+    [x] getUserPosts
+    [x] getPostsIndex fetches avatars
 
 [] Profile
-    [] getProfile
-    [] editProfile
+    [x] getProfile
+    [x] editProfile
 
 [] Friends
     [x] befriend user
