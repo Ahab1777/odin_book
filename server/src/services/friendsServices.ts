@@ -20,44 +20,6 @@ export const friendsService = {
     ];
   },
 
-  // async currentUserFollowedBy(currentUserId: string) {
-  //   const userWithFriendships = await prisma.user.findUnique({
-  //     where: { id: currentUserId },
-  //     include: {
-  //       friendshipsAsUser1: { include: { user2: true } },
-  //       friendshipsAsUser2: { include: { user1: true } },
-  //     },
-  //   });
-
-  //   if (!userWithFriendships) {
-  //     return [];
-  //   }
-
-  //   return [
-  //     ...userWithFriendships.friendshipsAsUser1.map((f) => f.user2),
-  //     ...userWithFriendships.friendshipsAsUser2.map((f) => f.user1),
-  //   ];
-  // },
-
-  // async mutualFriendships(currentUserId: string) {
-  //   const userWithFriendships = await prisma.user.findUnique({
-  //     where: { id: currentUserId },
-  //     include: {
-  //       friendshipsAsUser1: { include: { user2: true } },
-  //       friendshipsAsUser2: { include: { user1: true } },
-  //     },
-  //   });
-
-  //   if (!userWithFriendships) {
-  //     return [];
-  //   }
-
-  //   return [
-  //     ...userWithFriendships.friendshipsAsUser1.map((f) => f.user2),
-  //     ...userWithFriendships.friendshipsAsUser2.map((f) => f.user1),
-  //   ];
-  // },
-
   async unknownUsers(userId: string) {
     const unknownUsers = await prisma.user.findMany({
       where: {
