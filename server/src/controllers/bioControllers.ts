@@ -10,26 +10,45 @@ export const editBioValidation: ValidationChain[] = [
 ];
 
 export async function editBio(req: Request, res: Response): Promise<void> {
-    const { userId } = req.user as { userId: string };
-    
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        res.status(400).json({ errors: errors.array() });
-        return;
+  const { userId } = req.user as { userId: string };
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  const { bio } = req.body as { bio?: string };
+
+  try {
+    const updatedUser = await prisma.profile.update({
+      where: { id: userId },
+      data: { bio },
+      select: { id: true, bio: true },
+    });
+
+    res.status(200).json({ profile: updatedUser.bio });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update profile" });
+  }
+}
+
+export async function getBio(req: Request, res: Response): Promise<void> {
+  const { userId } = req.params as { userId: string };
+
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: { id: userId },
+      select: { id: true, bio: true },
+    });
+
+    if (!profile) {
+      res.status(404).json({ message: "Profile not found" });
+      return;
     }
 
-    const { bio } = req.body as { bio?: string };
-
-
-    try {
-        const updatedUser = await prisma.profile.update({
-            where: { id: userId },
-            data: { bio },
-            select: { id: true, bio: true },
-        });
-
-        res.status(200).json({ profile: updatedUser.bio });
-    } catch (error) {
-        res.status(500).json({ message: "Failed to update profile" });
-    }
+    res.status(200).json({ bio: profile.bio });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch profile" });
+  }
 }
