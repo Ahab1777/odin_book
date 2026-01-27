@@ -248,6 +248,8 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
     }
   });
 
+  
+
   // Sort by createdAt in descending order (newest first)
   allPosts.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
