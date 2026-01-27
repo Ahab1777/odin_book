@@ -371,6 +371,8 @@ test("function return 404 if the post does not exist", (done: jest.DoneCallback)
     .end(done);
 });
 
+
+
 //Get post index
 
 test("getPostIndex returns posts from current user and their friends only", async () => {
