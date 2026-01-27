@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { body, ValidationChain, validationResult } from "express-validator";
+import gravatarUrl from "../lib/gravatar";
 
 export const createPostValidation: ValidationChain[] = [
   body("title")
@@ -185,6 +186,7 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
             select: {
               id: true,
               username: true,
+              email: true,
             },
           },
         },
@@ -199,6 +201,7 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
                     select: {
                       id: true,
                       username: true,
+                      email: true,
                     },
                   },
                 },
@@ -217,6 +220,7 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
                     select: {
                       id: true,
                       username: true,
+                      email: true,
                     },
                   },
                 },
@@ -248,15 +252,30 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
     }
   });
 
-  
+  // Add avatar for each post's user using Gravatar
+  const postsWithAvatars = allPosts.map((post) => {
+    const email = post.user?.email as string | undefined;
+    const avatar = email ? gravatarUrl(email) : undefined;
+
+    return {
+      ...post,
+      user: post.user
+        ? {
+            id: post.user.id,
+            username: post.user.username,
+            avatar,
+          }
+        : post.user,
+    };
+  });
 
   // Sort by createdAt in descending order (newest first)
-  allPosts.sort(
+  postsWithAvatars.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 
   res.status(200).json({
-    posts: allPosts,
+    posts: postsWithAvatars,
   });
 }
 
