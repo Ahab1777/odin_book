@@ -5,6 +5,7 @@ import { userService } from "../services/userServices";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import gravatarUrl from "../lib/gravatar";
+import crypto from "crypto";
 
 //Sign-up
 //Validation array used as middleware for validating info going through a route
@@ -181,4 +182,49 @@ export async function loginDemo(req: Request, res: Response): Promise<void> {
     email,
     avatar,
   });
+}
+
+//Password reset
+export async function passwordReset(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { email } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  //Security - If user does not exist, return 200 with nothing
+  if (!user) {
+    res
+      .status(200)
+      .json({ message: "If that email exists, a reset link was sent" });
+    return;
+  }
+
+  const token = crypto.randomUUID();
+
+  // Set expiration time - 30min
+  const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+
+  //Create password reset request in db
+  const passwordReset = await prisma.passwordReset.create({
+    data: {
+      userId: user?.id,
+      token,
+      expiresAt,
+    },
+  });
+
+  // TODO: send email with token-based reset link
+
+
+  
+  // For now, respond generically for security
+  res
+    .status(200)
+    .json({ message: "If that email exists, a reset link was sent" });
 }
