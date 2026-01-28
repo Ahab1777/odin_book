@@ -4,6 +4,7 @@ import authRouter from "../authRouter";
 import { prisma } from "../../lib/prisma";
 import friendRouter from "../friendRouter";
 import friendUtils from "../testUtils/friendUtils";
+import gravatarUrl from "../../lib/gravatar";
 
 const app = express();
 app.use(express.json());
@@ -155,6 +156,8 @@ test("getFriendships returns correct friendships", async () => {
   expect(res.body.friendships.length).toBe(2);
   expect(ids).toContain(userB.id);
   expect(ids).toContain(userC.id);
+  //Return correct avatar
+  expect(res.body.friendships[0].avatar).toBe(gravatarUrl(res.body.friendships[0].email))
 });
 
 test("getUnknownUsers returns users with no relation to current user", async () => {
@@ -174,6 +177,8 @@ test("getUnknownUsers returns users with no relation to current user", async () 
   expect(ids).toContain(unknown.id);
   expect(ids).not.toContain(friend.id);
   expect(ids).not.toContain(current.id);
+  //Returns avatar also
+  expect(res.body.unknownUsers[0].avatar).toBe(gravatarUrl(res.body.unknownUsers[0].email))
 });
 
 afterAll(async () => {
