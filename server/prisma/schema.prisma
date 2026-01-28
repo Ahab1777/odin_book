@@ -28,21 +28,34 @@ datasource db {
 }
 
 model User {
-  id                 String          @id @default(cuid())
-  username           String          @unique
-  email              String          @unique
-  password           String
-  class              UserClasses     @default(NORMAL)
-  posts              Post[]
-  comments           Comment[]
-  friendshipsAsUser1 Friendship[]    @relation("FriendshipUser1")
-  friendshipsAsUser2 Friendship[]    @relation("FriendshipUser2")
-  likes              Like[]
-  profile            Profile?
-  sentRequests       FriendRequest[] @relation("sentRequests")
-  receivedRequests   FriendRequest[] @relation("receivedRequests")
+  id                  String               @id @default(cuid())
+  username            String               @unique
+  email               String               @unique
+  password            String
+  class               UserClasses          @default(NORMAL)
+  posts               Post[]
+  comments            Comment[]
+  friendshipsAsUser1  Friendship[]         @relation("FriendshipUser1")
+  friendshipsAsUser2  Friendship[]         @relation("FriendshipUser2")
+  likes               Like[]
+  profile             Profile?
+  sentRequests        FriendRequest[]      @relation("sentRequests")
+  receivedRequests    FriendRequest[]      @relation("receivedRequests")
+  passwordResetTokens PasswordReset[]
 
   @@map("users")
+}
+
+model PasswordReset {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@map("password_reset")
 }
 
 model Friendship {
