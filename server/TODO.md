@@ -30,7 +30,7 @@ TODOs
 
 [] User 
     [x] Demo access
-    [] Password recovery
+    [x] Password recovery
     [] Configure mail sender for password recovery
     [] logOut
     [] Limit demo requests
