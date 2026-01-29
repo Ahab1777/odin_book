@@ -7,7 +7,7 @@ import bcrypt from "bcrypt";
 import gravatarUrl from "../lib/gravatar";
 import crypto from "crypto";
 
-//Validation array used as middleware for validating info going through a route
+//Signup validation array
 export const signupValidation = [
   body("email")
     .isEmail()
@@ -35,6 +35,7 @@ export const signupValidation = [
   body("firstName").optional().trim(),
   body("lastName").optional().trim(),
 ];
+
 
 export async function signup(req: Request, res: Response): Promise<void> {
   //Validate user info
@@ -156,7 +157,7 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 }
 
-//Demo user
+//Login demo user
 export async function loginDemo(req: Request, res: Response): Promise<void> {
   const { id, email, username } = await userService.getOrCreateDemoUser();
 
