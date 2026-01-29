@@ -44,3 +44,4 @@ TODOs
     [] Route validation for admin
     [] test - admin can CRUD anything
     [] Prevent bad words
+    [] Remake all tests to check for non-normalized emails

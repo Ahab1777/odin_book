@@ -7,7 +7,6 @@ import bcrypt from "bcrypt";
 import gravatarUrl from "../lib/gravatar";
 import crypto from "crypto";
 
-//Sign-up
 //Validation array used as middleware for validating info going through a route
 export const signupValidation = [
   body("email")
@@ -184,6 +183,11 @@ export async function loginDemo(req: Request, res: Response): Promise<void> {
   });
 }
 
+export const passwordResetValidation = [
+  body("email").isEmail().withMessage("Invalid email format").normalizeEmail()
+]
+
+
 //Password reset
 export async function passwordReset(
   req: Request,
@@ -201,30 +205,28 @@ export async function passwordReset(
   if (!user) {
     res
       .status(200)
-      .json({ message: "If that email exists, a reset link was sent" });
+      .json({ message: "SUCCESS - If that email exists, a reset link was sent" });
     return;
   }
 
   const token = crypto.randomUUID();
-
-  // Set expiration time - 30min
   const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
 
-  //Create password reset request in db
-  const passwordReset = await prisma.passwordReset.create({
+  await prisma.passwordReset.create({
     data: {
-      userId: user?.id,
+      userId: user.id,
       token,
       expiresAt,
     },
   });
 
   // TODO: send email with token-based reset link
+  await userService.sendPasswordResetEmail(
+    email,
+    token
+  );
 
-
-  
-  // For now, respond generically for security
   res
     .status(200)
-    .json({ message: "If that email exists, a reset link was sent" });
+    .json({ message: "SUCCESS - If that email exists, a reset link was sent" });
 }

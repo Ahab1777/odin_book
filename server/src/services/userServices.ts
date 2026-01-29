@@ -1,6 +1,7 @@
 import { env } from "node:process";
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
+import { createTransporter } from "../lib/nodemailer";
 
 export const userService = {
   // Get user by email
@@ -53,7 +54,7 @@ export const userService = {
     let demoUser = await prisma.user.findUnique({
       where: { email: demoEmail },
     });
-  
+
     //If demoUser does not exist, create it
     if (!demoUser) {
       const hashedPassword: string = await bcrypt.hash(demoPassword, 10);
@@ -62,7 +63,7 @@ export const userService = {
           email: demoEmail,
           username: demoUsername,
           password: hashedPassword,
-          class: 'DEMO'
+          class: "DEMO",
         },
       });
       //Create profile for demoUser
@@ -79,5 +80,19 @@ export const userService = {
       email: demoUser.email,
       username: demoUser.username,
     };
+  },
+
+  //Password recovery
+  async sendPasswordResetEmail(
+    email: string,
+    token: string,
+    transporter = createTransporter(),
+  ) {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || process.env.SMTP_USER, // or hard-code a proper from
+      to: email,
+      subject: "Password reset",
+      text: `Use this token: ${token}`,
+    });
   },
 };
