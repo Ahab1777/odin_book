@@ -89,7 +89,7 @@ export const userService = {
     transporter = createTransporter(),
   ) {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER, // or hard-code a proper from
+      from: process.env.SMTP_FROM || process.env.SMTP_USER, 
       to: email,
       subject: "Password reset",
       text: `Use this token: ${token}`,

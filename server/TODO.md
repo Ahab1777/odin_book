@@ -31,6 +31,7 @@ TODOs
 [] User 
     [x] Demo access
     [] Password recovery
+    [] Configure mail sender for password recovery
     [] logOut
     [] Limit demo requests
     [x] Add flag to demo content (Added as User classes)

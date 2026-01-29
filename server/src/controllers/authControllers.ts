@@ -184,9 +184,8 @@ export async function loginDemo(req: Request, res: Response): Promise<void> {
 }
 
 export const passwordResetValidation = [
-  body("email").isEmail().withMessage("Invalid email format").normalizeEmail()
-]
-
+  body("email").isEmail().withMessage("Invalid email format").normalizeEmail(),
+];
 
 //Password reset
 export async function passwordReset(
@@ -205,7 +204,9 @@ export async function passwordReset(
   if (!user) {
     res
       .status(200)
-      .json({ message: "SUCCESS - If that email exists, a reset link was sent" });
+      .json({
+        message: "If that email exists, a reset link was sent",
+      });
     return;
   }
 
@@ -221,12 +222,60 @@ export async function passwordReset(
   });
 
   // TODO: send email with token-based reset link
-  await userService.sendPasswordResetEmail(
-    email,
-    token
-  );
+  await userService.sendPasswordResetEmail(email, token);
 
   res
     .status(200)
-    .json({ message: "SUCCESS - If that email exists, a reset link was sent" });
+    .json({ message: "If that email exists, a reset link was sent" });
+}
+
+export const passwordChangeValidation = [
+  body("token").isUUID().withMessage("Invalid token"),
+  body("password")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters")
+    .matches(/[A-Z]/)
+    .withMessage("Password must contain an uppercase letter")
+    .matches(/[0-9]/)
+    .withMessage("Password must contain a number"),
+];
+
+export async function passwordChange(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
+  const { token, password } = req.body;
+
+  // Find reset token
+  const resetEntry = await prisma.passwordReset.findUnique({
+    where: { token },
+  });
+
+  if (!resetEntry || resetEntry.expiresAt < new Date()) {
+    res.status(400).json({ error: "Invalid or expired token" });
+    return;
+  }
+
+  // Change password + clean up tokens in a transaction
+  await prisma.$transaction(async (tx) => {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await tx.user.update({
+      where: { id: resetEntry.userId },
+      data: { password: hashedPassword },
+    });
+
+    // Delete all reset tokens for this user
+    await tx.passwordReset.deleteMany({
+      where: { userId: resetEntry.userId },
+    });
+  });
+
+  res.status(200).json({ message: "Password changed successfully" });
 }
