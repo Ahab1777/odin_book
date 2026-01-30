@@ -7,7 +7,7 @@ import { normalizeAppEmail } from "../lib/email";
 export const userService = {
   // Get user by email
   async findByEmailForSignUp(email: string) {
-    const normalizedEmail = normalizeAppEmail(email)
+    const normalizedEmail = normalizeAppEmail(email);
     return await prisma.user.findUnique({
       where: { email: normalizedEmail },
       select: {
@@ -28,7 +28,7 @@ export const userService = {
 
   //Get username and password for login
   async findByEmailForLogin(email: string) {
-    const normalizedEmail = normalizeAppEmail(email)
+    const normalizedEmail = normalizeAppEmail(email);
     return await prisma.user.findUnique({
       where: { email: normalizedEmail },
       select: {
@@ -53,9 +53,9 @@ export const userService = {
       );
     }
 
-    const normalizedEmail = normalizeAppEmail(demoEmail)
- 
-   //Fetch demoUser, if it exists
+    const normalizedEmail = normalizeAppEmail(demoEmail);
+
+    //Fetch demoUser, if it exists
     let demoUser = await prisma.user.findUnique({
       where: { email: normalizedEmail },
     });
@@ -65,7 +65,7 @@ export const userService = {
       const hashedPassword: string = await bcrypt.hash(demoPassword, 10);
       demoUser = await prisma.user.create({
         data: {
-          email: demoEmail,
+          email: normalizedEmail,
           username: demoUsername,
           password: hashedPassword,
           class: "DEMO",
@@ -94,7 +94,7 @@ export const userService = {
     transporter = createTransporter(),
   ) {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER, 
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: email,
       subject: "Password reset",
       text: `Use this token: ${token}`,

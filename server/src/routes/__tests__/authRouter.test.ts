@@ -2,6 +2,7 @@ import authRouter from "../authRouter";
 import request from "supertest";
 import express from "express";
 import { prisma } from "../../lib/prisma";
+import { normalizeAppEmail } from "../../lib/email";
 
 const app = express();
 app.use(express.json());
@@ -26,18 +27,18 @@ let invalidPassword: string;
 beforeAll(() => {
   const suffix = Date.now().toString(36); // simple unique-ish string
   username = `ahab_${suffix}`;
-  email = `user_${suffix}@example.com`;
+  email = `user.${suffix}@gmail.com`;
   password = `Q1w2e3r4_${suffix}`;
 
   const invalidSuffix = Date.now().toString(36); // simple unique-ish string
   invalidUsername = `ahab_${invalidSuffix}`;
-  invalidEmail = `user_${invalidSuffix}@example.com`;
+  invalidEmail = `user.${invalidSuffix}@gmail.com`;
   invalidPassword = `Q1w2e3r4_${invalidSuffix}`;
 });
 
 beforeAll(async () => {
   const demoSuffix = Date.now().toString(36);
-  const demoEmail = `demo_${demoSuffix}@example.com`;
+  const demoEmail = `demo.${demoSuffix}@gmail.com`;
   const demoUsername = `demo_user_${demoSuffix}`;
 
   process.env.DEMO_USER_EMAIL = demoEmail;
@@ -108,7 +109,7 @@ test("signup fails with weak password", (done: jest.DoneCallback) => {
   request(app)
     .post("/signup")
     .send({
-      email: "newuser@example.com",
+      email: "new.user@gmail.com",
       username: "signupfailweakpassword",
       password: "weak", // Too short, no uppercase, no number
     })
@@ -204,7 +205,7 @@ test("login fails with nonexistent email", (done: jest.DoneCallback) => {
   request(app)
     .post("/login")
     .send({
-      email: "doesnotexist@example.com",
+      email: "does.not.exist@gmail.com",
       password: "SomePassword123",
     })
     .expect(401)
@@ -218,6 +219,8 @@ test("demo-login creates demo user and returns token", async () => {
   const demoEmail = process.env.DEMO_USER_EMAIL as string;
   const demoUsername = process.env.DEMO_USER_USERNAME as string;
 
+  const normalizedDemoEmail = normalizeAppEmail(demoEmail);
+
   const res = await request(app).post("/demo-login").send().expect(200);
 
   expect(res.body.token).toBeDefined();
@@ -225,12 +228,12 @@ test("demo-login creates demo user and returns token", async () => {
   expect(res.body.userId).toBeDefined();
   expect(typeof res.body.userId).toBe("string");
   expect(res.body.username).toBe(demoUsername);
-  expect(res.body.email).toBe(demoEmail);
+  expect(res.body.email).toBe(normalizedDemoEmail);
   expect(res.body.avatar).toBeDefined();
   expect(typeof res.body.avatar).toBe("string");
 
   const demoUserInDb = await prisma.user.findUnique({
-    where: { email: demoEmail },
+    where: { email: normalizedDemoEmail },
   });
   expect(demoUserInDb).not.toBeNull();
   expect(demoUserInDb?.username).toBe(demoUsername);
@@ -243,7 +246,10 @@ test("demo-login reuses the same demo user", async () => {
   expect(first.body.userId).toBe(second.body.userId);
 
   const demoEmail = process.env.DEMO_USER_EMAIL as string;
-  const count = await prisma.user.count({ where: { email: demoEmail } });
+  const normalizedDemoEmail = normalizeAppEmail(demoEmail);
+  const count = await prisma.user.count({
+    where: { email: normalizedDemoEmail },
+  });
   expect(count).toBe(1);
 });
 
@@ -287,16 +293,17 @@ test("password reset request for an existing user creates reset entry", async ()
 
 test("password change succeeds with valid token", async () => {
   const suffix = Date.now().toString(36);
-  const testEmail = `pwchange_${suffix}@example.com`;
+  const testEmail = `pw.change.${suffix}@gmail.com`;
+  const normalizedEmail = normalizeAppEmail(testEmail);
   const testUsername = `pwchange_user_${suffix}`;
   const originalPassword = `OldPass1_${suffix}`;
   const newPassword = `NewPass2_${suffix}`;
 
   // Ensure clean state
   await prisma.passwordReset.deleteMany({
-    where: { user: { email: testEmail } },
+    where: { user: { email: normalizedEmail } },
   });
-  await prisma.user.deleteMany({ where: { email: testEmail } });
+  await prisma.user.deleteMany({ where: { email: normalizedEmail } });
 
   // Create the account via the signup route
   await request(app)
@@ -308,7 +315,9 @@ test("password change succeeds with valid token", async () => {
     })
     .expect(201);
 
-  const user = await prisma.user.findUnique({ where: { email: testEmail } });
+  const user = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+  });
   expect(user).not.toBeNull();
 
   // Request password reset to generate a token
@@ -372,16 +381,17 @@ test("password change is denied with invalid token", async () => {
 
 test("password change is denied when password does not meet requirements", async () => {
   const suffix = Date.now().toString(36);
-  const testEmail = `pwweak_${suffix}@example.com`;
+  const testEmail = `pw.weak.${suffix}@gmail.com`;
+  const normalizedEmail = normalizeAppEmail(testEmail);
   const testUsername = `pwweak_user_${suffix}`;
   const originalPassword = `Strong1_${suffix}`;
   const weakPassword = "weak"; // too short, no uppercase, no number
 
   // Ensure clean state
   await prisma.passwordReset.deleteMany({
-    where: { user: { email: testEmail } },
+    where: { user: { email: normalizedEmail } },
   });
-  await prisma.user.deleteMany({ where: { email: testEmail } });
+  await prisma.user.deleteMany({ where: { email: normalizedEmail } });
 
   // Create the account via the signup route
   await request(app)
@@ -393,7 +403,9 @@ test("password change is denied when password does not meet requirements", async
     })
     .expect(201);
 
-  const user = await prisma.user.findUnique({ where: { email: testEmail } });
+  const user = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+  });
   expect(user).not.toBeNull();
 
   // Request password reset to generate a token

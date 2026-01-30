@@ -20,7 +20,7 @@ export async function signupUser(prefix: string): Promise<TestUser> {
   const res = await request(app)
     .post("/auth/signup")
     .send({
-      email: `${prefix}_${unique}@example.com`,
+      email: `${prefix}.${unique}@gmail.com`,
       username: `${prefix}_${unique}`,
       password: "Password1",
     })
