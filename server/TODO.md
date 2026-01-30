@@ -36,6 +36,7 @@ TODOs
     [] Limit demo requests
     [x] Add flag to demo content (Added as User classes)
     [] Add periodic wipe of demo-created content
+    [] Request mail confirmation for account creation
 
 [] Comment
  [X] Add comment
