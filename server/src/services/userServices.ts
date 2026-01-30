@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
 import { createTransporter } from "../lib/nodemailer";
 import { normalizeAppEmail } from "../lib/email";
+import { sendResetEmail } from "../lib/resend";
 
 export const userService = {
   // Get user by email
@@ -91,13 +92,22 @@ export const userService = {
   async sendPasswordResetEmail(
     email: string,
     token: string,
-    transporter = createTransporter(),
+    // transporter = createTransporter(),
   ) {
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
-      to: email,
-      subject: "Password reset",
-      text: `Use this token: ${token}`,
-    });
+  try {
+    await sendResetEmail(email, token);
+  } catch (err) {
+    console.error("Failed to send reset email", err);
+    // Optionally rethrow if you want the route to 500 instead of silently succeeding
+    // throw err;
+  }
+  
+    //Nodemailer method
+    // await transporter.sendMail({
+    //   from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    //   to: email,
+    //   subject: "Password reset",
+    //   text: `Use this token: ${token}`,
+    // });
   },
 };
