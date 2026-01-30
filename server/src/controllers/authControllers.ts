@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import gravatarUrl from "../lib/gravatar";
 import crypto from "crypto";
+import { normalizeAppEmail } from "../lib/email";
 
 //Signup validation array
 export const signupValidation = [
@@ -194,10 +195,10 @@ export async function passwordReset(
   res: Response,
 ): Promise<void> {
   const { email } = req.body;
-
+  const normalizedEmail = normalizeAppEmail(email)
   const user = await prisma.user.findUnique({
     where: {
-      email,
+      email: normalizedEmail,
     },
   });
 

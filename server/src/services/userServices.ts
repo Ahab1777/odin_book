@@ -2,12 +2,14 @@ import { env } from "node:process";
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
 import { createTransporter } from "../lib/nodemailer";
+import { normalizeAppEmail } from "../lib/email";
 
 export const userService = {
   // Get user by email
   async findByEmailForSignUp(email: string) {
+    const normalizedEmail = normalizeAppEmail(email)
     return await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
       select: {
         email: true,
       },
@@ -26,8 +28,9 @@ export const userService = {
 
   //Get username and password for login
   async findByEmailForLogin(email: string) {
+    const normalizedEmail = normalizeAppEmail(email)
     return await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
       select: {
         email: true,
         password: true,
@@ -50,9 +53,11 @@ export const userService = {
       );
     }
 
-    //Fetch demoUser, if it exists
+    const normalizedEmail = normalizeAppEmail(demoEmail)
+ 
+   //Fetch demoUser, if it exists
     let demoUser = await prisma.user.findUnique({
-      where: { email: demoEmail },
+      where: { email: normalizedEmail },
     });
 
     //If demoUser does not exist, create it
