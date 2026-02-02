@@ -91,22 +91,12 @@ export const userService = {
   async sendPasswordResetEmail(
     email: string,
     token: string,
-    // transporter = createTransporter(),
+    resetId: string
   ) {
-  try {
-    await sendResetEmail(email, token);
-  } catch (err) {
-    console.error("Failed to send reset email", err);
-    // Optionally rethrow if you want the route to 500 instead of silently succeeding
-    // throw err;
-  }
-  
-    //Nodemailer method
-    // await transporter.sendMail({
-    //   from: process.env.SMTP_FROM || process.env.SMTP_USER,
-    //   to: email,
-    //   subject: "Password reset",
-    //   text: `Use this token: ${token}`,
-    // });
+    try {
+      await sendResetEmail(email, token, resetId);
+    } catch (err) {
+      console.error("Failed to send reset email", err);
+    }
   },
 };

@@ -37,7 +37,6 @@ export const signupValidation = [
   body("lastName").optional().trim(),
 ];
 
-
 export async function signup(req: Request, res: Response): Promise<void> {
   //Validate user info
   const validationErrors = validationResult(req);
@@ -195,7 +194,7 @@ export async function passwordReset(
   res: Response,
 ): Promise<void> {
   const { email } = req.body;
-  const normalizedEmail = normalizeAppEmail(email)
+  const normalizedEmail = normalizeAppEmail(email);
   const user = await prisma.user.findUnique({
     where: {
       email: normalizedEmail,
@@ -204,27 +203,29 @@ export async function passwordReset(
 
   //Security - If user does not exist, return 200 with nothing
   if (!user) {
-    res
-      .status(200)
-      .json({
-        message: "If that email exists, a reset link was sent",
-      });
+    res.status(200).json({
+      message: "If that email exists, a reset link was sent",
+    });
     return;
   }
 
   const token = crypto.randomUUID();
+  //Expires in 30min
   const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
+  //Hash token
+  const tokenHash = await bcrypt.hash(token, 10);
 
-  await prisma.passwordReset.create({
+  //Create password reset instance
+  const resetRequest = await prisma.passwordReset.create({
     data: {
       userId: user.id,
-      token,
+      tokenHash,
       expiresAt,
     },
   });
 
-  // TODO: send email with token-based reset link
-  await userService.sendPasswordResetEmail(email, token);
+  //Send email with token-based reset link
+  await userService.sendPasswordResetEmail(email, token, resetRequest.id);
 
   res
     .status(200)
@@ -252,14 +253,27 @@ export async function passwordChange(
     return;
   }
 
-  const { token, password } = req.body;
+  const { resetId, token, password } = req.body;
 
-  // Find reset token
+  //
+  if (!resetId) {
+    res.status(400).json({ error: "Missing password reset request ID" });
+    return;
+  }
+
+  // Find reset request entry
   const resetEntry = await prisma.passwordReset.findUnique({
-    where: { token },
+    where: { id: resetId },
   });
 
   if (!resetEntry || resetEntry.expiresAt < new Date()) {
+    res.status(400).json({ error: "Invalid or expired token" });
+    return;
+  }
+
+  //Check if token is valid
+  const isValid = await bcrypt.compare(token, resetEntry.tokenHash);
+  if (!isValid) {
     res.status(400).json({ error: "Invalid or expired token" });
     return;
   }

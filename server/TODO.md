@@ -31,8 +31,9 @@ TODOs
 [] User 
     [x] Demo access
     [x] Password recovery
-    [] Configure mail sender for password recovery
+    [x] Configure mail sender for password recovery
     [] password recovery token is sent through req.params
+    [] Hash token before storing it
     [] logOut
     [] Limit demo requests
     [x] Add flag to demo content (Added as User classes)
