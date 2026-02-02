@@ -1,7 +1,6 @@
 import { env } from "node:process";
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
-import { createTransporter } from "../lib/nodemailer";
 import { normalizeAppEmail } from "../lib/email";
 import { sendResetEmail } from "../lib/resend";
 
