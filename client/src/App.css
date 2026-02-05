@@ -7,3 +7,9 @@
   --color-brown: #774e24;
   --color-rose: #f8c7cc;
 }
+
+html,
+body,
+#root {
+  height: 100%;
+}

@@ -2,22 +2,22 @@ import { Link, NavLink } from "react-router";
 
 export default function Navbar() {
   return (
-    <header className="navbar bg-lime text-xl">
-      <div className="navbar__inner">
-        <div className="navbar__brand">
-          <Link to="/" className="navbar__logo">
+    <header className="w-full bg-lime text-xl sticky top-0 z-50">
+      <div className="max-w-5xl mx-auto flex items-center justify-between px-5 py-5 gap-6">
+        <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             {/* Replace with your logo or text */}
-            <span className="navbar__logo-mark">OB</span>
-            <span className="navbar__logo-text">OdinBook</span>
+            <span className="font-semibold">OB</span>
+            <span className="font-medium">OdinBook</span>
           </Link>
         </div>
 
-        <nav className="navbar__nav" aria-label="Main navigation">
+        <nav className="flex items-center gap-4" aria-label="Main navigation">
           <NavLink
             to="/"
             end
             className={({ isActive }) =>
-              `navbar__link ${isActive ? "navbar__link--active" : ""}`
+              `hover:underline ${isActive ? "font-semibold" : ""}`
             }
           >
             Home
@@ -25,7 +25,7 @@ export default function Navbar() {
           <NavLink
             to="/feed"
             className={({ isActive }) =>
-              `navbar__link ${isActive ? "navbar__link--active" : ""}`
+              `hover:underline ${isActive ? "font-semibold" : ""}`
             }
           >
             Feed
@@ -33,18 +33,24 @@ export default function Navbar() {
           <NavLink
             to="/friends"
             className={({ isActive }) =>
-              `navbar__link ${isActive ? "navbar__link--active" : ""}`
+              `hover:underline ${isActive ? "font-semibold" : ""}`
             }
           >
             Friends
           </NavLink>
         </nav>
 
-        <div className="navbar__actions">
-          <Link to="/login" className="navbar__button navbar__button--ghost">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/login"
+            className="px-4 py-2 rounded-full border border-black/20 hover:bg-black/5"
+          >
             Log in
           </Link>
-          <Link to="/signup" className="navbar__button navbar__button--primary">
+          <Link
+            to="/signup"
+            className="px-4 py-2 rounded-full bg-black text-white hover:bg-black/80"
+          >
             Sign up
           </Link>
         </div>
