@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import gravatarUrl from "../lib/gravatar";
 import crypto from "crypto";
 import { normalizeAppEmail } from "../lib/email";
+import { userInfo } from "os";
 
 //Signup validation array
 export const signupValidation = [
@@ -294,4 +295,27 @@ export async function passwordChange(
   });
 
   res.status(200).json({ message: "Password changed successfully" });
+}
+
+
+
+export async function getUserInfo(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { userId } = req.user as {
+    userId: string;
+  };
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id:userId
+    }
+  })
+
+  res.json({
+    id: userId,
+    email: user?.email,
+    username: user?.username
+  });  
 }

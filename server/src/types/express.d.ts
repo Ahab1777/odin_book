@@ -11,4 +11,10 @@ declare global {
     }
 }
 
+interface UserInformation {
+    userId: string;
+    email: string;
+    username: string;
+}
+
 export {}

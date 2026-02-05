@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getUserInfo,
   login,
   loginDemo,
   loginValidation,
@@ -10,9 +11,11 @@ import {
   signup,
   signupValidation,
 } from "../controllers/authControllers";
+import { authentication } from "../middlewares/authMiddleware";
 
 const authRouter = express.Router();
 
+authRouter.get("/me", authentication, getUserInfo)
 authRouter.post("/signup", signupValidation, signup);
 authRouter.post("/login", loginValidation, login);
 authRouter.post("/demo-login", loginDemo);
