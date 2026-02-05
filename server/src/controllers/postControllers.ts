@@ -47,7 +47,7 @@ export async function createPost(req: Request, res: Response): Promise<void> {
 }
 
 export async function deletePost(req: Request, res: Response): Promise<void> {
-  const { postId } = req.params;
+  const postId = req.params.postId as string;
   const { userId } = req.user as { userId: string };
 
   // Check if post exists and user owns it
@@ -74,7 +74,7 @@ export async function deletePost(req: Request, res: Response): Promise<void> {
 }
 
 export async function updatePost(req: Request, res: Response): Promise<void> {
-  const { postId } = req.params;
+  const postId = req.params.postId as string;
   const { title, content } = req.body;
   const { userId } = req.user as { userId: string };
 
@@ -121,7 +121,7 @@ export async function updatePost(req: Request, res: Response): Promise<void> {
 }
 
 export async function getPost(req: Request, res: Response): Promise<void> {
-  const { postId } = req.params;
+  const postId = req.params.postId as string;
 
   // Check if post exists
   const post = await prisma.post.findUnique({
@@ -253,7 +253,7 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
   });
 
   // Add avatar for each post's user using Gravatar
-  const postsWithAvatars = allPosts.map((post) => {
+  const postsWithAvatars = allPosts.map((post: any) => {
     const email = post.user?.email as string | undefined;
     const avatar = email ? gravatarUrl(email) : undefined;
 
