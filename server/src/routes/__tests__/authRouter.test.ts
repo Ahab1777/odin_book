@@ -228,12 +228,12 @@ test("demo-login creates demo user and returns token", async () => {
   expect(res.body.userId).toBeDefined();
   expect(typeof res.body.userId).toBe("string");
   expect(res.body.username).toBe(demoUsername);
-  expect(res.body.email).toBe(normalizedDemoEmail);
+  expect(res.body.email).toBe(demoEmail);
   expect(res.body.avatar).toBeDefined();
   expect(typeof res.body.avatar).toBe("string");
 
   const demoUserInDb = await prisma.user.findUnique({
-    where: { email: normalizedDemoEmail },
+    where: { emailNormalized: normalizedDemoEmail },
   });
   expect(demoUserInDb).not.toBeNull();
   expect(demoUserInDb?.username).toBe(demoUsername);
@@ -248,7 +248,7 @@ test("demo-login reuses the same demo user", async () => {
   const demoEmail = process.env.DEMO_USER_EMAIL as string;
   const normalizedDemoEmail = normalizeAppEmail(demoEmail);
   const count = await prisma.user.count({
-    where: { email: normalizedDemoEmail },
+    where: { emailNormalized: normalizedDemoEmail },
   });
   expect(count).toBe(1);
 });

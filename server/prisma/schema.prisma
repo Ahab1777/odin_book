@@ -28,19 +28,20 @@ datasource db {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  username            String               @unique
-  email               String               @unique
+  id                  String          @id @default(cuid())
+  username            String          @unique
+  email               String          @unique
+  emailNormalized     String          @unique
   password            String
-  class               UserClasses          @default(NORMAL)
+  class               UserClasses     @default(NORMAL)
   posts               Post[]
   comments            Comment[]
-  friendshipsAsUser1  Friendship[]         @relation("FriendshipUser1")
-  friendshipsAsUser2  Friendship[]         @relation("FriendshipUser2")
+  friendshipsAsUser1  Friendship[]    @relation("FriendshipUser1")
+  friendshipsAsUser2  Friendship[]    @relation("FriendshipUser2")
   likes               Like[]
   profile             Profile?
-  sentRequests        FriendRequest[]      @relation("sentRequests")
-  receivedRequests    FriendRequest[]      @relation("receivedRequests")
+  sentRequests        FriendRequest[] @relation("sentRequests")
+  receivedRequests    FriendRequest[] @relation("receivedRequests")
   passwordResetTokens PasswordReset[]
 
   @@map("users")
@@ -48,7 +49,7 @@ model User {
 
 model PasswordReset {
   id        String    @id @default(uuid())
-  tokenHash     String    @unique
+  tokenHash String    @unique
   userId    String
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
