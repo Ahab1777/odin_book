@@ -7,9 +7,9 @@ import { sendResetEmail } from "../lib/resend";
 export const userService = {
   // Get user by email
   async findByEmailForSignUp(email: string) {
-    const normalizedEmail = normalizeAppEmail(email);
+    const emailNormalized = normalizeAppEmail(email);
     return await prisma.user.findUnique({
-      where: { email: normalizedEmail },
+      where: { emailNormalized },
       select: {
         email: true,
       },
@@ -28,9 +28,9 @@ export const userService = {
 
   //Get username and password for login
   async findByEmailForLogin(email: string) {
-    const normalizedEmail = normalizeAppEmail(email);
+    const emailNormalized = normalizeAppEmail(email);
     return await prisma.user.findUnique({
-      where: { email: normalizedEmail },
+      where: { emailNormalized },
       select: {
         email: true,
         password: true,
@@ -53,11 +53,11 @@ export const userService = {
       );
     }
 
-    const normalizedEmail = normalizeAppEmail(demoEmail);
+    const emailNormalized = normalizeAppEmail(demoEmail);
 
     //Fetch demoUser, if it exists
     let demoUser = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
+      where: { emailNormalized },
     });
 
     //If demoUser does not exist, create it
@@ -65,7 +65,8 @@ export const userService = {
       const hashedPassword: string = await bcrypt.hash(demoPassword, 10);
       demoUser = await prisma.user.create({
         data: {
-          email: normalizedEmail,
+          email: demoEmail,
+          emailNormalized,
           username: demoUsername,
           password: hashedPassword,
           class: "DEMO",

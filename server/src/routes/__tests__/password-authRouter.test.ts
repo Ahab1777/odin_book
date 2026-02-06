@@ -26,7 +26,7 @@ test("password reset request for an existing user creates reset entry", async ()
     .expect(201);
 
   const normalizedEmail = normalizeAppEmail(testEmail)
-  const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+  const user = await prisma.user.findUnique({ where: { emailNormalized: normalizedEmail } });
   expect(user).not.toBeNull();
 
   // Send password reset request

@@ -7,13 +7,13 @@ import bcrypt from "bcrypt";
 import gravatarUrl from "../lib/gravatar";
 import crypto from "crypto";
 import { normalizeAppEmail } from "../lib/email";
+import { userInfo } from "os";
 
 //Signup validation array
 export const signupValidation = [
   body("email")
     .isEmail()
     .withMessage("Invalid e-mail format")
-    .normalizeEmail()
     .custom(async (email) => {
       const user = await userService.findByEmailForSignUp(email);
       if (user) throw new Error("Email already registered");
@@ -49,6 +49,8 @@ export async function signup(req: Request, res: Response): Promise<void> {
 
   const { email, username, password } = req.body;
 
+  const emailNormalized = normalizeAppEmail(email);
+
   //Hash password
   const hashedPassword: string = await bcrypt.hash(password, 10);
 
@@ -58,6 +60,7 @@ export async function signup(req: Request, res: Response): Promise<void> {
       email,
       username,
       password: hashedPassword,
+      emailNormalized
     },
   });
 
@@ -92,7 +95,7 @@ export async function signup(req: Request, res: Response): Promise<void> {
 
 //Login
 export const loginValidation = [
-  body("email").isEmail().withMessage("Invalid email format").normalizeEmail(),
+  body("email").isEmail().withMessage("Invalid email format"),
   body("password").notEmpty().withMessage("Password is required"),
 ];
 
@@ -105,6 +108,7 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 
   const { email, password } = req.body;
+
 
   try {
     // Find user by email (with password hash)
@@ -194,10 +198,10 @@ export async function passwordReset(
   res: Response,
 ): Promise<void> {
   const { email } = req.body;
-  const normalizedEmail = normalizeAppEmail(email);
+  const emailNormalized = normalizeAppEmail(email);
   const user = await prisma.user.findUnique({
     where: {
-      email: normalizedEmail,
+      emailNormalized,
     },
   });
 
@@ -294,4 +298,26 @@ export async function passwordChange(
   });
 
   res.status(200).json({ message: "Password changed successfully" });
+}
+
+
+export async function getUserInfo(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { userId } = req.user as {
+    userId: string;
+  };
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id:userId
+    }
+  })
+
+  res.json({
+    id: userId,
+    email: user?.email,
+    username: user?.username
+  });  
 }
