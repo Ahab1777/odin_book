@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import Home from "./app/pages/Home.tsx";
 import Login from "./app/pages/Login.tsx";
 import { requireUser } from "./app/loaders/authLoader.ts";
+import { loginLoader } from "./app/loaders/loginLoader.ts";
 
 const router = createBrowserRouter([
   {
@@ -21,7 +22,8 @@ const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: <Login/>
+    element: <Login />,
+    loader: loginLoader
   }
 ])
 

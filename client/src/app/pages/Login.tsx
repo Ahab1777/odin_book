@@ -1,8 +1,19 @@
 import { useState } from "react";
+import { useLoaderData, useNavigate } from "react-router";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const { from } = useLoaderData() as { from: string };
+  const navigate = useNavigate();
+
+  async function handleSubmit(e: React.SubmitEvent) {
+    e.preventDefault();
+    //TODO - implement login logic
+
+    navigate(from, { replace: true });
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center">
@@ -41,6 +52,7 @@ export default function Login() {
             <button
               type="submit"
               className="mt-2 p-2 bg-blue-600 text-white rounded"
+              onSubmit={handleSubmit}
             >
               Log in
             </button>
