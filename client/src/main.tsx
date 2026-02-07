@@ -7,6 +7,7 @@ import Home from "./app/pages/Home.tsx";
 import Login from "./app/pages/Login.tsx";
 import { requireUser } from "./app/loaders/authLoader.ts";
 import { loginLoader } from "./app/loaders/loginLoader.ts";
+import CreateAccount from "./app/pages/CreateAccount.tsx";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,11 @@ const router = createBrowserRouter([
     path: '/login',
     element: <Login />,
     loader: loginLoader
+  },
+  {
+    path: '/create-account',
+    element: <CreateAccount />,
+    
   }
 ])
 
