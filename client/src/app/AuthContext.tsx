@@ -29,8 +29,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .finally(() => setIsLoading(false));
   }, []);
 
+  function logout() {
+    localStorage.removeItem('jwtToken');
+    setUser(null);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, setUser }}>
+    <AuthContext.Provider value={{ user, isLoading, setUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
