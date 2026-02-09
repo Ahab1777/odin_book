@@ -69,7 +69,8 @@ export default function Login() {
           </p>
         </header>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          {loginError ? <div>{loginError}</div> : ""}
           <div className="flex flex-col gap-4 ">
             <label className="flex flex-col">
               <span>Email</span>
@@ -96,9 +97,9 @@ export default function Login() {
             <button
               type="submit"
               className="mt-2 p-2 bg-blue-600 text-white rounded"
-              onSubmit={handleSubmit}
+              disabled={isLoading}
             >
-              Log in
+              {isLoading ? "Logging in..." : "Log in"}
             </button>
           </div>
         </form>
