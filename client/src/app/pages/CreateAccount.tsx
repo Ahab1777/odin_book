@@ -1,16 +1,91 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { api } from "../../lib/api";
+import { useAuth } from "../auth";
 
 export default function CreateAccount() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
-    const navigator = useNavigate();
-    
+  const navigator = useNavigate();
+  const { post } = api;
+  const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setUser } = useAuth();
+
+  type ValidationErrorItem = {
+    path?: string;
+    msg?: string;
+  };
+
+  type ApiError = {
+    status?: number;
+    data?: {
+      errors?: ValidationErrorItem[];
+    };
+    message: string;
+  };
+
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
-    // TODO: implement account creation logic
+
+    setFormError(null);
+    setFieldErrors({});
+
+    if (password !== passwordConfirmation) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        passwordConfirmation: "Password does not match",
+      }));
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      type SignupResponse = {
+        token: string;
+        userId: string;
+        username: string;
+        avatar: string;
+      };
+      const res = await post<SignupResponse>("/auth/signup", {
+        username,
+        email,
+        password,
+      });
+
+      //Store token in local storage and user in context
+      localStorage.setItem("jwtToken", res.token);
+      setUser({
+        id: res.userId,
+        username: res.username,
+        email,
+        avatar: res.avatar,
+      });
+      //Return to main page
+      navigator("/");
+    } catch (err) {
+      const error = err as ApiError;
+
+      if (error.status === 400 && Array.isArray(error.data?.errors)) {
+        const nextFieldErrors: Record<string, string> = {};
+        for (const v of error.data.errors) {
+          if (typeof v.path === "string" && typeof v.msg === "string") {
+            nextFieldErrors[v.path] = v.msg;
+          }
+        }
+        setFieldErrors(nextFieldErrors);
+      } else {
+        setFormError(
+          error.message || "Something went wrong, please try again.",
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -23,6 +98,12 @@ export default function CreateAccount() {
           </p>
         </header>
 
+        {formError && (
+          <p className="mb-4 text-sm text-red-600" role="alert">
+            {formError}
+          </p>
+        )}
+
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-4">
             <label className="flex flex-col">
@@ -34,6 +115,11 @@ export default function CreateAccount() {
                 className="border p-2 rounded"
                 required
               />
+              {fieldErrors.username && (
+                <span className="text-xs text-red-600">
+                  {fieldErrors.username}
+                </span>
+              )}
             </label>
 
             <label className="flex flex-col">
@@ -45,6 +131,11 @@ export default function CreateAccount() {
                 className="border p-2 rounded"
                 required
               />
+              {fieldErrors.email && (
+                <span className="text-xs text-red-600">
+                  {fieldErrors.email}
+                </span>
+              )}
             </label>
 
             <label className="flex flex-col">
@@ -56,6 +147,11 @@ export default function CreateAccount() {
                 className="border p-2 rounded"
                 required
               />
+              {fieldErrors.password && (
+                <span className="text-xs text-red-600">
+                  {fieldErrors.password}
+                </span>
+              )}
             </label>
 
             <label className="flex flex-col">
@@ -67,13 +163,19 @@ export default function CreateAccount() {
                 className="border p-2 rounded"
                 required
               />
+              {fieldErrors.passwordConfirmation && (
+                <span className="text-xs text-red-600">
+                  {fieldErrors.passwordConfirmation}
+                </span>
+              )}
             </label>
 
             <button
               type="submit"
-              className="mt-2 p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="mt-2 p-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              disabled={isSubmitting}
             >
-              Create account
+              {isSubmitting ? "Creating account..." : "Create account"}
             </button>
           </div>
         </form>

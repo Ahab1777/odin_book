@@ -8,10 +8,11 @@ import Login from "./app/pages/Login.tsx";
 import { requireUser } from "./app/loaders/authLoader.ts";
 import { loginLoader } from "./app/loaders/loginLoader.ts";
 import CreateAccount from "./app/pages/CreateAccount.tsx";
+import { AuthProvider } from "./app/AuthContext";
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <App />,
     loader: requireUser,
     children: [
@@ -19,24 +20,23 @@ const router = createBrowserRouter([
         index: true,
         element: <Home />,
       },
-    ]
+    ],
   },
   {
-    path: '/login',
+    path: "/login",
     element: <Login />,
-    loader: loginLoader
+    loader: loginLoader,
   },
   {
-    path: '/create-account',
+    path: "/create-account",
     element: <CreateAccount />,
-    
-  }
-])
-
-
+  },
+]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );
