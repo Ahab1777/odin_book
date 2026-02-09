@@ -2,31 +2,21 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { api } from "../../lib/api";
 import { useAuth } from "../auth";
+import type { ApiValidationError, SignupResponse } from "../../types/auth";
 
 export default function CreateAccount() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const navigator = useNavigate();
+  const navigate = useNavigate();
   const { post } = api;
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setUser } = useAuth();
 
-  type ValidationErrorItem = {
-    path?: string;
-    msg?: string;
-  };
 
-  type ApiError = {
-    status?: number;
-    data?: {
-      errors?: ValidationErrorItem[];
-    };
-    message: string;
-  };
 
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
@@ -45,12 +35,7 @@ export default function CreateAccount() {
     try {
       setIsSubmitting(true);
 
-      type SignupResponse = {
-        token: string;
-        userId: string;
-        username: string;
-        avatar: string;
-      };
+
       const res = await post<SignupResponse>("/auth/signup", {
         username,
         email,
@@ -66,9 +51,9 @@ export default function CreateAccount() {
         avatar: res.avatar,
       });
       //Return to main page
-      navigator("/");
+      navigate("/");
     } catch (err) {
-      const error = err as ApiError;
+      const error = err as ApiValidationError;
 
       if (error.status === 400 && Array.isArray(error.data?.errors)) {
         const nextFieldErrors: Record<string, string> = {};

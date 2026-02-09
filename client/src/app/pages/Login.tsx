@@ -1,18 +1,62 @@
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router";
+import { api } from "../../lib/api";
+import { useAuth } from "../auth";
+import type { ApiValidationError, LoginResponse } from "../../types/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const { from } = useLoaderData() as { from: string };
   const navigate = useNavigate();
 
+  const { post } = api;
+  const { setUser } = useAuth();
+
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
-    //TODO - implement login logic
+    setIsLoading(true);
+    setLoginError("");
 
-    navigate(from, { replace: true });
+    try {
+      //Login user through API
+      const res = await post<LoginResponse>("/auth/login", {
+        email,
+        password,
+      });
+
+      //Save jwtToken
+      localStorage.setItem("jwtToken", res.token);
+      setUser({
+        id: res.userId,
+        username: res.username,
+        email: res.email,
+        avatar: res.avatar,
+      });
+      //Go back to original page
+      navigate(from, { replace: true });
+    } catch (error) {
+      const err = error as ApiValidationError;
+
+      if (err.status === 400) {
+        const serverMsg =
+          typeof err.data?.errors === "string"
+            ? err.data.errors
+            : "Invalid request. Please check your input.";
+        setLoginError(serverMsg);
+      } else if (err.status === 401) {
+        setLoginError("Invalid email or password.");
+      } else if (!err.status) {
+        setLoginError("Network error. Please try again.");
+      } else {
+        setLoginError(`Unexpected error (status ${err.status}).`);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
