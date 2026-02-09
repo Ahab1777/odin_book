@@ -1,10 +1,18 @@
 import express from 'express';
 import type { Application } from 'express';
 import { routes } from './routes/index';
+import cors from 'cors';
 
 
 const app: Application = express();
 
+//CORS
+
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
+app.use(cors({
+    origin: CLIENT_ORIGIN,
+    credentials: true
+}))
 
 //Middlewares
 app.use(express.json());
