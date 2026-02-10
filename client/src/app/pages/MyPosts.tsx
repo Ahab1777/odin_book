@@ -4,7 +4,7 @@ import { api } from "../../lib/api";
 import { useEffect, useState } from "react";
 import type { PostIndexResponse } from "../../types/auth";
 
-export default function Home() {
+export default function MyPosts() {
   const [postIndex, setPostIndex] = useState<PostCardContent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +14,7 @@ export default function Home() {
 
     async function loadPosts() {
       try {
-        const res = await api.get<PostIndexResponse>("/post");
+        const res = await api.get<PostIndexResponse>("/user");
         if (!cancelled) {
           setPostIndex(res.posts);
         }
@@ -37,9 +37,9 @@ export default function Home() {
   return (
     <main>
       <section>
-        <h1 className="text-brown text-center">Home Feed</h1>
+        <h1 className="text-brown text-center">My Posts</h1>
         {isLoading ? (
-          <p>Loading posts...</p>
+          <p>Loading your posts...</p>
         ) : error ? (
           <p className="text-red-600">{error}</p>
         ) : postIndex.length === 0 ? (

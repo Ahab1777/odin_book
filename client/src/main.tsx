@@ -9,6 +9,7 @@ import { requireUser } from "./app/loaders/authLoader.ts";
 import { loginLoader } from "./app/loaders/loginLoader.ts";
 import CreateAccount from "./app/pages/CreateAccount.tsx";
 import { AuthProvider } from "./app/AuthContext";
+import MyPosts from "./app/pages/MyPosts.tsx";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "/my-posts",
+        element: <MyPosts />,
       },
     ],
   },

@@ -31,12 +31,12 @@ export default function Navbar() {
             Home
           </NavLink>
           <NavLink
-            to="/feed"
+            to="/my-posts"
             className={({ isActive }) =>
               `hover:underline ${isActive ? "font-semibold" : ""}`
             }
           >
-            Feed
+            My Posts
           </NavLink>
           <NavLink
             to="/friends"
