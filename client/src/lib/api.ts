@@ -6,13 +6,18 @@ if (!API_URL) {
   console.warn("VITE_API_URL is not defined; API requests will fail.");
 }
 
+function getJwtToken() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("jwtToken");
+}
+
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 interface RequestOptions extends Omit<RequestInit, "body"> {
   body?: unknown;
 }
 
-export async function request<T>(
+async function request<T>(
   path: string,
   method: HttpMethod = "GET",
   options: RequestOptions = {},
@@ -25,10 +30,15 @@ export async function request<T>(
   const url =
     API_URL.replace(/\/$/, "") + (path.startsWith("/") ? path : `/${path}`);
 
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
-  };
+const headers = new Headers({
+  "Content-Type": "application/json",
+  ...(options.headers instanceof Headers ? {} : options.headers),
+});
+
+const token = getJwtToken();
+if (token) {
+  headers.set("Authorization", `Bearer ${token}`);
+}
 
   const init: RequestInit = {
     ...options,

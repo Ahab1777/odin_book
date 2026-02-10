@@ -25,3 +25,19 @@ export type SignupResponse = {
   username: string;
   avatar: string;
 };
+
+type PostCardContentUser = {
+  id: string;
+  username: string;
+  avatar: string;
+}
+
+export type PostCardContent = {
+  id: string;
+  title: string;
+  content: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  user: PostCardContentUser;
+}
