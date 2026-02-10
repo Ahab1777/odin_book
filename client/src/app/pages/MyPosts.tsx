@@ -14,7 +14,7 @@ export default function MyPosts() {
 
     async function loadPosts() {
       try {
-        const res = await api.get<PostIndexResponse>("/user");
+        const res = await api.get<PostIndexResponse>("/post/user");
         if (!cancelled) {
           setPostIndex(res.posts);
         }
