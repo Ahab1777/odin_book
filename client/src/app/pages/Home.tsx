@@ -1,43 +1,50 @@
 import type { PostCardContent } from "../../types/auth";
 import PostCard from "../components/PostCard";
-
+import { api } from "../../lib/api";
+import { useEffect, useState } from "react";
+import type { PostIndexResponse } from "../../types/auth";
 
 export default function Home() {
-  //Api postIndex return object example:
-  // {
-  //   "posts": [
-  // {
-  //   "id": "post_123",
-  //   "title": "My first post",
-  //   "content": "This is the content of my first post.",
-  //   "userId": "user_abc",
-  //   "createdAt": "2026-02-10T12:34:56.789Z",
-  //   "updatedAt": "2026-02-10T12:34:56.789Z",
-  //   "user": {
-  // "id": "user_abc",
-  // "username": "alice",
-  // "avatar": "https://www.gravatar.com/avatar/abc123..."
-  //   }
-  // }
-  //   ]
-    // }
-    
-    const postIndex:
-        PostCardContent[] = [];
-    //TODO - fetch postIndex
-    
+  const [postIndex, setPostIndex] = useState<PostCardContent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
 
+    async function loadPosts() {
+      try {
+        const res = await api.get<PostIndexResponse>("/post");
+        if (!cancelled) {
+          setPostIndex(res.posts);
+        }
+      } catch (err: unknown) {
+          if (!cancelled) {
+              const error = err as Error;
+          setError(error.message || "Failed to load posts");
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
 
+    loadPosts();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (isLoading) return <p>Loading feed…</p>;
+  if (error) return <p className="text-red-600">{error}</p>;
 
   return (
     <main>
       <section>
-          <h1 className="text-brown text-center">Home Feed</h1>
-              {postIndex.map(post => (
-            <PostCard key={post.id} {...post}/>
+        <h1 className="text-brown text-center">Home Feed</h1>
+        {postIndex.map((post) => (
+          <PostCard key={post.id} {...post} />
         ))}
-          </section>
+      </section>
     </main>
   );
 }

@@ -26,6 +26,10 @@ export type SignupResponse = {
   avatar: string;
 };
 
+export type PostIndexResponse = {
+  posts: PostCardContent[];
+};
+
 type PostCardContentUser = {
   id: string;
   username: string;
