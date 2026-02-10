@@ -39,6 +39,14 @@ export default function Navbar() {
             My Posts
           </NavLink>
           <NavLink
+            to="/new-post"
+            className={({ isActive }) =>
+              `hover:underline ${isActive ? "font-semibold" : ""}`
+            }
+          >
+            New Post
+          </NavLink>
+          <NavLink
             to="/friends"
             className={({ isActive }) =>
               `hover:underline ${isActive ? "font-semibold" : ""}`

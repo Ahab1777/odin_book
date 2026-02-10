@@ -8,7 +8,6 @@ export const createPostValidation: ValidationChain[] = [
     .trim()
     .isLength({ min: 3, max: 24 })
     .withMessage("Title must be between 3 and 24 characters"),
-  body("userId").notEmpty().withMessage("User ID is required"),
   body("content")
     .trim()
     .isLength({ min: 10, max: 240 })

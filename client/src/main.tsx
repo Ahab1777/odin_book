@@ -10,6 +10,7 @@ import { loginLoader } from "./app/loaders/loginLoader.ts";
 import CreateAccount from "./app/pages/CreateAccount.tsx";
 import { AuthProvider } from "./app/AuthContext";
 import MyPosts from "./app/pages/MyPosts.tsx";
+import NewPost from "./app/pages/NewPost.tsx";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
         path: "/my-posts",
         element: <MyPosts />,
       },
+      {
+        path: "/new-post",
+        element: <NewPost/>
+      }
     ],
   },
   {
