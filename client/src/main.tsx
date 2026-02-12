@@ -11,6 +11,7 @@ import CreateAccount from "./app/pages/CreateAccount.tsx";
 import { AuthProvider } from "./app/AuthContext";
 import MyPosts from "./app/pages/MyPosts.tsx";
 import NewPost from "./app/pages/NewPost.tsx";
+import Community from "./app/pages/Community.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,8 +29,26 @@ const router = createBrowserRouter([
       },
       {
         path: "/new-post",
-        element: <NewPost/>
-      }
+        element: <NewPost />,
+      },
+      {
+        path: "/community",
+        element: <Community />,
+        children: [
+          {
+            path: "/",
+            element: <NewPost />,
+          },
+          {
+            path: "/pending",
+            element: <NewPost />,
+          },
+          {
+            path: "/unknown",
+            element: <NewPost />,
+          },
+        ],
+      },
     ],
   },
   {

@@ -30,7 +30,7 @@ export type PostIndexResponse = {
   posts: PostCardContent[];
 };
 
-type PostCardContentUser = {
+export type BasicUser = {
   id: string;
   username: string;
   avatar: string;
@@ -43,7 +43,7 @@ export type PostCardContent = {
   userId: string;
   createdAt: string;
   updatedAt: string;
-  user: PostCardContentUser;
+  user: BasicUser;
 }
 
 type Comment = {

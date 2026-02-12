@@ -47,12 +47,12 @@ export default function Navbar() {
             New Post
           </NavLink>
           <NavLink
-            to="/friends"
+            to="/community"
             className={({ isActive }) =>
               `hover:underline ${isActive ? "font-semibold" : ""}`
             }
           >
-            Friends
+            Community
           </NavLink>
         </nav>
 
