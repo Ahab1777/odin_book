@@ -26,6 +26,17 @@ export async function getUnknownUsers(
 
   res.status(200).json({ unknownUsers });
 }
+
+export async function getIncomingPendingRequests(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { userId } = req.user as { userId: string };
+
+  const pendingRequests = await friendsService.incomingPendingRequests(userId);
+
+  res.status(200).json({ pendingRequests });
+}
 //Done
 export async function sendFriendRequest(
   req: Request,

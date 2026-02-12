@@ -73,4 +73,28 @@ export const friendsService = {
 
     return unknownUsersWithAvatar;
   },
+
+  async incomingPendingRequests(userId: string) {
+    const requests = await prisma.friendRequest.findMany({
+      where: {
+        receiverId: userId,
+        status: "PENDING",
+      },
+      include: {
+        requester: true,
+      },
+    });
+
+    const pendingWithAvatar = requests.map((request) => {
+      const avatar = gravatarUrl(request.requester.email);
+
+      return {
+        id: request.requester.id,
+        username: request.requester.username,
+        avatar,
+      };
+    });
+
+    return pendingWithAvatar;
+  },
 };
