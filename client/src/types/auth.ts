@@ -65,3 +65,7 @@ export type UserPostCardContent = Omit<PostCardContent, "user"> & {
   comments: Comment[];
   likes: Like[];
 };
+
+export type UserPostIndexResponse = {
+  posts: UserPostCardContent[];
+};

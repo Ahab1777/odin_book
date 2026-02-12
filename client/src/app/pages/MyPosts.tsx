@@ -1,11 +1,11 @@
-import type { PostCardContent } from "../../types/auth";
-import PostCard from "../components/PostCard";
+import type { UserPostCardContent } from "../../types/auth";
+import UserPostCard from "../components/UserPostCard";
 import { api } from "../../lib/api";
 import { useEffect, useState } from "react";
-import type { PostIndexResponse } from "../../types/auth";
+import type { UserPostIndexResponse } from "../../types/auth";
 
 export default function MyPosts() {
-  const [postIndex, setPostIndex] = useState<PostCardContent[]>([]);
+  const [postIndex, setPostIndex] = useState<UserPostCardContent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -14,7 +14,7 @@ export default function MyPosts() {
 
     async function loadPosts() {
       try {
-        const res = await api.get<PostIndexResponse>("/post/user");
+        const res = await api.get<UserPostIndexResponse>("/post/user");
         if (!cancelled) {
           setPostIndex(res.posts);
         }
@@ -45,7 +45,7 @@ export default function MyPosts() {
         ) : postIndex.length === 0 ? (
           "You have no posts yet"
         ) : (
-          postIndex.map((post) => <PostCard key={post.id} {...post} />)
+          postIndex.map((post) => <UserPostCard key={post.id} {...post} />)
         )}
       </section>
     </main>

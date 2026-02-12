@@ -14,7 +14,7 @@ export default function Home() {
 
     async function loadPosts() {
       try {
-        const res = await api.get<PostIndexResponse>("/post");
+        const res = await api.get<PostIndexResponse>("/post/index");
         if (!cancelled) {
           setPostIndex(res.posts);
         }
