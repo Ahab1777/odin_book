@@ -280,10 +280,13 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
 
 export async function getUserPosts(req: Request, res: Response): Promise<void> {
   const { userId } = req.user as { userId: string };
-
   const posts = await prisma.post.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
+    include: {
+      comments: true,
+      likes: true,
+    },
   });
 
   res.status(200).json({ posts });

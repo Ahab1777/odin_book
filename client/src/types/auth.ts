@@ -45,3 +45,23 @@ export type PostCardContent = {
   updatedAt: string;
   user: PostCardContentUser;
 }
+
+type Comment = {
+  id: string;
+  content: string;
+  userId: string;
+  postId: string;
+  createdAt: string;
+};
+
+type Like = {
+  id: string;
+  userId: string;
+  postId: string;
+  createdAt: string;
+};
+
+export type UserPostCardContent = Omit<PostCardContent, "user"> & {
+  comments: Comment[];
+  likes: Like[];
+};
