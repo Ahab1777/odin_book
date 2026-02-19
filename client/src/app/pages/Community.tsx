@@ -1,13 +1,12 @@
 import { Outlet, NavLink } from "react-router";
 
 export default function Community() {
-
   return (
     <main>
       <header>
-        <nav>
+        <nav className="flex justify-center gap-4 py-4 border-2">
           <NavLink
-            to="/"
+            to="/community"
             end
             className={({ isActive }) =>
               `hover:underline ${isActive ? "font-semibold" : ""}`
@@ -16,7 +15,7 @@ export default function Community() {
             Friends
           </NavLink>
           <NavLink
-            to="/pending"
+            to="/community/pending"
             end
             className={({ isActive }) =>
               `hover:underline ${isActive ? "font-semibold" : ""}`
@@ -25,7 +24,7 @@ export default function Community() {
             Pending Requests
           </NavLink>
           <NavLink
-            to="/unknown"
+            to="/community/unknown"
             end
             className={({ isActive }) =>
               `hover:underline ${isActive ? "font-semibold" : ""}`
@@ -35,7 +34,9 @@ export default function Community() {
           </NavLink>
         </nav>
       </header>
-      <Outlet />
+      <div>
+        <Outlet />
+      </div>
     </main>
   );
 }

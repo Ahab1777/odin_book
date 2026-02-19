@@ -12,6 +12,7 @@ import { AuthProvider } from "./app/AuthContext";
 import MyPosts from "./app/pages/MyPosts.tsx";
 import NewPost from "./app/pages/NewPost.tsx";
 import Community from "./app/pages/Community.tsx";
+import FriendsTab from "./app/components/community/FriendTab.tsx";
 
 const router = createBrowserRouter([
   {
@@ -36,15 +37,15 @@ const router = createBrowserRouter([
         element: <Community />,
         children: [
           {
-            path: "/",
+            index: true,
+            element: <FriendsTab />,
+          },
+          {
+            path: "pending",
             element: <NewPost />,
           },
           {
-            path: "/pending",
-            element: <NewPost />,
-          },
-          {
-            path: "/unknown",
+            path: "unknown",
             element: <NewPost />,
           },
         ],

@@ -34,6 +34,7 @@ export type BasicUser = {
   id: string;
   username: string;
   avatar: string;
+  email?: string;
 }
 
 export type PostCardContent = {
