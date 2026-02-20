@@ -67,12 +67,18 @@ export default function PendingCard({
         className="h-10 w-10 rounded-full object-cover"
       />
       <div>
-        <button onClick={handleAccept} disabled={isLoading}>
-          Accept
-        </button>
-        <button onClick={handleReject} disabled={isLoading}>
-          Reject
-        </button>
+        {error ? (
+          <p>`${error}`</p>
+        ) : (
+          <>
+            <button className="hover:font-bold" onClick={handleAccept} disabled={isLoading}>
+              Accept
+            </button>
+            <button className="hover:font-bold hover:text-red-500" onClick={handleReject} disabled={isLoading}>
+              Reject
+            </button>
+          </>
+        )}
       </div>
     </article>
   );

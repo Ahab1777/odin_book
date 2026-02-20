@@ -6,3 +6,4 @@ Routes
 
 Community 
     [] FriendCard should take user to user's profile
+    [] add pagination to community tabs

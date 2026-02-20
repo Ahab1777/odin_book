@@ -14,6 +14,7 @@ import NewPost from "./app/pages/NewPost.tsx";
 import Community from "./app/pages/Community.tsx";
 import FriendsTab from "./app/components/community/FriendTab.tsx";
 import PendingTab from "./app/components/community/PendingTab.tsx";
+import UnknownTab from "./app/components/community/UnknownTab.tsx";
 
 const router = createBrowserRouter([
   {
@@ -47,7 +48,7 @@ const router = createBrowserRouter([
           },
           {
             path: "unknown",
-            element: <NewPost />,
+            element: <UnknownTab />,
           },
         ],
       },
