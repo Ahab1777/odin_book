@@ -4,36 +4,43 @@ import { api } from "../../../lib/api";
 import type { BasicUser } from "../../../types/auth";
 import PendingCard from "./PendingCard";
 
+
+
 export default function PendingTab() {
   const [pendingRequests, setPendingRequests] = useState<BasicUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        let cancelled = false;
+  useEffect(() => {
+    let cancelled = false;
 
-        async function loadPendingRequests() {
-            try {
-                const res = await api.get<PendingRequestsResponse>("/requests/incoming");
-                if (!cancelled) {
-                    setPendingRequests(res.pendingRequests)
-                }
-            } catch (err: unknown) {
-                if (!cancelled) {
-                    const error = err as Error;
-                    setError(error.message || "Failed to load pending requests")
-                }
-            } finally {
-                if(!cancelled) setIsLoading(false)
-            }
+    async function loadPendingRequests() {
+      try {
+        const res =
+          await api.get<PendingRequestsResponse>("/friend/requests/incoming");
+        if (!cancelled) {
+          setPendingRequests(res.pendingRequests);
         }
-
-        loadPendingRequests();
-        return () => {
-            cancelled = true;
+      } catch (err: unknown) {
+        if (!cancelled) {
+          const error = err as Error;
+          setError(error.message || "Failed to load pending requests");
         }
-    })
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+
+    loadPendingRequests();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Callback to remove a request from the list
+  const handleRequestUpdate = (id: string) => {
+    setPendingRequests((prev) => prev.filter((request) => request.id !== id));
+  };
 
   return (
     <>
@@ -42,9 +49,13 @@ export default function PendingTab() {
       ) : error ? (
         <p className="text-red-600">{error}</p>
       ) : pendingRequests.length === 0 ? (
-        <p className="text-red-600">You have no friends yet</p>
+        <p className="text-red-600">You have no pending requests</p>
       ) : (
-        pendingRequests.map((request) => <PendingCard key={request.id} {...request} />)
+        pendingRequests.map((request) => (
+          <PendingCard key={request.id} {...request}
+          onRequestUpdate={handleRequestUpdate}
+          />
+        ))
       )}
     </>
   );

@@ -7,3 +7,11 @@ export type FriendsResponse = {
 export type PendingRequestsResponse = {
     pendingRequests: Array<BasicUser>
 }
+
+export type CreateFriendshipResponse = {
+    id: string;
+    user1Id: string;
+    user2Id: string;
+    createdAt: Date;
+    requestStatus: string;
+}

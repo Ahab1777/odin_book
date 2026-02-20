@@ -7,6 +7,7 @@ import {
   getUnknownUsers,
   sendFriendRequest,
   getIncomingPendingRequests,
+  denyFriendRequest,
 } from "../controllers/friendControllers";
 
 const friendRouter = express.Router();
@@ -25,6 +26,12 @@ friendRouter.get(
   "/requests/incoming",
   authentication,
   getIncomingPendingRequests,
+);
+
+friendRouter.post(
+  "/deny/:userId",
+  authentication,
+  denyFriendRequest,
 );
 
 export default friendRouter;

@@ -13,6 +13,7 @@ import MyPosts from "./app/pages/MyPosts.tsx";
 import NewPost from "./app/pages/NewPost.tsx";
 import Community from "./app/pages/Community.tsx";
 import FriendsTab from "./app/components/community/FriendTab.tsx";
+import PendingTab from "./app/components/community/PendingTab.tsx";
 
 const router = createBrowserRouter([
   {
@@ -42,7 +43,7 @@ const router = createBrowserRouter([
           },
           {
             path: "pending",
-            element: <NewPost />,
+            element: <PendingTab />,
           },
           {
             path: "unknown",

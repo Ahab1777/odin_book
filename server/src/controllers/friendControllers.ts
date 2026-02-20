@@ -126,6 +126,43 @@ export async function sendFriendRequest(
     status: request.status,
   });
 }
+
+export async function denyFriendRequest(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const requesterId = req.params.userId as string;
+  const { userId: receiverId } = req.user as { userId: string };
+
+  // Confirm request exists
+  const existingRequest = await prisma.friendRequest.findUnique({
+    where: {
+      requesterId_receiverId: {
+        requesterId,
+        receiverId,
+      },
+    },
+  });
+
+  if (!existingRequest || existingRequest.status !== "PENDING") {
+    res.status(400).json({ error: "no pending friend request from this user" });
+    return;
+  }
+
+  // Delete the request
+  await prisma.friendRequest.delete({
+    where: {
+      requesterId_receiverId: {
+        requesterId,
+        receiverId,
+      },
+    },
+  });
+
+  res.status(200).json({ message: "Friend request denied" });
+}
+
+
 //Done
 export async function befriend(req: Request, res: Response): Promise<void> {
   // :userId is the one who sent the request (requester)
@@ -236,3 +273,5 @@ export async function unfriend(req: Request, res: Response): Promise<void> {
 
   res.status(200).json({ message: "Successfully unfriended user" });
 }
+
+
