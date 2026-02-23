@@ -62,6 +62,9 @@ export async function getIncomingPendingRequests(
     offset,
   );
 
+  console.log("🚀 ~ friendControllers.ts:65 ~ getIncomingPendingRequests ~ pendingRequests:", pendingRequests);
+
+
   res.status(200).json(pendingRequests);
 }
 //Done

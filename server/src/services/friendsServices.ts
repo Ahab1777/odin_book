@@ -186,9 +186,9 @@ export const friendsService = {
 
   async incomingPendingRequests(
     userId: string,
+    page: number,
     limit: number,
     offset: number,
-    page: number,
   ) {
     // Fetch the total count of pending requests
     const totalPendingRequests = await prisma.friendRequest.count({
@@ -214,6 +214,9 @@ export const friendsService = {
       orderBy: { createdAt: "desc" },
     });
 
+    console.log("🚀 ~ friendsServices.ts:217 ~ pendingRequests:", pendingRequests);
+
+
     // Add avatars to pending requests
     const pendingWithAvatar = pendingRequests.map((request) => {
       const avatar = request.requester.email
@@ -221,12 +224,9 @@ export const friendsService = {
         : null;
 
       return {
-        id: request.id,
-        requester: {
           id: request.requester.id,
           username: request.requester.username,
           avatar,
-        },
       };
     });
 
