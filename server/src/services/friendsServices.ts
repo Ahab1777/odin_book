@@ -48,57 +48,84 @@ export const friendsService = {
     offset: number,
     page: number,
   ) {
-    // Fetch the total count of friendships
-    const totalFriendships = await prisma.friendship.count({
-      where: {
-        OR: [{ user1Id: userId }, { user2Id: userId }],
-      },
-    });
-
-    // Fetch paginated friendships
-    const friendships = await prisma.friendship.findMany({
-      where: {
-        OR: [{ user1Id: userId }, { user2Id: userId }],
-      },
+    // Fetch the user's friendships
+    const friendships = await prisma.user.findUnique({
+      where: { id: userId },
       include: {
-        user1: {
-          select: { id: true, username: true, email: true },
-        },
-        user2: {
-          select: { id: true, username: true, email: true },
-        },
+        friendshipsAsUser1: { include: { user2: true } },
+        friendshipsAsUser2: { include: { user1: true } },
       },
-      skip: offset,
-      take: limit,
-      orderBy: { createdAt: "desc" },
     });
 
-    // Add avatars to friendships
-    const friendshipsWithAvatar = friendships.map((friendship) => {
-      const friend =
-        friendship.user1.id === userId ? friendship.user2 : friendship.user1;
-      const avatar = friend.email ? gravatarUrl(friend.email) : null;
 
+
+    if (!friendships) {
       return {
-        id: friendship.id,
-        friend: {
-          id: friend.id,
-          username: friend.username,
-          avatar,
+        friends: [],
+        pagination: {
+          currentPage: page,
+          totalPages: 0,
+          totalFriendships: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
         },
       };
-    });
+    }
 
-    // Return paginated friendships and metadata
+    // Combine all friendships into a single array and add avatar links
+    const allFriendshipsWithAvatar = [
+      ...friendships.friendshipsAsUser1.map((f) => {
+        const avatar = gravatarUrl(f.user2.email);
+
+        return {
+          id: f.user2.id,
+          username: f.user2.username,
+          email: f.user2.email,
+          avatar,
+        };
+      }),
+      ...friendships.friendshipsAsUser2.map((f) => {
+        const avatar = gravatarUrl(f.user1.email);
+
+        return {
+          id: f.user1.id,
+          username: f.user1.username,
+          email: f.user1.email,
+          avatar,
+        };
+      }),
+    ];
+
+    console.log("🚀 ~ friendsServices.ts:99 ~ allFriendshipsWithAvatar:", allFriendshipsWithAvatar);
+
+
+    // Total number of friendships
+    const totalFriendships = allFriendshipsWithAvatar.length;
+
+    console.log("🚀 ~ friendsServices.ts:105 ~ totalFriendships:", totalFriendships);
+
+
+    // Paginate the friendships
+    const paginatedFriendships = allFriendshipsWithAvatar.slice(
+      offset,
+      offset + limit,
+    );
+
+    console.log("🚀 ~ friendsServices.ts:114 ~ paginatedFriendships:", paginatedFriendships);
+
+
+    // Calculate pagination metadata
+    const pagination = {
+      currentPage: page,
+      totalPages: Math.ceil(totalFriendships / limit),
+      totalFriendships,
+      hasNextPage: offset + limit < totalFriendships,
+      hasPreviousPage: offset > 0,
+    };
+
     return {
-      friendships: friendshipsWithAvatar,
-      pagination: {
-        currentPage: page,
-        totalPages: Math.ceil(totalFriendships / limit),
-        totalFriendships,
-        hasNextPage: offset + limit < totalFriendships,
-        hasPreviousPage: offset > 0,
-      },
+      friends: paginatedFriendships,
+      pagination,
     };
   },
 

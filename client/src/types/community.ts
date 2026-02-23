@@ -1,12 +1,29 @@
 import type { BasicUser } from "./auth";
 
+
 export type FriendsResponse = {
-  friendships: Array<BasicUser>;
+  friends: Array<BasicUser>;
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalFriendships: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 };
 
 export type PendingRequestsResponse = {
   pendingRequests: Array<BasicUser>;
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalUsers: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 };
+
+
 
 export type CreateFriendshipResponse = {
   id: string;

@@ -42,7 +42,7 @@ export default function UnknownTab() {
     };
   }, [page, limit]);
 
-  //TODO handle page change
+  //handle page change
   const handleNextPage = () => {
     setPage((p) => p + 1);
   };
