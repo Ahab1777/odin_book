@@ -9,10 +9,18 @@ export async function getFriendships(
   res: Response,
 ): Promise<void> {
   const { userId } = req.user as { userId: string };
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = (page - 1) * limit;
 
-  const friendships = await friendsService.currentFriendships(userId);
+  const friendships = await friendsService.currentFriendships(
+    userId,
+    page,
+    limit,
+    offset,
+  );
 
-  res.status(200).json({ friendships });
+  res.status(200).json(friendships);
 }
 
 //Done
@@ -25,7 +33,12 @@ export async function getUnknownUsers(
   const limit = parseInt(req.query.limit as string) || 10;
   const offset = (page - 1) * limit;
 
-  const unknownUsers = await friendsService.unknownUsers(userId, limit, offset, page);
+  const unknownUsers = await friendsService.unknownUsers(
+    userId,
+    limit,
+    offset,
+    page,
+  );
 
   res.status(200).json(unknownUsers);
 }
@@ -35,10 +48,18 @@ export async function getIncomingPendingRequests(
   res: Response,
 ): Promise<void> {
   const { userId } = req.user as { userId: string };
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = (page - 1) * limit;
 
-  const pendingRequests = await friendsService.incomingPendingRequests(userId);
+  const pendingRequests = await friendsService.incomingPendingRequests(
+    userId,
+    page,
+    limit,
+    offset,
+  );
 
-  res.status(200).json({ pendingRequests });
+  res.status(200).json(pendingRequests);
 }
 //Done
 export async function sendFriendRequest(

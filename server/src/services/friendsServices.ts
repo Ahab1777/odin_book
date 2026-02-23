@@ -2,44 +2,104 @@ import gravatarUrl from "../lib/gravatar";
 import { prisma } from "../lib/prisma";
 
 export const friendsService = {
-  async currentFriendships(userId: string) {
-    const friendships = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        friendshipsAsUser1: { include: { user2: true } },
-        friendshipsAsUser2: { include: { user1: true } },
+  // async currentFriendships(userId: string) {
+  //   const friendships = await prisma.user.findUnique({
+  //     where: { id: userId },
+  //     include: {
+  //       friendshipsAsUser1: { include: { user2: true } },
+  //       friendshipsAsUser2: { include: { user1: true } },
+  //     },
+  //   });
+
+  //   if (!friendships) {
+  //     return [];
+  //   }
+
+  //   //Add avatar link to each user
+  //   const friendshipsWithAvatar = [
+  //     ...friendships.friendshipsAsUser1.map((f) => {
+  //       const avatar = gravatarUrl(f.user2.email);
+
+  //       return {
+  //         id: f.user2.id,
+  //         username: f.user2.username,
+  //         email: f.user2.email,
+  //         avatar,
+  //       };
+  //     }),
+  //     ...friendships.friendshipsAsUser2.map((f) => {
+  //       const avatar = gravatarUrl(f.user1.email);
+
+  //       return {
+  //         id: f.user1.id,
+  //         username: f.user1.username,
+  //         email: f.user1.email,
+  //         avatar,
+  //       };
+  //     }),
+  //   ];
+
+  //   return friendshipsWithAvatar;
+  // },
+
+  async currentFriendships(
+    userId: string,
+    limit: number,
+    offset: number,
+    page: number,
+  ) {
+    // Fetch the total count of friendships
+    const totalFriendships = await prisma.friendship.count({
+      where: {
+        OR: [{ user1Id: userId }, { user2Id: userId }],
       },
     });
 
-    if (!friendships) {
-      return [];
-    }
+    // Fetch paginated friendships
+    const friendships = await prisma.friendship.findMany({
+      where: {
+        OR: [{ user1Id: userId }, { user2Id: userId }],
+      },
+      include: {
+        user1: {
+          select: { id: true, username: true, email: true },
+        },
+        user2: {
+          select: { id: true, username: true, email: true },
+        },
+      },
+      skip: offset,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+    });
 
-    //Add avatar link to each user
-    const friendshipsWithAvatar = [
-      ...friendships.friendshipsAsUser1.map((f) => {
-        const avatar = gravatarUrl(f.user2.email);
+    // Add avatars to friendships
+    const friendshipsWithAvatar = friendships.map((friendship) => {
+      const friend =
+        friendship.user1.id === userId ? friendship.user2 : friendship.user1;
+      const avatar = friend.email ? gravatarUrl(friend.email) : null;
 
-        return {
-          id: f.user2.id,
-          username: f.user2.username,
-          email: f.user2.email,
+      return {
+        id: friendship.id,
+        friend: {
+          id: friend.id,
+          username: friend.username,
           avatar,
-        };
-      }),
-      ...friendships.friendshipsAsUser2.map((f) => {
-        const avatar = gravatarUrl(f.user1.email);
+        },
+      };
+    });
 
-        return {
-          id: f.user1.id,
-          username: f.user1.username,
-          email: f.user1.email,
-          avatar,
-        };
-      }),
-    ];
-
-    return friendshipsWithAvatar;
+    // Return paginated friendships and metadata
+    return {
+      friendships: friendshipsWithAvatar,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalFriendships / limit),
+        totalFriendships,
+        hasNextPage: offset + limit < totalFriendships,
+        hasPreviousPage: offset > 0,
+      },
+    };
   },
 
   async unknownUsers(
@@ -107,27 +167,62 @@ export const friendsService = {
     };
   },
 
-  async incomingPendingRequests(userId: string) {
-    const requests = await prisma.friendRequest.findMany({
+  async incomingPendingRequests(
+    userId: string,
+    limit: number,
+    offset: number,
+    page: number,
+  ) {
+    // Fetch the total count of pending requests
+    const totalPendingRequests = await prisma.friendRequest.count({
+      where: {
+        receiverId: userId,
+        status: "PENDING",
+      },
+    });
+
+    // Fetch paginated pending requests
+    const pendingRequests = await prisma.friendRequest.findMany({
       where: {
         receiverId: userId,
         status: "PENDING",
       },
       include: {
-        requester: true,
+        requester: {
+          select: { id: true, username: true, email: true },
+        },
       },
+      skip: offset,
+      take: limit,
+      orderBy: { createdAt: "desc" },
     });
 
-    const pendingWithAvatar = requests.map((request) => {
-      const avatar = gravatarUrl(request.requester.email);
+    // Add avatars to pending requests
+    const pendingWithAvatar = pendingRequests.map((request) => {
+      const avatar = request.requester.email
+        ? gravatarUrl(request.requester.email)
+        : null;
 
       return {
-        id: request.requester.id,
-        username: request.requester.username,
-        avatar,
+        id: request.id,
+        requester: {
+          id: request.requester.id,
+          username: request.requester.username,
+          avatar,
+        },
       };
     });
 
-    return pendingWithAvatar;
+    // Return paginated pending requests and metadata
+    return {
+      pendingRequests: pendingWithAvatar,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalPendingRequests / limit),
+        totalPendingRequests,
+        hasNextPage: offset + limit < totalPendingRequests,
+        hasPreviousPage: offset > 0,
+      },
+    };
   },
 };
