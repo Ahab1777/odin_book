@@ -13,6 +13,9 @@ export async function getFriendships(
   const limit = parseInt(req.query.limit as string) || 10;
   const offset = (page - 1) * limit;
 
+  console.log("🚀 ~ friendControllers.ts:16 ~ getFriendships ~ offset:", offset);
+
+
   const friendships = await friendsService.currentFriendships(
     userId,
     page,

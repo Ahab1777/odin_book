@@ -44,9 +44,9 @@ export const friendsService = {
 
   async currentFriendships(
     userId: string,
+    page: number,
     limit: number,
     offset: number,
-    page: number,
   ) {
     // Fetch the user's friendships
     const friendships = await prisma.user.findUnique({
@@ -56,8 +56,6 @@ export const friendsService = {
         friendshipsAsUser2: { include: { user1: true } },
       },
     });
-
-
 
     if (!friendships) {
       return {
@@ -96,24 +94,16 @@ export const friendsService = {
       }),
     ];
 
-    console.log("🚀 ~ friendsServices.ts:99 ~ allFriendshipsWithAvatar:", allFriendshipsWithAvatar);
-
-
     // Total number of friendships
     const totalFriendships = allFriendshipsWithAvatar.length;
-
-    console.log("🚀 ~ friendsServices.ts:105 ~ totalFriendships:", totalFriendships);
-
 
     // Paginate the friendships
     const paginatedFriendships = allFriendshipsWithAvatar.slice(
       offset,
+
       offset + limit,
     );
-
-    console.log("🚀 ~ friendsServices.ts:114 ~ paginatedFriendships:", paginatedFriendships);
-
-
+    
     // Calculate pagination metadata
     const pagination = {
       currentPage: page,
