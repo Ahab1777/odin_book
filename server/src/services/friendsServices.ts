@@ -42,7 +42,28 @@ export const friendsService = {
     return friendshipsWithAvatar;
   },
 
-  async unknownUsers(userId: string) {
+  async unknownUsers(
+    userId: string,
+    limit: number,
+    offset: number,
+    page: number,
+  ) {
+    // Fetch the total count of unknown users
+    const totalUsers = await prisma.user.count({
+      where: {
+        AND: [
+          { id: { not: userId } }, // Exclude the current user
+          {
+            OR: [
+              { friendshipsAsUser1: { none: { user2Id: userId } } },
+              { friendshipsAsUser2: { none: { user1Id: userId } } },
+            ],
+          },
+        ],
+      },
+    });
+
+    //Fetch paginated unknown users
     const unknownUsers = await prisma.user.findMany({
       where: {
         id: { not: userId },
@@ -58,6 +79,9 @@ export const friendsService = {
         username: true,
         email: true,
       },
+      skip: offset,
+      take: limit,
+      orderBy: { username: "desc" },
     });
 
     const unknownUsersWithAvatar = unknownUsers.map((user) => {
@@ -71,7 +95,16 @@ export const friendsService = {
       };
     });
 
-    return unknownUsersWithAvatar;
+    return {
+      unknownUsers: unknownUsersWithAvatar,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalUsers / limit),
+        totalUsers,
+        hasNextPage: offset + limit < totalUsers,
+        hasPreviousPage: offset > 0,
+      },
+    };
   },
 
   async incomingPendingRequests(userId: string) {

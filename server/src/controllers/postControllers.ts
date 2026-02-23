@@ -175,7 +175,8 @@ export async function getPost(req: Request, res: Response): Promise<void> {
 export async function getPostIndex(req: Request, res: Response): Promise<void> {
   const { userId } = req.user as { userId: string };
 
-  // Get current user with their posts and posts of all friendship partners
+
+  // Get current user with their posts and posts of all friendships
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {

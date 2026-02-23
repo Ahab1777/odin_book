@@ -16,8 +16,16 @@ export type CreateFriendshipResponse = {
   requestStatus: string;
 };
 
+
 export type UnknownUsersResponse = {
   unknownUsers: Array<BasicUser>;
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalUsers: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 };
 
 export type FriendRequestResponse = {

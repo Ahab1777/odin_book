@@ -21,10 +21,13 @@ export async function getUnknownUsers(
   res: Response,
 ): Promise<void> {
   const { userId } = req.user as { userId: string };
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = (page - 1) * limit;
 
-  const unknownUsers = await friendsService.unknownUsers(userId);
+  const unknownUsers = await friendsService.unknownUsers(userId, limit, offset, page);
 
-  res.status(200).json({ unknownUsers });
+  res.status(200).json(unknownUsers);
 }
 
 export async function getIncomingPendingRequests(
@@ -162,7 +165,6 @@ export async function denyFriendRequest(
   res.status(200).json({ message: "Friend request denied" });
 }
 
-
 //Done
 export async function befriend(req: Request, res: Response): Promise<void> {
   // :userId is the one who sent the request (requester)
@@ -273,5 +275,3 @@ export async function unfriend(req: Request, res: Response): Promise<void> {
 
   res.status(200).json({ message: "Successfully unfriended user" });
 }
-
-
