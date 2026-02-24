@@ -1,5 +1,4 @@
-import type { BasicUser } from "./auth";
-
+import type { BasicUser, Like, Comment } from "./auth";
 
 export type FriendsResponse = {
   friends: Array<BasicUser>;
@@ -23,8 +22,6 @@ export type PendingRequestsResponse = {
   };
 };
 
-
-
 export type CreateFriendshipResponse = {
   id: string;
   user1Id: string;
@@ -32,7 +29,6 @@ export type CreateFriendshipResponse = {
   createdAt: Date;
   requestStatus: string;
 };
-
 
 export type UnknownUsersResponse = {
   unknownUsers: Array<BasicUser>;
@@ -51,4 +47,24 @@ export type FriendRequestResponse = {
   receiverId: string;
   createdAt: Date;
   status: string;
+};
+
+export type Post = {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+  likes: Array<Like>;
+  comments: Array<Comment>;
+};
+
+export type UserProfile = {
+  id: string;
+  username: string;
+  posts: Array<Post>;
+  friends: Array<BasicUser>;
+  bio: string;
+  avatar: string;
 };

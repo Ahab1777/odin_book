@@ -2,8 +2,13 @@ Figma reference: https://clap-uncut-52866516.figma.site/
 
 Routes
     [] - Apply from to login redirects so user gets back to page they intended after appropriate login
-    [] - create global state for user info
+    [x] - create global state for user info
+    [] - Add pagination parameters to URL
 
 Community 
     [] FriendCard should take user to user's profile
-    [] add pagination to community tabs
+    [x] add pagination to community tabs
+    [] User search
+
+Profile
+    [] Provide basic profile pictures to choose from

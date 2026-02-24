@@ -4,6 +4,7 @@ import postRouter from "./postRouter";
 import friendRouter from "./friendRouter";
 import commentRouter from "./commentRouter";
 import bioRouter from "./bioRouter";
+import profileRouter from "./profileRouter";
 
 export const routes = {
   auth: authRouter,
@@ -11,5 +12,6 @@ export const routes = {
   friend: friendRouter,
   like: likeRouter,
   comment: commentRouter,
-  bio: bioRouter
+  bio: bioRouter,
+  profile: profileRouter
 };

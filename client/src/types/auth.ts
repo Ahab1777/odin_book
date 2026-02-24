@@ -47,7 +47,7 @@ export type PostCardContent = {
   user: BasicUser;
 }
 
-type Comment = {
+export type Comment = {
   id: string;
   content: string;
   userId: string;
@@ -55,7 +55,7 @@ type Comment = {
   createdAt: string;
 };
 
-type Like = {
+export type Like = {
   id: string;
   userId: string;
   postId: string;
