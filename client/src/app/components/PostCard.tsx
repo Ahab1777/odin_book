@@ -40,6 +40,7 @@ export default function PostCard(post: PostCardContent) {
         <time dateTime={post.createdAt}>
           {new Date(post.createdAt).toLocaleString()}
         </time>
+        
       </footer>
     </article>
   );
