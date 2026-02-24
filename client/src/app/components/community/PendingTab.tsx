@@ -77,9 +77,9 @@ export default function PendingTab() {
         <button
           onClick={handlePreviousPage}
           disabled={!hasPreviousPage}
-          className={`px-4 py-2 text-lg font-bold hover:scale-110 transition-transform ${
+          className={`px-4 py-2 text-lg font-bold  transition-transform ${
             hasPreviousPage
-              ? "bg-blue-500 text-white"
+              ? "bg-blue-500 text-white hover:scale-110"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
@@ -88,7 +88,6 @@ export default function PendingTab() {
             viewBox="0 0 24 24"
             width="24"
             height="24"
-            className="fill-current"
           >
             <title>arrow-left-bold</title>
             <path d="M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z" />
@@ -96,9 +95,10 @@ export default function PendingTab() {
         </button>
         <button
           onClick={handleNextPage}
-          className={`px-4 py-2 text-lg font-bold hover:scale-110 transition-transform ${
+          disabled={!hasNextPage}
+          className={`px-4 py-2 text-lg font-bold  transition-transform ${
             hasNextPage
-              ? "bg-blue-500 text-white"
+              ? "bg-blue-500 text-white hover:scale-110"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
