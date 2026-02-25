@@ -18,7 +18,7 @@ friendRouter.post("/befriend/:userId", authentication, befriend);
 
 friendRouter.delete("/unfriend/:userId", authentication, unfriend);
 
-friendRouter.get("/friendships", authentication, getFriendships);
+friendRouter.get("/friendships/:userId", authentication, getFriendships);
 
 friendRouter.get("/unknown", authentication, getUnknownUsers);
 

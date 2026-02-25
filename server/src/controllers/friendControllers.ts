@@ -8,7 +8,7 @@ export async function getFriendships(
   req: Request,
   res: Response,
 ): Promise<void> {
-  const { userId } = req.user as { userId: string };
+  const { userId } = req.params as { userId: string };
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
   const offset = (page - 1) * limit;
@@ -20,6 +20,9 @@ export async function getFriendships(
     limit,
     offset,
   );
+
+  console.log("🚀 ~ friendControllers.ts:24 ~ getFriendships ~ friendships:", friendships);
+
 
   res.status(200).json(friendships);
 }

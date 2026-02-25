@@ -3,6 +3,7 @@ import type { FriendsResponse } from "../../../types/community";
 import FriendCard from "./FriendCard";
 import { api } from "../../../lib/api";
 import type { BasicUser } from "../../../types/auth";
+import { useAuth } from "../../auth";
 
 export default function FriendsTab() {
   const [friends, setFriends] = useState<BasicUser[]>([]);
@@ -12,6 +13,9 @@ export default function FriendsTab() {
   const [limit, setLimit] = useState(10);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [hasPreviousPage, setHasPreviousPage] = useState(false);
+  const { user } = useAuth();
+  const userId = user?.id;
+
 
   useEffect(() => {
     let cancelled = false;
@@ -19,16 +23,11 @@ export default function FriendsTab() {
     async function loadFriends() {
       try {
         const res = await api.get<FriendsResponse>(
-          `/friend/friendships?page=${page}&limit=${limit}`,
+          `/friend/friendships/${userId}?page=${page}&limit=${limit}`,
         );
+
         if (!cancelled) {
           setFriends(res.friends);
-
-          console.log(
-            "🚀 ~ FriendTab.tsx:28 ~ loadFriends ~ res.friends:",
-            res.friends,
-          );
-
           setHasNextPage(res.pagination.hasNextPage);
           setHasPreviousPage(res.pagination.hasPreviousPage);
         }
@@ -46,7 +45,7 @@ export default function FriendsTab() {
     return () => {
       cancelled = true;
     };
-  }, [limit, page]);
+  }, [limit, page, userId]);
 
   //handle page change
   const handleNextPage = () => {

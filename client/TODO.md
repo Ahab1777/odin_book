@@ -12,3 +12,6 @@ Community
 
 Profile
     [] Provide basic profile pictures to choose from
+
+Home
+    [] Display likes and comments in main page
