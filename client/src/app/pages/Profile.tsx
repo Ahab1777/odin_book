@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import type { FriendsResponse, UserProfile } from "../../types/community";
+import type { UserProfile } from "../../types/community";
 import { api } from "../../lib/api";
 import { useParams } from "react-router";
-import FriendCard from "../components/community/FriendCard";
+import FriendsContainer from "../components/profile/FriendsContainer";
 
 export default function Profile() {
   const { userId } = useParams();
@@ -17,50 +17,6 @@ export default function Profile() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [friends, setFriends] = useState<FriendsResponse>({
-    friends: [],
-    pagination: {
-      currentPage: 1,
-      totalPages: 1,
-      totalFriendships: 0,
-      hasNextPage: false,
-      hasPreviousPage: true
-    }
-  });
-  //Friends pagination
-  const [friendsPage, setFriendsPage] = useState<number>(1);
-  const [hasNextPage, setHasNextPage] = useState(false);
-  const [hasPreviousPage, setHasPreviousPage] = useState(false);
-
-  //Friends useEffect
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadFriends() {
-      try {
-        const res = await api.get<FriendsResponse>(`/friend/friendships/${userId}?page${friendsPage}`);
-        if (!cancelled) {
-          setFriends(res);
-          setHasNextPage(res.pagination.hasNextPage);
-          setHasPreviousPage(res.pagination.hasPreviousPage)
-        }
-      } catch (err: unknown) {
-        if (!cancelled) {
-          const error = err as Error;
-          setError(error.message || "Failed to fetch friends");
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadFriends();
-    return () => {
-      cancelled = true;
-    };
-  }, [friendsPage, userId]);
 
   //Profile userEffect
   useEffect(() => {
@@ -89,7 +45,6 @@ export default function Profile() {
       cancelled = true;
     };
   }, [userId]);
-
 
   return (
     <main className="flex flex-col items-center bg-slate-100 min-h-screen py-8">
@@ -120,14 +75,12 @@ export default function Profile() {
             </div>
             <div className="profile-friends w-full text-center">
               <h2 className="text-xl font-semibold text-brown">Friends</h2>
-              {friends.friends.length > 0 ? (
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  {friends.friends.map((friend) => (
-                    <FriendCard key={friend.id} {...friend}></FriendCard>
-                  ))}
-                </div>
+              {userId ? (
+                <FriendsContainer userId={userId} />
               ) : (
-                <p className="text-slate mt-2">No friends to display</p>
+                <p className="text-red-600">
+                  Unable to load friends: User ID is missing.
+                </p>
               )}
             </div>
             <div className="profile-posts w-full text-center">
