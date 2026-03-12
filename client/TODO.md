@@ -15,3 +15,8 @@ Profile
 
 Home
     [] Display likes and comments in main page
+
+Posts
+    [] Delete post
+    [] Like post
+    [] Comment post
