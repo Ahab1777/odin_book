@@ -12,6 +12,7 @@ Community
 
 Profile
     [] Provide basic profile pictures to choose from
+    [] Edit bio
 
 Home
     [] Display likes and comments in main page

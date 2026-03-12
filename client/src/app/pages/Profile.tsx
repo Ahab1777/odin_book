@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { UserProfile } from "../../types/community";
+import type { FriendsResponse, UserProfile } from "../../types/community";
 import { api } from "../../lib/api";
 import { useParams } from "react-router";
 import FriendCard from "../components/community/FriendCard";
@@ -17,7 +17,39 @@ export default function Profile() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [friends, setFriends] = useState<FriendsResponse | null>(null);
+  //Friends pagination state
+  const [friendsPage, setFriendsPage] = useState<number>(1)
 
+  //Friends useEffect
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadFriends() {
+      try {
+        const res = await api.get<FriendsResponse>(`/friend/friendships/${userId}?page${friendsPage}`);
+        if (!cancelled) {
+          setFriends(res);
+        }
+      } catch (err: unknown) {
+        if (!cancelled) {
+          const error = err as Error;
+          setError(error.message || "Failed to fetch friends");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadFriends();
+    return () => {
+      cancelled = true;
+    };
+  }, [friendsPage, userId]);
+
+  //Profile userEffect
   useEffect(() => {
     let cancelled = false;
 
@@ -74,7 +106,7 @@ export default function Profile() {
             </div>
             <div className="profile-friends w-full text-center">
               <h2 className="text-xl font-semibold text-brown">Friends</h2>
-              {profile.friends.length > 0 ? (
+              {friends.friends.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   {profile.friends.map((friend) => (
                     <FriendCard key={friend.id} {...friend}></FriendCard>
