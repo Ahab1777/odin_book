@@ -17,9 +17,20 @@ export default function Profile() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [friends, setFriends] = useState<FriendsResponse | null>(null);
-  //Friends pagination state
-  const [friendsPage, setFriendsPage] = useState<number>(1)
+  const [friends, setFriends] = useState<FriendsResponse>({
+    friends: [],
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+      totalFriendships: 0,
+      hasNextPage: false,
+      hasPreviousPage: true
+    }
+  });
+  //Friends pagination
+  const [friendsPage, setFriendsPage] = useState<number>(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPreviousPage, setHasPreviousPage] = useState(false);
 
   //Friends useEffect
   useEffect(() => {
@@ -30,6 +41,8 @@ export default function Profile() {
         const res = await api.get<FriendsResponse>(`/friend/friendships/${userId}?page${friendsPage}`);
         if (!cancelled) {
           setFriends(res);
+          setHasNextPage(res.pagination.hasNextPage);
+          setHasPreviousPage(res.pagination.hasPreviousPage)
         }
       } catch (err: unknown) {
         if (!cancelled) {
@@ -77,6 +90,7 @@ export default function Profile() {
     };
   }, [userId]);
 
+
   return (
     <main className="flex flex-col items-center bg-slate-100 min-h-screen py-8">
       <section className="profile-container w-full max-w-4xl bg-white shadow-md rounded-lg p-6">
@@ -108,7 +122,7 @@ export default function Profile() {
               <h2 className="text-xl font-semibold text-brown">Friends</h2>
               {friends.friends.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4 mt-4">
-                  {profile.friends.map((friend) => (
+                  {friends.friends.map((friend) => (
                     <FriendCard key={friend.id} {...friend}></FriendCard>
                   ))}
                 </div>
