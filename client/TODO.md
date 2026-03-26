@@ -6,7 +6,7 @@ Routes
     [] - Add pagination parameters to URL
 
 Community 
-    [] FriendCard should take user to user's profile
+    [x] FriendCard should take user to user's profile
     [x] add pagination to community tabs
     [] User search
 
@@ -16,6 +16,7 @@ Profile
 
 Home
     [] Display likes and comments in main page
+    [] Home page post's pagination
 
 Posts
     [] Delete post

@@ -74,7 +74,6 @@ export default function Profile() {
               </p>
             </div>
             <div className="profile-friends w-full text-center">
-              <h2 className="text-xl font-semibold text-brown">Friends</h2>
               {userId ? (
                 <FriendsContainer userId={userId} />
               ) : (

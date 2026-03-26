@@ -18,6 +18,7 @@ export default function FriendsContainer({ userId }: FriendsContainerProps) {
       hasPreviousPage: false,
     },
   });
+
   const [friendsPage, setFriendsPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,9 +29,14 @@ export default function FriendsContainer({ userId }: FriendsContainerProps) {
     async function loadFriends() {
       try {
         const res = await api.get<FriendsResponse>(
-          `/friend/friendships/${userId}?page${friendsPage}`,
+          `/friend/friendships/${userId}?page=${friendsPage}`,
         );
         if (!cancelled) {
+          console.log(
+            "🚀 ~ FriendsContainer.tsx:22 ~ FriendsContainer ~ friends:",
+            friends,
+          );
+
           setFriends(res);
         }
       } catch (err: unknown) {
@@ -49,7 +55,7 @@ export default function FriendsContainer({ userId }: FriendsContainerProps) {
     return () => {
       cancelled = true;
     };
-  }, [friendsPage, userId]);
+  }, [friendsPage, userId, friends]);
 
   return (
     <>
