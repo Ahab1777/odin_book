@@ -30,7 +30,7 @@ export default function PostsContainer({userId}: PostsContainerProps) {
     async function loadPosts() {
       try {
         const res = await api.get<GetUserPostsResponse>(
-          `/post/${userId}?page=${postsPage}&limit=5`,
+          `/post/all/${userId}?page=${postsPage}&limit=5`,
         );
         if (!cancelled) {
           setPosts(res);
