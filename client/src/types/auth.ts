@@ -35,7 +35,7 @@ export type BasicUser = {
   username: string;
   avatar: string;
   email?: string;
-}
+};
 
 export type PostCardContent = {
   id: string;
@@ -45,7 +45,7 @@ export type PostCardContent = {
   createdAt: string;
   updatedAt: string;
   user: BasicUser;
-}
+};
 
 export type Comment = {
   id: string;
@@ -62,11 +62,22 @@ export type Like = {
   createdAt: string;
 };
 
+
+//postindex
 export type UserPostCardContent = Omit<PostCardContent, "user"> & {
   comments: Comment[];
   likes: Like[];
 };
 
+
+//API get
 export type UserPostIndexResponse = {
   posts: UserPostCardContent[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalPosts: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 };

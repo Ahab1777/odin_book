@@ -277,16 +277,22 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 
-  //Pagination
+  // Pagination (only for posts)
   const totalPosts = postsWithAvatars.length;
   const totalPages = Math.ceil(totalPosts / limit);
   const paginatedPosts = postsWithAvatars.slice(offset, offset + limit);
+  const hasNextPage = page < totalPages;
+  const hasPreviousPage = page > 1;
 
   res.status(200).json({
     posts: paginatedPosts,
-    currentPage: page,
-    totalPages,
-    totalPosts,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalPosts,
+      hasNextPage,
+      hasPreviousPage
+    }
   });
 }
 

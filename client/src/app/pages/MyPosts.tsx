@@ -4,11 +4,28 @@ import { api } from "../../lib/api";
 import { useEffect, useState } from "react";
 import type { UserPostIndexResponse } from "../../types/auth";
 
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalPosts: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 export default function MyPosts() {
   const [postIndex, setPostIndex] = useState<UserPostCardContent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [postsPage, setPostsPage] = useState<number>(1);
+  const [pagination, setPagination] = useState<Pagination>({
+    currentPage: 1,
+    totalPages: 1,
+    totalPosts: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+
+
 
   useEffect(() => {
     let cancelled = false;
@@ -20,6 +37,7 @@ export default function MyPosts() {
         );
         if (!cancelled) {
           setPostIndex(res.posts);
+          setPagination(res.pagination)
         }
       } catch (err: unknown) {
         if (!cancelled) {
@@ -35,7 +53,7 @@ export default function MyPosts() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [postsPage, pagination]);
 
   return (
     <main>
@@ -55,14 +73,14 @@ export default function MyPosts() {
             <div className="pagination-controls mt-4">
               <button
                 onClick={() => setPostsPage((prev) => Math.max(prev - 1, 1))}
-                disabled={!posts.pagination.hasPreviousPage}
+                disabled={!pagination.hasPreviousPage}
                 className="btn btn-primary"
               >
                 Previous
               </button>
               <button
                 onClick={() => setPostsPage((prev) => prev + 1)}
-                disabled={!posts.pagination.hasNextPage}
+                disabled={!pagination.hasNextPage}
                 className="btn btn-primary"
               >
                 Next
