@@ -212,16 +212,25 @@ export default function PostCard(post: PostWithExtras) {
               </ul>
             )}
 
-            {visibleCount < comments.length && (
-              <div className="mt-2 text-center">
+            <div className="mt-2 flex items-center justify-center gap-4">
+              {visibleCount > 5 && (
+                <button
+                  onClick={() => setVisibleCount((v) => Math.max(5, v - 5))}
+                  className="text-sm text-slate underline"
+                >
+                  Load less
+                </button>
+              )}
+
+              {visibleCount < comments.length && (
                 <button
                   onClick={() => setVisibleCount((v) => v + 5)}
                   className="text-sm text-slate underline"
                 >
                   Load more
                 </button>
-              </div>
-            )}
+              )}
+            </div>
 
             <div className="mt-3 flex gap-2">
               <input
