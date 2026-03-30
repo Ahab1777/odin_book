@@ -63,14 +63,12 @@ export type Like = {
 };
 
 
-//postindex
 export type UserPostCardContent = Omit<PostCardContent, "user"> & {
   comments: Comment[];
   likes: Like[];
 };
 
 
-//API get
 export type UserPostIndexResponse = {
   posts: UserPostCardContent[];
   pagination: {

@@ -4,6 +4,7 @@ import { api } from "../../lib/api";
 import { useParams } from "react-router";
 import FriendsContainer from "../components/profile/FriendsContainer";
 import PostsContainer from "../components/profile/PostsContainer";
+import { useAuth } from "../auth";
 
 export default function Profile() {
   const { userId } = useParams();
@@ -18,6 +19,42 @@ export default function Profile() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  //Bio editing
+  const { user: currentUser } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftBio, setDraftBio] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  function startEdit() {
+    setDraftBio(profile.bio ?? "");
+    setSaveError(null);
+    setIsEditing(true);
+  }
+  function cancelEdit() {
+    setIsEditing(false);
+    setSaveError(null);
+  }
+
+  async function saveBio() {
+    if (draftBio.length > 250) {
+      setSaveError("Bio must be 250 characters or less");
+      return;
+    }
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      await api.put("/bio", { bio: draftBio });
+      setProfile((p) => ({ ...p, bio: draftBio }));
+      setIsEditing(false);
+    } catch (err: unknown) {
+      const e = err as Error;
+      setSaveError(e.message || "Failed to save bio");
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   //Profile userEffect
   useEffect(() => {
@@ -70,10 +107,55 @@ export default function Profile() {
             </div>
             <div className="profile-bio w-full text-center">
               <h2 className="text-xl font-semibold text-brown">Bio</h2>
-              <p className="text-slate mt-2">
-                {profile.bio || "No bio available"}
-              </p>
+
+              {!isEditing ? (
+                <>
+                  <p className="text-slate mt-2">
+                    {profile.bio || "No bio available"}
+                  </p>
+
+                  {currentUser?.id === profile.id && (
+                    <button
+                      onClick={startEdit}
+                      className="mt-2 btn btn-secondary"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </>
+              ) : (
+                <>
+                  <textarea
+                    value={draftBio}
+                    onChange={(e) => setDraftBio(e.target.value)}
+                    maxLength={250}
+                    rows={4}
+                    disabled={isSaving}
+                    className="w-full mt-2 p-2 border rounded"
+                  />
+                  {saveError && (
+                    <p className="text-red-600 mt-2">{saveError}</p>
+                  )}
+                  <div className="flex gap-2 justify-center mt-2">
+                    <button
+                      onClick={saveBio}
+                      disabled={isSaving}
+                      className="btn btn-primary"
+                    >
+                      {isSaving ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      disabled={isSaving}
+                      className="btn btn-secondary"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
+
             <div className="profile-friends w-full text-center">
               {userId ? (
                 <FriendsContainer userId={userId} />
@@ -88,7 +170,9 @@ export default function Profile() {
               {userId ? (
                 <PostsContainer userId={userId as string} />
               ) : (
-                <p className="text-red-600">Unable to load posts: User ID is missing.</p>
+                <p className="text-red-600">
+                  Unable to load posts: User ID is missing.
+                </p>
               )}
             </div>
           </div>
