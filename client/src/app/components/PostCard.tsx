@@ -1,4 +1,4 @@
-import type { PostCardContent } from "../../types/auth";
+import type { PostCardContent } from "../../types/content";
 import { Link } from "react-router";
 
 export default function PostCard(post: PostCardContent) {

@@ -3,6 +3,7 @@ import type { UserProfile } from "../../types/community";
 import { api } from "../../lib/api";
 import { useParams } from "react-router";
 import FriendsContainer from "../components/profile/FriendsContainer";
+import ProfilePostCard from "../components/profile/ProfilePostCard";
 
 export default function Profile() {
   const { userId } = useParams();
@@ -87,18 +88,8 @@ export default function Profile() {
               {profile.posts.length > 0 ? (
                 <ul className="space-y-4 mt-4">
                   {profile.posts.map((post) => (
-                    <li
-                      key={post.id}
-                      className="bg-rose-100 p-4 rounded-lg shadow-md"
-                    >
-                      <h3 className="text-lg font-bold text-indigo">
-                        {post.title}
-                      </h3>
-                      <p className="text-slate mt-2">{post.content}</p>
-                      <small className="text-slate mt-2 block">
-                        Created at: {new Date(post.createdAt).toLocaleString()}
-                      </small>
-                    </li>
+                    <ProfilePostCard key={post.id} {...post} />
+                    
                   ))}
                 </ul>
               ) : (

@@ -54,8 +54,8 @@ export type Post = {
   userId: string;
   title: string;
   content: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   likes: Array<Like>;
   comments: Array<Comment>;
 };
