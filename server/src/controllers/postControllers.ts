@@ -179,19 +179,15 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
   const limit = parseInt(req.query.limit as string) || 10;
   const offset = (page - 1) * limit;
 
-  // Get current user with their posts and posts of all friendships
+  // Load user + posts + friends' posts, including comments & likes
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
       posts: {
         include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              email: true,
-            },
-          },
+          user: { select: { id: true, username: true, email: true } },
+          comments: { include: { user: { select: { id: true, username: true } } } },
+          likes: { include: { user: { select: { id: true, username: true } } } },
         },
       },
       friendshipsAsUser1: {
@@ -200,13 +196,9 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
             include: {
               posts: {
                 include: {
-                  user: {
-                    select: {
-                      id: true,
-                      username: true,
-                      email: true,
-                    },
-                  },
+                  user: { select: { id: true, username: true, email: true } },
+                  comments: { include: { user: { select: { id: true, username: true } } } },
+                  likes: { include: { user: { select: { id: true, username: true } } } },
                 },
               },
             },
@@ -219,13 +211,9 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
             include: {
               posts: {
                 include: {
-                  user: {
-                    select: {
-                      id: true,
-                      username: true,
-                      email: true,
-                    },
-                  },
+                  user: { select: { id: true, username: true, email: true } },
+                  comments: { include: { user: { select: { id: true, username: true } } } },
+                  likes: { include: { user: { select: { id: true, username: true } } } },
                 },
               },
             },
@@ -240,22 +228,17 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  // Collect all posts: user's posts + posts from all friendship partners
+  // Collect all posts
   const allPosts = [...(user.posts || [])];
 
-  user.friendshipsAsUser1?.forEach((friendship) => {
-    if (friendship.user2.posts) {
-      allPosts.push(...friendship.user2.posts);
-    }
+  user.friendshipsAsUser1?.forEach((f) => {
+    if (f.user2?.posts) allPosts.push(...f.user2.posts);
+  });
+  user.friendshipsAsUser2?.forEach((f) => {
+    if (f.user1?.posts) allPosts.push(...f.user1.posts);
   });
 
-  user.friendshipsAsUser2?.forEach((friendship) => {
-    if (friendship.user1.posts) {
-      allPosts.push(...friendship.user1.posts);
-    }
-  });
-
-  // Add avatar for each post's user using Gravatar
+  // Add avatar for each post.user and keep comments/likes intact
   const postsWithAvatars = allPosts.map((post: any) => {
     const email = post.user?.email as string | undefined;
     const avatar = email ? gravatarUrl(email) : undefined;
@@ -269,17 +252,17 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
             avatar,
           }
         : post.user,
+      // comments and likes are already present from the query
     };
   });
 
-  // Sort by createdAt in descending order (newest first)
+  // Sort and paginate
   postsWithAvatars.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 
-  // Pagination (only for posts)
   const totalPosts = postsWithAvatars.length;
-  const totalPages = Math.ceil(totalPosts / limit);
+  const totalPages = Math.max(1, Math.ceil(totalPosts / limit));
   const paginatedPosts = postsWithAvatars.slice(offset, offset + limit);
   const hasNextPage = page < totalPages;
   const hasPreviousPage = page > 1;
@@ -291,8 +274,8 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
       totalPages,
       totalPosts,
       hasNextPage,
-      hasPreviousPage
-    }
+      hasPreviousPage,
+    },
   });
 }
 

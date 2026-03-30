@@ -62,12 +62,10 @@ export type Like = {
   createdAt: string;
 };
 
-
 export type UserPostCardContent = Omit<PostCardContent, "user"> & {
   comments: Comment[];
   likes: Like[];
 };
-
 
 export type UserPostIndexResponse = {
   posts: UserPostCardContent[];
@@ -78,4 +76,9 @@ export type UserPostIndexResponse = {
     hasNextPage: boolean;
     hasPreviousPage: boolean;
   };
+};
+
+export type HomePostCardContent = PostCardContent & {
+  comments: Comment[];
+  likes: Like[];
 };
