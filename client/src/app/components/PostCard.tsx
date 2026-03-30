@@ -31,6 +31,7 @@ export default function PostCard(post: PostWithExtras) {
   const [comments, setComments] = useState<InlineComment[]>(
     post.comments ?? [],
   );
+  const [visibleCount, setVisibleCount] = useState<number>(5);
   const [commentInput, setCommentInput] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
 
@@ -60,6 +61,7 @@ export default function PostCard(post: PostWithExtras) {
         user: user ? { id: user.id, username: user.username } : undefined,
       };
       setComments((prev) => [newComment, ...prev]);
+      setVisibleCount((v) => v + 1);
       setCommentInput("");
       setShowComments(true);
     } catch (err) {
@@ -73,7 +75,11 @@ export default function PostCard(post: PostWithExtras) {
     if (!user) return;
     try {
       await api.delete(`/comment/${id}`);
-      setComments((prev) => prev.filter((comment) => comment.id !== id));
+      setComments((prev) => {
+        const next = prev.filter((comment) => comment.id !== id);
+        setVisibleCount((vc) => Math.min(vc, next.length));
+        return next;
+      });
     } catch (err) {
       console.error("Failed to delete comment", err);
     }
@@ -110,12 +116,22 @@ export default function PostCard(post: PostWithExtras) {
     }
   }
 
+  const commentItemHeight = 72; // px per comment (approx.)
+  const inputAreaHeight = 56; // px for input + button area
+  const loadMoreHeight = visibleCount < comments.length ? 36 : 0;
+  const extraSpace = inputAreaHeight + loadMoreHeight + 16; // padding
+  const computedMaxHeight = showComments
+    ? Math.max(400, visibleCount * commentItemHeight + extraSpace)
+    : 0;
+
   return (
     <article>
       <header className="grid grid-cols-5 grid-rows-2 items-center gap-2">
-        <h2 className="font-bold text-brown col-span-3 row-start-1">
-          {post.title}
-        </h2>
+        <Link to={`/post/${post.id}`}>
+          <h2 className="font-bold text-brown col-span-3 row-start-1">
+            {post.title}
+          </h2>
+        </Link>
         <Link to={`/profile/${post.userId}`}>
           <h3 className="text-brown col-span-3 row-start-2">
             {post.user.username}
@@ -162,14 +178,14 @@ export default function PostCard(post: PostWithExtras) {
 
         <div
           className="mt-2 transition-all duration-200 overflow-hidden"
-          style={{ maxHeight: showComments ? 400 : 0 }}
+          style={{ maxHeight: computedMaxHeight }}
         >
           <div className="bg-slate-50 p-3 rounded">
             {comments.length === 0 ? (
               <p className="text-slate">No comments yet.</p>
             ) : (
               <ul className="space-y-2">
-                {comments.slice(0, 5).map((c) => (
+                {comments.slice(0, visibleCount).map((c) => (
                   <li
                     key={c.id}
                     className="flex items-start justify-between gap-2"
@@ -194,6 +210,17 @@ export default function PostCard(post: PostWithExtras) {
                   </li>
                 ))}
               </ul>
+            )}
+
+            {visibleCount < comments.length && (
+              <div className="mt-2 text-center">
+                <button
+                  onClick={() => setVisibleCount((v) => v + 5)}
+                  className="text-sm text-slate underline"
+                >
+                  Load more
+                </button>
+              </div>
             )}
 
             <div className="mt-3 flex gap-2">

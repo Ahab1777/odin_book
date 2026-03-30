@@ -16,6 +16,7 @@ import FriendsTab from "./app/components/community/FriendTab.tsx";
 import PendingTab from "./app/components/community/PendingTab.tsx";
 import UnknownTab from "./app/components/community/UnknownTab.tsx";
 import Profile from "./app/pages/Profile.tsx";
+import Post from "./app/pages/Post.tsx";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
       {
         path: "/profile/:userId",
         element: <Profile/>
+      },
+      {
+        path: "/post/:postId",
+        element: <Post/>
       },
       {
         path: "/new-post",

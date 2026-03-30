@@ -130,6 +130,7 @@ export async function getPost(req: Request, res: Response): Promise<void> {
         select: {
           id: true,
           username: true,
+          email: true,
         },
       },
       comments: {
@@ -160,12 +161,21 @@ export async function getPost(req: Request, res: Response): Promise<void> {
     return;
   }
 
+  const email = post.user?.email as string | undefined;
+  const avatar = email ? gravatarUrl(email) : undefined;
+
   res.status(200).json({
     id: post.id,
     title: post.title,
     content: post.content,
     userId: post.userId,
-    user: post.user,
+    user: post.user
+      ? {
+          id: post.user.id,
+          username: post.user.username,
+          avatar,
+        }
+      : post.user,
     comments: post.comments,
     likes: post.likes,
     createdAt: post.createdAt,
@@ -186,8 +196,12 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
       posts: {
         include: {
           user: { select: { id: true, username: true, email: true } },
-          comments: { include: { user: { select: { id: true, username: true } } } },
-          likes: { include: { user: { select: { id: true, username: true } } } },
+          comments: {
+            include: { user: { select: { id: true, username: true } } },
+          },
+          likes: {
+            include: { user: { select: { id: true, username: true } } },
+          },
         },
       },
       friendshipsAsUser1: {
@@ -197,8 +211,12 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
               posts: {
                 include: {
                   user: { select: { id: true, username: true, email: true } },
-                  comments: { include: { user: { select: { id: true, username: true } } } },
-                  likes: { include: { user: { select: { id: true, username: true } } } },
+                  comments: {
+                    include: { user: { select: { id: true, username: true } } },
+                  },
+                  likes: {
+                    include: { user: { select: { id: true, username: true } } },
+                  },
                 },
               },
             },
@@ -212,8 +230,12 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
               posts: {
                 include: {
                   user: { select: { id: true, username: true, email: true } },
-                  comments: { include: { user: { select: { id: true, username: true } } } },
-                  likes: { include: { user: { select: { id: true, username: true } } } },
+                  comments: {
+                    include: { user: { select: { id: true, username: true } } },
+                  },
+                  likes: {
+                    include: { user: { select: { id: true, username: true } } },
+                  },
                 },
               },
             },
@@ -281,7 +303,6 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
 
 export async function getUserPosts(req: Request, res: Response): Promise<void> {
   const { userId } = req.user as { userId: string };
-  
 
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
@@ -323,7 +344,10 @@ export async function getUserPosts(req: Request, res: Response): Promise<void> {
   });
 }
 
-export async function getPostsTargetUser(req: Request, res: Response): Promise<void> {
+export async function getPostsTargetUser(
+  req: Request,
+  res: Response,
+): Promise<void> {
   const userId = req.params.userId as string;
 
   const page = parseInt(req.query.page as string) || 1;
