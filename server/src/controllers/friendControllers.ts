@@ -21,9 +21,6 @@ export async function getFriendships(
     offset,
   );
 
-  console.log("🚀 ~ friendControllers.ts:24 ~ getFriendships ~ friendships:", friendships);
-
-
   res.status(200).json(friendships);
 }
 
@@ -62,12 +59,6 @@ export async function getIncomingPendingRequests(
     limit,
     offset,
   );
-
-  console.log(
-    "🚀 ~ friendControllers.ts:65 ~ getIncomingPendingRequests ~ pendingRequests:",
-    pendingRequests,
-  );
-
   res.status(200).json(pendingRequests);
 }
 //Done

@@ -13,6 +13,8 @@ Community
 Profile
     [] Provide basic profile pictures to choose from
     [] Edit bio
+    [] Post pagination at profile page
+    
 
 Home
     [] Display likes and comments in main page
