@@ -32,11 +32,6 @@ export default function FriendsContainer({ userId }: FriendsContainerProps) {
           `/friend/friendships/${userId}?page=${friendsPage}`,
         );
         if (!cancelled) {
-          console.log(
-            "🚀 ~ FriendsContainer.tsx:22 ~ FriendsContainer ~ friends:",
-            friends,
-          );
-
           setFriends(res);
         }
       } catch (err: unknown) {

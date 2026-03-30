@@ -42,3 +42,14 @@ export type UserPostCardContent = Omit<PostCardContent, "user"> & {
 export type UserPostIndexResponse = {
   posts: UserPostCardContent[];
 };
+
+export type GetUserPostsResponse = {
+  posts: UserPostCardContent[],
+  pagination: {
+    currentPage: number,
+    totalPages: number,
+    totalPosts: number
+    hasNextPage: boolean,
+    hasPreviousPage: boolean
+  }
+}

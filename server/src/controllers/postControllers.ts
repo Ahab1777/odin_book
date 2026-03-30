@@ -175,6 +175,9 @@ export async function getPost(req: Request, res: Response): Promise<void> {
 export async function getPostIndex(req: Request, res: Response): Promise<void> {
   const { userId } = req.user as { userId: string };
 
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = (page - 1) * limit;
 
   // Get current user with their posts and posts of all friendships
   const user = await prisma.user.findUnique({
@@ -274,21 +277,58 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 
+  //Pagination
+  const totalPosts = postsWithAvatars.length;
+  const totalPages = Math.ceil(totalPosts / limit);
+  const paginatedPosts = postsWithAvatars.slice(offset, offset + limit);
+
   res.status(200).json({
-    posts: postsWithAvatars,
+    posts: paginatedPosts,
+    currentPage: page,
+    totalPages,
+    totalPosts,
   });
 }
 
 export async function getUserPosts(req: Request, res: Response): Promise<void> {
-  const { userId } = req.user as { userId: string };
+  const userId = req.params.useId as string;
+
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const offset = (page - 1) * limit;
+
+  // Fetch paginated posts
   const posts = await prisma.post.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
+    skip: offset,
+    take: limit,
     include: {
       comments: true,
       likes: true,
     },
   });
 
-  res.status(200).json({ posts });
+  // Count total posts
+  const totalPosts = await prisma.post.count({
+    where: { userId },
+  });
+
+  // Calculate total pages
+  const totalPages = Math.ceil(totalPosts / limit);
+
+  // Calculate hasNextPage and hasPreviousPage
+  const hasNextPage = page < totalPages;
+  const hasPreviousPage = page > 1;
+
+  res.status(200).json({
+    posts,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalPosts,
+      hasNextPage,
+      hasPreviousPage,
+    },
+  });
 }

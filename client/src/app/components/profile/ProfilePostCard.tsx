@@ -8,7 +8,11 @@ export default function ProfilePostCard(post: UserPostCardContent) {
         <p className="text-slate mt-2">{post.content}</p>
         <small className="text-slate mt-2 block">
           Created at: {new Date(post.createdAt).toLocaleString()}
-        </small>
+              </small>
+                    <footer className="mt-2 flex items-center justify-end gap-4 text-sm text-slate">
+        <span>💬 {post.comments.length}</span>
+        <span>❤️ {post.likes.length}</span>
+      </footer>
       </li>
     </>
   );

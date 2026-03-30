@@ -3,7 +3,7 @@ import type { UserProfile } from "../../types/community";
 import { api } from "../../lib/api";
 import { useParams } from "react-router";
 import FriendsContainer from "../components/profile/FriendsContainer";
-import ProfilePostCard from "../components/profile/ProfilePostCard";
+import PostsContainer from "../components/profile/PostsContainer";
 
 export default function Profile() {
   const { userId } = useParams();
@@ -85,15 +85,10 @@ export default function Profile() {
             </div>
             <div className="profile-posts w-full text-center">
               <h2 className="text-xl font-semibold text-brown">Posts</h2>
-              {profile.posts.length > 0 ? (
-                <ul className="space-y-4 mt-4">
-                  {profile.posts.map((post) => (
-                    <ProfilePostCard key={post.id} {...post} />
-                    
-                  ))}
-                </ul>
+              {userId ? (
+                <PostsContainer userId={userId as string} />
               ) : (
-                <p className="text-slate mt-2">No posts to display</p>
+                <p className="text-red-600">Unable to load posts: User ID is missing.</p>
               )}
             </div>
           </div>

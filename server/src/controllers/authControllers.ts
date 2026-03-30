@@ -7,7 +7,6 @@ import bcrypt from "bcrypt";
 import gravatarUrl from "../lib/gravatar";
 import crypto from "crypto";
 import { normalizeAppEmail } from "../lib/email";
-import { userInfo } from "os";
 
 //Signup validation array
 export const signupValidation = [

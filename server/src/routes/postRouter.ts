@@ -16,7 +16,7 @@ postRouter.post("/create", authentication, createPostValidation, createPost);
 postRouter.delete("/:postId", authentication, deletePost);
 postRouter.put("/:postId", authentication, createPostValidation, updatePost);
 postRouter.get("/index", authentication, getPostIndex);
-postRouter.get("/user", authentication, getUserPosts);
+postRouter.get("/:userId", authentication, getUserPosts);
 postRouter.get("/:postId", getPost);
 
 export default postRouter;
