@@ -4,6 +4,7 @@ import { useAuth } from "../auth";
 export default function Navbar() {
   const { user, isLoading, logout } = useAuth();
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
 
   function handleLogout() {
     logout();
@@ -59,7 +60,9 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           {isLoading ? null : user ? (
             <>
-              <span className="text-sm">Hi, {user.username}</span>
+              <NavLink to={`/profile/${user.id}`}>
+              <span className="text-sm">Hi, {currentUser?.username}</span>
+              </NavLink>
               <button
                 type="button"
                 onClick={handleLogout}
