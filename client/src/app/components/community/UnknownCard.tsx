@@ -17,12 +17,17 @@ export default function UnknownCard({
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const isDemo =
+    typeof window !== "undefined" && localStorage.getItem("isDemo") === "true";
+
   const handleSendFriendRequest: React.MouseEventHandler<
     HTMLButtonElement
   > = async () => {
     try {
       setIsLoading(true);
-      const response = await api.post<FriendRequestResponse>(`/friend/request/${id}`);
+      const response = await api.post<FriendRequestResponse>(
+        `/friend/request/${id}`,
+      );
 
       //Call parent's function to refresh request list
       onRequestUpdate(id);
@@ -50,13 +55,19 @@ export default function UnknownCard({
           <p>`${error}`</p>
         ) : (
           <>
-            <button
-              onClick={handleSendFriendRequest}
-              disabled={isLoading}
-              className="hover:font-bold"
-            >
-              Befriend
-            </button>
+            {isDemo ? (
+              <button disabled className="opacity-50">
+                Disabled for demo users
+              </button>
+            ) : (
+              <button
+                onClick={handleSendFriendRequest}
+                disabled={isLoading}
+                className="hover:font-bold"
+              >
+                Befriend
+              </button>
+            )}
           </>
         )}
       </div>

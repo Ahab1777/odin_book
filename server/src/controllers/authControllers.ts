@@ -59,7 +59,7 @@ export async function signup(req: Request, res: Response): Promise<void> {
       email,
       username,
       password: hashedPassword,
-      emailNormalized
+      emailNormalized,
     },
   });
 
@@ -107,7 +107,6 @@ export async function login(req: Request, res: Response): Promise<void> {
   }
 
   const { email, password } = req.body;
-
 
   try {
     // Find user by email (with password hash)
@@ -184,6 +183,7 @@ export async function loginDemo(req: Request, res: Response): Promise<void> {
     username,
     email,
     avatar,
+    isDemo: true,
   });
 }
 
@@ -299,24 +299,20 @@ export async function passwordChange(
   res.status(200).json({ message: "Password changed successfully" });
 }
 
-
-export async function getUserInfo(
-  req: Request,
-  res: Response,
-): Promise<void> {
+export async function getUserInfo(req: Request, res: Response): Promise<void> {
   const { userId } = req.user as {
     userId: string;
   };
 
   const user = await prisma.user.findUnique({
     where: {
-      id:userId
-    }
-  })
+      id: userId,
+    },
+  });
 
   res.json({
     id: userId,
     email: user?.email,
-    username: user?.username
-  });  
+    username: user?.username,
+  });
 }

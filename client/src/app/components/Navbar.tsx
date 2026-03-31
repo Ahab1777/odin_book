@@ -39,14 +39,17 @@ export default function Navbar() {
           >
             My Posts
           </NavLink>
-          <NavLink
-            to="/new-post"
-            className={({ isActive }) =>
-              `hover:underline ${isActive ? "font-semibold" : ""}`
-            }
-          >
-            New Post
-          </NavLink>
+          {typeof window !== "undefined" &&
+          localStorage.getItem("isDemo") === "true" ? null : (
+            <NavLink
+              to="/new-post"
+              className={({ isActive }) =>
+                `hover:underline ${isActive ? "font-semibold" : ""}`
+              }
+            >
+              New Post
+            </NavLink>
+          )}
           <NavLink
             to="/community"
             className={({ isActive }) =>
@@ -61,7 +64,7 @@ export default function Navbar() {
           {isLoading ? null : user ? (
             <>
               <NavLink to={`/profile/${user.id}`}>
-              <span className="text-sm">Hi, {currentUser?.username}</span>
+                <span className="text-sm">Hi, {currentUser?.username}</span>
               </NavLink>
               <button
                 type="button"

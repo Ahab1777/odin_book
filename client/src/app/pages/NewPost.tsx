@@ -1,16 +1,38 @@
 import { useState } from "react";
-import { api } from "../../lib/api";
 import { useNavigate } from "react-router";
+import { api } from "../../lib/api";
 import type { ApiValidationError } from "../../types/auth";
 
 export default function NewPost() {
+  const navigate = useNavigate();
+
+  const isDemo =
+    typeof window !== "undefined" && localStorage.getItem("isDemo") === "true";
+
+  if (isDemo) {
+    return (
+      <main>
+        <section>
+          <header>
+            <h1>Demo Account</h1>
+          </header>
+          <p className="mb-4">Demo accounts cannot create new posts.</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 rounded bg-blue-600 text-white"
+          >
+            Go back
+          </button>
+        </section>
+      </main>
+    );
+  }
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { post } = api;
-  const navigate = useNavigate();
 
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();

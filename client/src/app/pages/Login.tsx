@@ -30,6 +30,8 @@ export default function Login() {
 
       //Save jwtToken
       localStorage.setItem("jwtToken", res.token);
+      // Clear demo flag for regular login
+      localStorage.removeItem("isDemo");
       setUser({
         id: res.userId,
         username: res.username,
@@ -53,6 +55,36 @@ export default function Login() {
         setLoginError("Network error. Please try again.");
       } else {
         setLoginError(`Unexpected error (status ${err.status}).`);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleDemo() {
+    setIsLoading(true);
+    setLoginError("");
+
+    try {
+      const res = await post<LoginResponse>("/auth/demo-login", {});
+
+      localStorage.setItem("jwtToken", res.token);
+      // Mark demo session
+      localStorage.setItem("isDemo", "true");
+      setUser({
+        id: res.userId,
+        username: res.username,
+        email: res.email,
+        avatar: res.avatar,
+      });
+
+      navigate(from, { replace: true });
+    } catch (error) {
+      const err = error as ApiValidationError;
+      if (!err.status) {
+        setLoginError("Network error. Please try again.");
+      } else {
+        setLoginError(`Unable to start demo (status ${err.status}).`);
       }
     } finally {
       setIsLoading(false);
@@ -116,6 +148,8 @@ export default function Login() {
           data-slot="button"
           className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive border bg-background text-foreground hover:bg-lime hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 h-9 px-4 py-2 has-[&gt;svg]:px-3 w-full gap-2"
           type="button"
+          onClick={handleDemo}
+          disabled={isLoading}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +166,7 @@ export default function Login() {
             <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path>
             <circle cx="12" cy="12" r="3"></circle>
           </svg>
-          Continue as Demo User
+          {isLoading ? "Starting demo..." : "Continue as Demo User"}
         </button>
       </section>
     </main>

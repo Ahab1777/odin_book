@@ -30,7 +30,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   function logout() {
-    localStorage.removeItem('jwtToken');
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("isDemo");
     setUser(null);
   }
 
@@ -40,4 +41,3 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     </AuthContext.Provider>
   );
 }
-
