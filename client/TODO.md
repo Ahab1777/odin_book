@@ -12,7 +12,7 @@ Community
 
 Profile
     [] Provide basic profile pictures to choose from
-    [] Edit bio
+    [x] Edit bio
     [] Post pagination at profile page
 
 
