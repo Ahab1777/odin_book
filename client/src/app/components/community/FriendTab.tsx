@@ -16,7 +16,6 @@ export default function FriendsTab() {
   const { user } = useAuth();
   const userId = user?.id;
 
-
   useEffect(() => {
     let cancelled = false;
 
@@ -58,7 +57,10 @@ export default function FriendsTab() {
 
   return (
     <>
-      {isLoading ? (
+      {typeof window !== "undefined" &&
+      localStorage.getItem("isDemo") === "true" ? (
+        "Demo user cannot befriend users"
+      ) : isLoading ? (
         <p>Loading friends...</p>
       ) : error ? (
         <p className="text-red-600">{error}</p>

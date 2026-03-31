@@ -114,14 +114,17 @@ export default function Profile() {
                     {profile.bio || "No bio available"}
                   </p>
 
-                  {currentUser?.id === profile.id && (
-                    <button
-                      onClick={startEdit}
-                      className="mt-2 btn btn-secondary"
-                    >
-                      Edit
-                    </button>
-                  )}
+                  {typeof window !== "undefined" &&
+                  localStorage.getItem("isDemo") === "true"
+                    ? ""
+                    : currentUser?.id === profile.id && (
+                        <button
+                          onClick={startEdit}
+                          className="mt-2 btn btn-secondary"
+                        >
+                          Edit
+                        </button>
+                      )}
                 </>
               ) : (
                 <>

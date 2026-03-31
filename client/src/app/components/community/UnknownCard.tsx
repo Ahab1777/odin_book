@@ -57,7 +57,7 @@ export default function UnknownCard({
           <>
             {isDemo ? (
               <button disabled className="opacity-50">
-                Disabled for demo users
+                Demo users cannot add users as friends
               </button>
             ) : (
               <button

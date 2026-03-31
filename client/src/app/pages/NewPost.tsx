@@ -5,6 +5,12 @@ import type { ApiValidationError } from "../../types/auth";
 
 export default function NewPost() {
   const navigate = useNavigate();
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [title, setTitle] = useState<string>("");
+  const [content, setContent] = useState<string>("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const { post } = api;
 
   const isDemo =
     typeof window !== "undefined" && localStorage.getItem("isDemo") === "true";
@@ -27,12 +33,6 @@ export default function NewPost() {
       </main>
     );
   }
-  const [formError, setFormError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [title, setTitle] = useState<string>("");
-  const [content, setContent] = useState<string>("");
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const { post } = api;
 
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();

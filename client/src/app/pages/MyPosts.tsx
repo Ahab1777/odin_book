@@ -25,8 +25,6 @@ export default function MyPosts() {
     hasPreviousPage: false,
   });
 
-
-
   useEffect(() => {
     let cancelled = false;
 
@@ -37,7 +35,7 @@ export default function MyPosts() {
         );
         if (!cancelled) {
           setPostIndex(res.posts);
-          setPagination(res.pagination)
+          setPagination(res.pagination);
         }
       } catch (err: unknown) {
         if (!cancelled) {
@@ -59,7 +57,10 @@ export default function MyPosts() {
     <main>
       <section>
         <h1 className="text-brown text-center">My Posts</h1>
-        {isLoading ? (
+        {typeof window !== "undefined" &&
+        localStorage.getItem("isDemo") === "true" ? (
+          "Sorry, demo users cannot create posts!"
+        ) : isLoading ? (
           <p>Loading your posts...</p>
         ) : error ? (
           <p className="text-red-600">{error}</p>

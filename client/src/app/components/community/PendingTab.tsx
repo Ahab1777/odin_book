@@ -58,7 +58,10 @@ export default function PendingTab() {
 
   return (
     <>
-      {isLoading ? (
+      {typeof window !== "undefined" &&
+      localStorage.getItem("isDemo") === "true" ? (
+        "Demo user cannot befriend users"
+      ) : isLoading ? (
         <p>Loading pending friendships...</p>
       ) : error ? (
         <p className="text-red-600">{error}</p>
