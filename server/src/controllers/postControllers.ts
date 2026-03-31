@@ -189,7 +189,69 @@ export async function getPostIndex(req: Request, res: Response): Promise<void> {
   const limit = parseInt(req.query.limit as string) || 10;
   const offset = (page - 1) * limit;
 
-  // Load user + posts + friends' posts, including comments & likes
+  // Fetch user to detect demo class
+  const requestingUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, class: true },
+  });
+
+  if (!requestingUser) {
+    res.status(404).json({ error: "User not found" });
+    return;
+  }
+
+  // If demo user, return all posts across all users
+  if (requestingUser.class === "DEMO") {
+    const posts = await prisma.post.findMany({
+      orderBy: { createdAt: "desc" },
+      skip: offset,
+      take: limit,
+      include: {
+        user: { select: { id: true, username: true, email: true } },
+        comments: {
+          include: { user: { select: { id: true, username: true } } },
+        },
+        likes: { include: { user: { select: { id: true, username: true } } } },
+      },
+    });
+
+    const totalPosts = await prisma.post.count();
+    const totalPages = Math.max(1, Math.ceil(totalPosts / limit));
+
+    const postsWithAvatars = posts.map((post: any) => {
+      const email = post.user?.email as string | undefined;
+      const avatar = email ? gravatarUrl(email) : undefined;
+
+      return {
+        ...post,
+        user: post.user
+          ? {
+              id: post.user.id,
+              username: post.user.username,
+              avatar,
+            }
+          : post.user,
+      };
+    });
+
+    const hasNextPage = page < totalPages;
+    const hasPreviousPage = page > 1;
+
+    res.status(200).json({
+      posts: postsWithAvatars,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalPosts,
+        hasNextPage,
+        hasPreviousPage,
+      },
+    });
+
+    return;
+  }
+
+  // Non-demo users: Load user + posts + friends' posts, including comments & likes
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
