@@ -6,6 +6,13 @@
   --color-indigo: #2d3047;
   --color-brown: #774e24;
   --color-rose: #f8c7cc;
+  --color-primary: #4F46E5;
+  --color-secondary: #22C55E;
+  --color-background: #F9FAFB;
+  --color-surface: #FFEBEB;
+  --color-text: #111827;
+  --color-muted-text: #6B7280;
+  --color-accent: #F59E0B;
 }
 
 html,
