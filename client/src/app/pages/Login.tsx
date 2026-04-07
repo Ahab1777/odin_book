@@ -114,6 +114,7 @@ export default function Login() {
           rounded-lg
           border
           p-6
+          animate-color-cycle-background
         '
         >
           <header
@@ -160,7 +161,13 @@ export default function Login() {
                 flex-col
               '
               >
-                <span>Email</span>
+                <span
+                  className='
+                  text-text 
+                  '
+                >
+                  Email
+                </span>
                 <input
                   type='email'
                   value={email}
@@ -170,7 +177,9 @@ export default function Login() {
                     rounded
                     border
                     p-2
-                  '
+                    hover:border-primary
+                    hover:shadow-md
+                    '
                   required
                 />
               </label>
@@ -181,7 +190,13 @@ export default function Login() {
                 flex-col
               '
               >
-                <span>Password</span>
+                <span
+                  className='
+                  text-text 
+                  '
+                >
+                  Password
+                </span>
                 <input
                   type='password'
                   value={password}
@@ -191,6 +206,9 @@ export default function Login() {
                     rounded
                     border
                     p-2
+                    hover:border-primary
+                    hover:shadow-md
+                    transition-all
                   '
                   required
                 />
@@ -199,6 +217,7 @@ export default function Login() {
               <button
                 type='submit'
                 className='
+                  text-text 
                   focus-visible:border-ring
                   focus-visible:ring-ring/50
                   aria-invalid:ring-destructive/20
@@ -209,6 +228,7 @@ export default function Login() {
                   hover:bg-primary
                   hover:text-accent-foreground
                   hover:text-surface
+                  hover:shadow-md
                   dark:bg-input/30
                   dark:border-input
                   dark:hover:bg-input/50
@@ -256,6 +276,7 @@ export default function Login() {
               hover:bg-primary
               hover:text-accent-foreground
               hover:text-surface
+              hover:shadow-md
               dark:bg-input/30
               dark:border-input
               dark:hover:bg-input/50
@@ -316,6 +337,7 @@ export default function Login() {
               text-foreground
               hover:bg-accent
               hover:text-accent-foreground
+              hover:shadow-md
               dark:bg-input/30
               dark:border-input
               dark:hover:bg-input/50

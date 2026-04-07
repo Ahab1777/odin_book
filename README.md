@@ -1,10 +1,5 @@
 Mockdin Social
 
-
-
-
-
-
 🎨 Color System Breakdown (Applied to Mockdin)
 🔵 Primary — #4F46E5 (Indigo)
 
@@ -26,7 +21,7 @@ Links (hover state especially)
 “Post” button → solid indigo background + white text
 Active nav item → indigo icon + subtle background tint
 
-----------------------------------------------------------
+---
 
 🟢 Secondary — #22C55E (Green)
 
@@ -47,8 +42,7 @@ Number of likes (optional)
 Heart/like icon → gray → turns green when clicked
 Toast message → green accent bar on the left
 
-----------------------------------------------------------
-
+---
 
 🟡 Accent — #F59E0B (Amber)
 
@@ -67,8 +61,7 @@ Demo-related hints:
 Notification bell → small amber badge with number
 “Demo User” button → outline with amber hover
 
-----------------------------------------------------------
-
+---
 
 ⚪ Background — #F9FAFB
 
@@ -80,7 +73,7 @@ Keeps UI light and breathable
 👉 Important:
 Avoid pure white for the whole page—this off-white reduces eye strain and looks more modern.
 
-----------------------------------------------------------
+---
 
 ⚪ Surface — #FFFFFF
 
@@ -97,7 +90,7 @@ Input fields
 👉 Example:
 Each post = white card with shadow over #F9FAFB
 
-----------------------------------------------------------
+---
 
 ⚫ Text — #111827
 
@@ -110,7 +103,7 @@ Important labels
 
 👉 This should dominate your UI text.
 
-----------------------------------------------------------
+---
 
 ⚫ Muted Text — #6B7280
 

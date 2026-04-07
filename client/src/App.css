@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-lime: #44c923;
@@ -6,13 +6,28 @@
   --color-indigo: #2d3047;
   --color-brown: #774e24;
   --color-rose: #f8c7cc;
-  --color-primary: #4F46E5;
-  --color-secondary: #22C55E;
-  --color-background: #F9FAFB;
-  --color-surface: #FFEBEB;
+  --color-primary: #4f46e5;
+  --color-secondary: #22c55e;
+  --color-background: #f9fafb;
+  --color-surface: #ffebeb;
   --color-text: #111827;
-  --color-muted-text: #6B7280;
-  --color-accent: #F59E0B;
+  --color-muted-text: #6b7280;
+  --color-accent: #f59e0b;
+}
+
+@theme {
+  --animate-color-cycle-background: color-cycle 7s ease-in-out infinite;
+
+  @keyframes color-cycle {
+    0%,
+    100% {
+      background-color: var(--color-surface);
+    }
+
+    50% {
+      background-color: color-mix(in srgb, var(--color-secondary) 30%, transparent);
+    }
+  }
 }
 
 html,
