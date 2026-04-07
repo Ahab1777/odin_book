@@ -36,7 +36,14 @@ export default function Home() {
 
   return (
     <main>
-      <section>
+      <section
+        className="
+      flex 
+      flex-col 
+      gap-1.5
+      px-4
+        "
+      >
         <h1 className="text-brown text-center">Home Feed</h1>
         {isLoading ? (
           <p>Loading posts...</p>

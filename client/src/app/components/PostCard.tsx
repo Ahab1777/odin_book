@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import type { PostCardContent, Like, Comment } from "../../types/content";
-import { Link } from "react-router";
-import { useAuth } from "../auth";
-import { api } from "../../lib/api";
+import { useState, useEffect } from 'react';
+import type { PostCardContent, Like, Comment } from '../../types/content';
+import { Link } from 'react-router';
+import { useAuth } from '../auth';
+import { api } from '../../lib/api';
 
 type PostWithExtras = PostCardContent & {
   likes?: Like[];
@@ -29,10 +29,10 @@ export default function PostCard(post: PostWithExtras) {
   // Comments
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<InlineComment[]>(
-    post.comments ?? [],
+    post.comments ?? []
   );
   const [visibleCount, setVisibleCount] = useState<number>(5);
-  const [commentInput, setCommentInput] = useState("");
+  const [commentInput, setCommentInput] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
 
   useEffect(() => {
@@ -62,10 +62,10 @@ export default function PostCard(post: PostWithExtras) {
       };
       setComments((prev) => [newComment, ...prev]);
       setVisibleCount((v) => v + 1);
-      setCommentInput("");
+      setCommentInput('');
       setShowComments(true);
     } catch (err) {
-      console.error("Failed to post comment", err);
+      console.error('Failed to post comment', err);
     } finally {
       setCommentLoading(false);
     }
@@ -81,7 +81,7 @@ export default function PostCard(post: PostWithExtras) {
         return next;
       });
     } catch (err) {
-      console.error("Failed to delete comment", err);
+      console.error('Failed to delete comment', err);
     }
   }
 
@@ -110,7 +110,7 @@ export default function PostCard(post: PostWithExtras) {
         ]);
       }
     } catch (err) {
-      console.error("Like toggle failed", err);
+      console.error('Like toggle failed', err);
     } finally {
       setLoading(false);
     }
@@ -125,50 +125,111 @@ export default function PostCard(post: PostWithExtras) {
     : 0;
 
   return (
-    <article>
-      <header className="grid grid-cols-5 grid-rows-2 items-center gap-2">
+    <article
+      className='
+    hover:animate-color-cycle-background
+    border-2
+    rounded-2xl
+    hover:shadow-2xs
+      '
+    >
+      <header
+        className='
+          grid
+          grid-cols-5
+          grid-rows-1
+          items-center
+          gap-2
+        '
+      >
         <Link to={`/post/${post.id}`}>
-          <h2 className="font-bold text-brown col-span-3 row-start-1">
+          <h2
+            className='
+            font-bold
+            text-brown
+            col-span-3
+            row-start-1
+            
+            '
+          >
             {post.title}
           </h2>
         </Link>
         <Link to={`/profile/${post.userId}`}>
-          <h3 className="text-brown col-span-3 row-start-2">
+          <h3
+            className='
+                      text-brown
+                      col-span-3
+                    '
+          >
             {post.user.username}
           </h3>
         </Link>
         <Link to={`/profile/${post.userId}`}>
           <img
-            className="col-start-4 col-end-6 row-span-2 justify-self-end rounded-full"
+            className='
+              col-start-4
+              col-end-6
+              row-span-2
+              justify-self-end
+              rounded-full
+            '
             src={post.user.avatar}
             alt={`${post.user.username}'s avatar`}
           />
         </Link>
       </header>
       <p>{post.content}</p>
-      <footer className="text-sm text-slate">
-        <div className="flex items-center justify-between">
+      <footer
+        className='
+          text-sm
+          text-slate
+        '
+      >
+        <div
+          className='
+            flex
+            items-center
+            justify-between
+          '
+        >
           <time dateTime={post.createdAt}>
             {new Date(post.createdAt).toLocaleString()}
           </time>
 
-          <div className="flex items-center gap-2">
+          <div
+            className='
+              flex
+              items-center
+              gap-2
+            '
+          >
             <button
               onClick={toggleLike}
               disabled={loading}
               aria-pressed={isLiked}
-              className={`px-2 py-1 rounded ${isLiked ? "text-red-600" : "text-slate"}`}
-              title={isLiked ? "Unlike" : "Like"}
+              className={`
+                px-2
+                py-1
+                rounded
+                ${isLiked ? 'text-red-600' : 'text-slate'}
+              `}
+              title={isLiked ? 'Unlike' : 'Like'}
             >
-              {isLiked ? "♥" : "♡"}
+              {isLiked ? '♥' : '♡'}
             </button>
             <span>{likes.length}</span>
 
             <button
               onClick={() => setShowComments((s) => !s)}
-              className="px-2 py-1 rounded text-slate"
+              className='
+                px-2
+                py-1
+                rounded
+                text-slate
+              '
               aria-expanded={showComments}
-              title="Toggle comments"
+              title='Toggle comments'
             >
               💬
             </button>
@@ -177,32 +238,78 @@ export default function PostCard(post: PostWithExtras) {
         </div>
 
         <div
-          className="mt-2 transition-all duration-200 overflow-hidden"
+          className='
+            mt-2
+            transition-all
+            duration-200
+            overflow-hidden
+          '
           style={{ maxHeight: computedMaxHeight }}
         >
-          <div className="bg-slate-50 p-3 rounded">
+          <div
+            className='
+              bg-slate-50
+              p-3
+              rounded
+            '
+          >
             {comments.length === 0 ? (
-              <p className="text-slate">No comments yet.</p>
+              <p
+                className='
+                  text-slate
+                '
+              >
+                No comments yet.
+              </p>
             ) : (
-              <ul className="space-y-2">
+              <ul
+                className='
+                  space-y-2
+                '
+              >
                 {comments.slice(0, visibleCount).map((c) => (
                   <li
                     key={c.id}
-                    className="flex items-start justify-between gap-2"
+                    className='
+                      flex
+                      items-start
+                      justify-between
+                      gap-2
+                    '
                   >
                     <div>
-                      <p className="text-sm font-semibold">
+                      <p
+                        className='
+                          text-sm
+                          font-semibold
+                        '
+                      >
                         {(c as InlineComment).user?.username ?? c.userId}
                       </p>
-                      <p className="text-sm text-slate">{c.content}</p>
-                      <small className="text-xs text-slate">
+                      <p
+                        className='
+                          text-sm
+                          text-slate
+                        '
+                      >
+                        {c.content}
+                      </p>
+                      <small
+                        className='
+                          text-xs
+                          text-slate
+                        '
+                      >
                         {new Date(c.createdAt).toLocaleString()}
                       </small>
                     </div>
                     {user && c.userId === user.id && (
                       <button
                         onClick={() => deleteComment(c.id)}
-                        className="text-red-600 ml-2"
+                        className='
+                          text-red-600
+                          ml-2
+                        '
                       >
                         Delete
                       </button>
@@ -212,11 +319,23 @@ export default function PostCard(post: PostWithExtras) {
               </ul>
             )}
 
-            <div className="mt-2 flex items-center justify-center gap-4">
+            <div
+              className='
+                mt-2
+                flex
+                items-center
+                justify-center
+                gap-4
+              '
+            >
               {visibleCount > 5 && (
                 <button
                   onClick={() => setVisibleCount((v) => Math.max(5, v - 5))}
-                  className="text-sm text-slate underline"
+                  className='
+                    text-sm
+                    text-slate
+                    underline
+                  '
                 >
                   Load less
                 </button>
@@ -225,27 +344,45 @@ export default function PostCard(post: PostWithExtras) {
               {visibleCount < comments.length && (
                 <button
                   onClick={() => setVisibleCount((v) => v + 5)}
-                  className="text-sm text-slate underline"
+                  className='
+                    text-sm
+                    text-slate
+                    underline
+                  '
                 >
                   Load more
                 </button>
               )}
             </div>
 
-            <div className="mt-3 flex gap-2">
+            <div
+              className='
+                mt-3
+                flex
+                gap-2
+              '
+            >
               <input
                 value={commentInput}
                 onChange={(e) => setCommentInput(e.target.value)}
-                placeholder="Write a comment..."
-                className="flex-1 p-2 border rounded"
+                placeholder='Write a comment...'
+                className='
+                  flex-1
+                  p-2
+                  border
+                  rounded
+                '
                 disabled={commentLoading || !user}
               />
               <button
                 onClick={submitComment}
                 disabled={commentLoading || !user}
-                className="btn btn-primary"
+                className='
+                  btn
+                  btn-primary
+                '
               >
-                {commentLoading ? "Posting..." : "Post"}
+                {commentLoading ? 'Posting...' : 'Post'}
               </button>
             </div>
           </div>

@@ -375,7 +375,8 @@ export default function CreateAccount() {
             whitespace-nowrap
             transition-all
             duration-700
-            ease-out            outline-none
+            ease-out            
+            outline-none
             focus-visible:ring-[3px]
             disabled:pointer-events-none
             disabled:opacity-50

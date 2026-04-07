@@ -248,7 +248,8 @@ export default function Login() {
                   font-medium
                   whitespace-nowrap
                   transition-all
-                  outline-none
+                  duration-700
+                  ease-out                             outline-none
                   focus-visible:ring-[3px]
                   disabled:pointer-events-none
                   disabled:opacity-50
@@ -296,7 +297,8 @@ export default function Login() {
               font-medium
               whitespace-nowrap
               transition-all
-              outline-none
+              duration-700
+              ease-out                         outline-none
               focus-visible:ring-[3px]
               disabled:pointer-events-none
               disabled:opacity-50
@@ -357,6 +359,8 @@ export default function Login() {
               font-medium
               whitespace-nowrap
               transition-all
+              duration-700
+              ease-out           
               outline-none
               focus-visible:ring-[3px]
               disabled:pointer-events-none
