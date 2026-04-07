@@ -20,14 +20,20 @@
 
   @keyframes color-cycle {
     0%,
+    50%,
     100% {
       background-color: var(--color-surface);
     }
 
-    50% {
+    25%,
+    75% {
       background-color: color-mix(in srgb, var(--color-secondary) 30%, transparent);
     }
   }
+}
+
+@theme {
+  --shadow-clickable: 5px 5px 5px -5px rgba(0, 0, 0, 1);
 }
 
 html,

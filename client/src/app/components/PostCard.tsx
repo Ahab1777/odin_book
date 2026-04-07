@@ -131,6 +131,7 @@ export default function PostCard(post: PostWithExtras) {
     border-2
     rounded-2xl
     hover:shadow-2xs
+    p-4
       '
     >
       <header
@@ -142,37 +143,47 @@ export default function PostCard(post: PostWithExtras) {
           gap-2
         '
       >
-        <Link to={`/post/${post.id}`}>
-          <h2
-            className='
-            font-bold
-            text-brown
-            col-span-3
-            row-start-1
-            
-            '
-          >
-            {post.title}
-          </h2>
+        <Link
+          to={`/post/${post.id}`}
+          className='
+          font-bold
+          text-brown
+          col-span-3
+          col-start-1
+          col-end-4
+          row-start-1
+          
+          '
+        >
+          <h2>{post.title}</h2>
         </Link>
-        <Link to={`/profile/${post.userId}`}>
-          <h3
-            className='
-                      text-brown
-                      col-span-3
-                    '
-          >
-            {post.user.username}
-          </h3>
+        <Link
+          to={`/profile/${post.userId}`}
+          className='
+          text-brown
+          col-start-4
+          col-end-5
+        '
+        >
+          <h3>{post.user.username}</h3>
         </Link>
-        <Link to={`/profile/${post.userId}`}>
+        <Link
+          to={`/profile/${post.userId}`}
+          className='
+            col-start-5
+            col-end-6
+            justify-self-end
+            rounded-full
+          '
+        >
           <img
             className='
-              col-start-4
-              col-end-6
-              row-span-2
-              justify-self-end
-              rounded-full
+            rounded-full
+            border-2
+            hover:shadow-clickable
+            transition-all
+            ease-out
+            duration-200
             '
             src={post.user.avatar}
             alt={`${post.user.username}'s avatar`}

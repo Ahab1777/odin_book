@@ -44,7 +44,11 @@ export default function Home() {
       px-4
         "
       >
-        <h1 className="text-brown text-center">Home Feed</h1>
+        <h1 className="
+        text-text
+        text-3xl
+        text-center
+        ">Home Feed</h1>
         {isLoading ? (
           <p>Loading posts...</p>
         ) : error ? (
