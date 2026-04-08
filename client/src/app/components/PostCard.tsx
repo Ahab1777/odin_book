@@ -236,7 +236,8 @@ export default function PostCard(post: PostWithExtras) {
       <footer
         className='
           text-sm
-          text-slate
+          text-muted-text
+          mt-2
         '
       >
         <div
@@ -258,29 +259,34 @@ export default function PostCard(post: PostWithExtras) {
               disabled={loading}
               aria-pressed={isLiked}
               className={`
-                px-2
-                py-2
-                text-[18px]
+                h-8 
+                w-8 
+                flex 
+                items-center 
+                justify-center
+                text-[26px]
                 rounded-full
                 hover:shadow-clickable
                 hover:border-background/70
                 transition-all
                 ease-in-out
                 cursor-pointer
-                ${isLiked ? 'text-red-600' : 'text-slate'}
+                ${isLiked ? 'text-red-600' : 'text-background'}
               `}
               title={isLiked ? 'Unlike' : 'Like'}
             >
-              {isLiked ? '♥' : '♡'}
+              ♥
             </button>
             <span>{likes.length}</span>
 
             <button
               onClick={() => setShowComments((s) => !s)}
               className='
-                px-2
-                py-2
-              
+                h-8 
+                w-8 
+                flex 
+                items-center 
+                justify-center
                 text-slate
                 text-[18px]
                 rounded-full
