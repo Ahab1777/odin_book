@@ -40,7 +40,7 @@ export default function Home() {
         className="
       flex 
       flex-col 
-      gap-1.5
+      gap-3
       px-4
         "
       >

@@ -143,11 +143,11 @@ export default function PostCard(post: PostWithExtras) {
       <header
         className='
           grid
-          grid-cols-5
+          grid-cols-[50px_1fr_1fr_1fr_1fr]
           grid-rows-2
           items-center
           gap-2
-          col-first-width-50
+          
         '
       >
         <Link //avatar
@@ -176,21 +176,35 @@ export default function PostCard(post: PostWithExtras) {
             alt={`${post.user.username}'s avatar`}
           />
         </Link>
-          <Link //username
-            to={`/profile/${post.userId}`}
-            className='
+        <Link //username
+          to={`/profile/${post.userId}`}
+          className='
             text-text
             col-start-2
-            col-end-3
+            col-end-4
           '
-          >
+        >
           <h3
             className='
           text-text
           text-[14px]
             '
-          >{post.user.username}</h3>
-          </Link>
+          >
+            {post.user.username}
+          </h3>
+        </Link>
+        <time
+          className='
+          col-start-4
+          col-end-6
+          text-muted-text
+          text-[12px]
+          ml-auto
+          '          
+          dateTime={post.createdAt}>
+          {new Date(post.createdAt).toLocaleString()}
+        </time>
+
         <Link //Title
           to={`/post/${post.id}`}
           className='
@@ -205,12 +219,20 @@ export default function PostCard(post: PostWithExtras) {
           <h2
             className='
           text-text
-          text-[20px]
+          text-[18px]
             '
-          >{post.title}</h2>
+          >
+            {post.title}
+          </h2>
         </Link>
       </header>
-      <p>{post.content}</p>
+      <p
+        className='
+      text-[16px]
+        '
+      >
+        {post.content}
+      </p>
       <footer
         className='
           text-sm
@@ -224,10 +246,6 @@ export default function PostCard(post: PostWithExtras) {
             justify-between
           '
         >
-          <time dateTime={post.createdAt}>
-            {new Date(post.createdAt).toLocaleString()}
-          </time>
-
           <div
             className='
               flex
@@ -241,8 +259,14 @@ export default function PostCard(post: PostWithExtras) {
               aria-pressed={isLiked}
               className={`
                 px-2
-                py-1
-                rounded
+                py-2
+                text-[18px]
+                rounded-full
+                hover:shadow-clickable
+                hover:border-background/70
+                transition-all
+                ease-in-out
+                cursor-pointer
                 ${isLiked ? 'text-red-600' : 'text-slate'}
               `}
               title={isLiked ? 'Unlike' : 'Like'}
@@ -255,9 +279,16 @@ export default function PostCard(post: PostWithExtras) {
               onClick={() => setShowComments((s) => !s)}
               className='
                 px-2
-                py-1
-                rounded
+                py-2
+              
                 text-slate
+                text-[18px]
+                rounded-full
+                hover:shadow-clickable
+                hover:border-background/70
+                transition-all
+                ease-in-out
+                cursor-pointer
               '
               aria-expanded={showComments}
               title='Toggle comments'
