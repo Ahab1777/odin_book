@@ -128,66 +128,86 @@ export default function PostCard(post: PostWithExtras) {
     <article
       className='
     hover:animate-color-cycle-background
-    border-2
+    border
+    border-accent/30
     rounded-2xl
+    shadow-2xs
     hover:shadow-2xs
     p-4
+    mx-auto
+    max-w-[500px]
+    w-full
+
       '
     >
       <header
         className='
           grid
           grid-cols-5
-          grid-rows-1
+          grid-rows-2
           items-center
           gap-2
+          col-first-width-50
         '
       >
-        <Link
-          to={`/post/${post.id}`}
-          className='
-          font-bold
-          text-brown
-          col-span-3
-          col-start-1
-          col-end-4
-          row-start-1
-          
-          '
-        >
-          <h2>{post.title}</h2>
-        </Link>
-        <Link
+        <Link //avatar
           to={`/profile/${post.userId}`}
           className='
-          text-brown
-          col-start-4
-          col-end-5
-        '
-        >
-          <h3>{post.user.username}</h3>
-        </Link>
-        <Link
-          to={`/profile/${post.userId}`}
-          className='
-            col-start-5
-            col-end-6
-            justify-self-end
+            col-start-1
+            col-end-2
             rounded-full
+            
           '
         >
           <img
             className='
             rounded-full
-            border-2
+            border
+            border-accent/30
             hover:shadow-clickable
             transition-all
             ease-out
             duration-200
+            h-10
+            w-10
+            mr-auto
             '
             src={post.user.avatar}
             alt={`${post.user.username}'s avatar`}
           />
+        </Link>
+          <Link //username
+            to={`/profile/${post.userId}`}
+            className='
+            text-text
+            col-start-2
+            col-end-3
+          '
+          >
+          <h3
+            className='
+          text-text
+          text-[14px]
+            '
+          >{post.user.username}</h3>
+          </Link>
+        <Link //Title
+          to={`/post/${post.id}`}
+          className='
+          font-bold
+          text-text
+          col-span-3
+          col-start-1
+          col-end-6
+          row-start-2
+          '
+        >
+          <h2
+            className='
+          text-text
+          text-[20px]
+            '
+          >{post.title}</h2>
         </Link>
       </header>
       <p>{post.content}</p>
