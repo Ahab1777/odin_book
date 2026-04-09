@@ -5,6 +5,7 @@ import Navbar from "./app/components/Navbar";
 function App() {
   return (
     <>
+      <Navbar />
       <div className="
       app-layout
       min-h-screen
@@ -13,7 +14,6 @@ function App() {
       max-w-240 
       mx-auto
       w-full">
-        <Navbar />
         <Outlet />
       </div>
     </>

@@ -190,6 +190,7 @@ export default function PostCard(post: PostWithExtras) {
             className='
           text-text
           text-[14px]
+          font-inter
             '
           >
             {post.user.username}
@@ -223,6 +224,7 @@ export default function PostCard(post: PostWithExtras) {
             className='
           text-text
           text-[18px]
+          font-inter
             '
           >
             {post.title}

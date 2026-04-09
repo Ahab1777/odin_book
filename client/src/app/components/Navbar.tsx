@@ -1,5 +1,5 @@
-import { Link, NavLink, useNavigate } from "react-router";
-import { useAuth } from "../auth";
+import { Link, NavLink, useNavigate } from 'react-router';
+import { useAuth } from '../auth';
 
 export default function Navbar() {
   const { user, isLoading, logout } = useAuth();
@@ -8,68 +8,182 @@ export default function Navbar() {
 
   function handleLogout() {
     logout();
-    navigate("/login");
+    navigate('/login');
   }
 
   return (
-    <header className="w-full bg-lime text-xl sticky top-0 z-50">
-      <div className="max-w-5xl mx-auto flex items-center justify-between px-5 py-5 gap-6">
-        <div className="flex items-center gap-2">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="font-semibold">OB</span>
-            <span className="font-medium">OdinBook</span>
+    <header
+      className='
+      w-full
+      bg-surface
+      text-xl
+      sticky
+      top-0
+      z-50
+      shadow-highlight
+      font-system
+      font-extrabold
+      '
+    >
+      <div
+        className='
+          mx-auto
+          flex
+          items-center
+          justify-between
+          px-8
+          py-5
+          gap-6
+        '
+      >
+        <div
+          className='
+            flex
+            items-center
+            gap-2
+            
+          '
+        >
+          <Link
+            to='/'
+            className='
+              flex
+              items-center
+              gap-2
+              
+            '
+          >
+            <span
+              className='
+                font-semibold
+              '
+            >
+              OB
+            </span>
+            <span
+              className='
+                font-medium
+              '
+            >
+              OdinBook
+            </span>
           </Link>
         </div>
 
-        <nav className="flex items-center gap-4" aria-label="Main navigation">
+        <nav
+          className='
+            flex
+            items-center
+            gap-4
+            text-base
+          '
+          aria-label='Main navigation'
+        >
           <NavLink
-            to="/"
+            to='/'
             end
             className={({ isActive }) =>
-              `hover:underline ${isActive ? "font-semibold" : ""}`
+              `
+            hover:border-accent/50
+              hover:bg-accent/20
+              transition-all
+              ease-in
+              box-border
+              text-center
+              w-30
+              px-3
+              py-1
+              rounded-2xl
+              hover:border
+              hover:shadow-clickable
+              hover: border-accent/50
+              ${isActive ?
+                'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
+            `
             }
           >
             Home
           </NavLink>
           <NavLink
-            to="/my-posts"
+            to='/my-posts'
             className={({ isActive }) =>
-              `hover:underline ${isActive ? "font-semibold" : ""}`
+              `
+            hover:border-accent/50
+              hover:bg-accent/20
+              transition-all
+              ease-in
+              box-border
+              text-center
+              w-30
+              px-3
+              py-1
+              rounded-2xl
+              hover:border
+              hover:shadow-clickable
+              hover: border-accent/50
+              ${isActive ?
+                'border-accent/50 bg-accent/60 border shadow-clickable' : 'font-normal'}
+            `
             }
           >
             My Posts
           </NavLink>
-          {typeof window !== "undefined" &&
-          localStorage.getItem("isDemo") === "true" ? null : (
+          {typeof window !== 'undefined' &&
+          localStorage.getItem('isDemo') === 'true' ? null : (
             <NavLink
-              to="/new-post"
+              to='/new-post'
               className={({ isActive }) =>
-                `hover:underline ${isActive ? "font-semibold" : ""}`
+                `
+                hover:underline
+                ${isActive ? '' : 'font-thin'}
+              `
               }
             >
               New Post
             </NavLink>
           )}
           <NavLink
-            to="/community"
+            to='/community'
             className={({ isActive }) =>
-              `hover:underline ${isActive ? "font-semibold" : ""}`
+              `
+              hover:underline
+              ${isActive ? '' : 'font-thin'}
+            `
             }
           >
             Community
           </NavLink>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div
+          className='
+            flex
+            items-center
+            gap-3
+          '
+        >
           {isLoading ? null : user ? (
             <>
               <NavLink to={`/profile/${user.id}`}>
-                <span className="text-sm">Hi, {currentUser?.username}</span>
+                <span
+                  className='
+                    text-sm
+                  '
+                >
+                  Hi, {currentUser?.username}
+                </span>
               </NavLink>
               <button
-                type="button"
+                type='button'
                 onClick={handleLogout}
-                className="px-4 py-2 rounded-full border border-black/20 hover:bg-black/5"
+                className='
+                  px-4
+                  py-2
+                  rounded-full
+                  border
+                  border-black/20
+                  hover:bg-black/5
+                '
               >
                 Log out
               </button>
@@ -77,14 +191,28 @@ export default function Navbar() {
           ) : (
             <>
               <Link
-                to="/login"
-                className="px-4 py-2 rounded-full border border-black/20 hover:bg-black/5"
+                to='/login'
+                className='
+                  px-4
+                  py-2
+                  rounded-full
+                  border
+                  border-black/20
+                  hover:bg-black/5
+                '
               >
                 Log in
               </Link>
               <Link
-                to="/create-account"
-                className="px-4 py-2 rounded-full bg-black text-white hover:bg-black/80"
+                to='/create-account'
+                className='
+                  px-4
+                  py-2
+                  rounded-full
+                  bg-black
+                  text-white
+                  hover:bg-black/80
+                '
               >
                 Sign up
               </Link>

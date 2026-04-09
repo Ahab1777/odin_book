@@ -1,5 +1,9 @@
 Mockdin Social
 
+Fonts:
+Primary/Display - Funnel
+Secondary/Content - Inter
+
 🎨 Color System Breakdown (Applied to Mockdin)
 🔵 Primary — #4F46E5 (Indigo)
 

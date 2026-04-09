@@ -34,10 +34,13 @@
 
 @theme {
   --shadow-clickable: 5px 5px 10px -5px rgba(0, 0, 0, 1);
+  --shadow-highlight: 5px 5px 10px -5px rgba(0, 0, 0, 0.5);
 }
 
 @theme {
   --font-funnel: Funnel;
+  --font-inter: Inter;
+  --font-system: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 html,
