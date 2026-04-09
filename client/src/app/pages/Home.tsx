@@ -35,7 +35,11 @@ export default function Home() {
   }, []);
 
   return (
-    <main>
+    <main
+      className="
+    font-funnel
+      "
+    >
       <section
         className="
       flex 
@@ -48,6 +52,7 @@ export default function Home() {
         text-text
         text-3xl
         text-center
+        m-5
         ">Home Feed</h1>
         {isLoading ? (
           <p>Loading posts...</p>
