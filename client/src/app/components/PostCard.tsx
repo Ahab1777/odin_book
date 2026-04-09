@@ -139,7 +139,7 @@ export default function PostCard(post: PostWithExtras) {
     mx-auto
     max-w-[500px]
     w-full
-
+    font-funnel
       '
     >
       <header
@@ -333,8 +333,6 @@ export default function PostCard(post: PostWithExtras) {
           >
             {comments.length === 0 ? (
               <p
-                className='
-                '
               >
                 No comments yet.
               </p>

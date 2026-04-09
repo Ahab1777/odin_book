@@ -36,6 +36,10 @@
   --shadow-clickable: 5px 5px 10px -5px rgba(0, 0, 0, 1);
 }
 
+@theme {
+  --font-funnel: Funnel;
+}
+
 html,
 body,
 #root {

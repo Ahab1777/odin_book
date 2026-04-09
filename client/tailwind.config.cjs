@@ -21,6 +21,7 @@ module.exports = {
         card: "0 6px 16px rgba(45,48,71,0.06)",
         clickable: "45px 45px 5px -5px rgba(0, 0, 0, 1)"
       },
+      
     },
   },
   plugins: [],
