@@ -127,12 +127,14 @@ export default function PostCard(post: PostWithExtras) {
   return (
     <article
       className='
-    hover:animate-color-cycle-background
+    hover:shadow-clickable
+    transition-all
+    ease-in
+    bg-surface
     border
     border-accent/30
     rounded-2xl
     shadow-2xs
-    hover:shadow-2xs
     p-4
     mx-auto
     max-w-[500px]
@@ -200,8 +202,9 @@ export default function PostCard(post: PostWithExtras) {
           text-muted-text
           text-[12px]
           ml-auto
-          '          
-          dateTime={post.createdAt}>
+          '
+          dateTime={post.createdAt}
+        >
           {new Date(post.createdAt).toLocaleString()}
         </time>
 
@@ -229,6 +232,8 @@ export default function PostCard(post: PostWithExtras) {
       <p
         className='
       text-[16px]
+      text-text
+        wrap-break-word
         '
       >
         {post.content}
@@ -255,6 +260,7 @@ export default function PostCard(post: PostWithExtras) {
             '
           >
             <button
+              style={{ textShadow: '2px 2px 5px rgba(0,0,0,0.6)' }}
               onClick={toggleLike}
               disabled={loading}
               aria-pressed={isLiked}
@@ -271,7 +277,7 @@ export default function PostCard(post: PostWithExtras) {
                 transition-all
                 ease-in-out
                 cursor-pointer
-                ${isLiked ? 'text-red-600' : 'text-background'}
+                ${isLiked ? 'text-red-600' : 'text-white'}
               `}
               title={isLiked ? 'Unlike' : 'Like'}
             >
@@ -280,6 +286,7 @@ export default function PostCard(post: PostWithExtras) {
             <span>{likes.length}</span>
 
             <button
+              style={{ textShadow: '2px 2px 6px rgba(0,0,0,0.7)' }}
               onClick={() => setShowComments((s) => !s)}
               className='
                 h-8 
@@ -311,28 +318,35 @@ export default function PostCard(post: PostWithExtras) {
             transition-all
             duration-200
             overflow-hidden
+            
           '
           style={{ maxHeight: computedMaxHeight }}
         >
           <div
             className='
-              bg-slate-50
+            
+              bg-surface
               p-3
               rounded
+              
             '
           >
             {comments.length === 0 ? (
               <p
                 className='
-                  text-slate
                 '
               >
                 No comments yet.
               </p>
             ) : (
+                
+                
               <ul
                 className='
                   space-y-2
+                  divide-y 
+                  divide-muted-text/50
+
                 '
               >
                 {comments.slice(0, visibleCount).map((c) => (
@@ -346,18 +360,20 @@ export default function PostCard(post: PostWithExtras) {
                     '
                   >
                     <div>
-                      <p
-                        className='
+                      <Link to={`/profile/${c.userId}`}>
+                        <p
+                          className='
                           text-sm
                           font-semibold
                         '
-                      >
-                        {(c as InlineComment).user?.username ?? c.userId}
-                      </p>
+                        >
+                          {(c as InlineComment).user?.username ?? c.userId}
+                        </p>
+                      </Link>
                       <p
                         className='
                           text-sm
-                          text-slate
+                          text-text
                         '
                       >
                         {c.content}
@@ -365,7 +381,7 @@ export default function PostCard(post: PostWithExtras) {
                       <small
                         className='
                           text-xs
-                          text-slate
+                          text-muted-text
                         '
                       >
                         {new Date(c.createdAt).toLocaleString()}
@@ -403,6 +419,10 @@ export default function PostCard(post: PostWithExtras) {
                     text-sm
                     text-slate
                     underline
+                    cursor-pointer
+                    hover:text-text
+                    transition-all
+                    ease-in-out
                   '
                 >
                   Load less
@@ -416,6 +436,10 @@ export default function PostCard(post: PostWithExtras) {
                     text-sm
                     text-slate
                     underline
+                    cursor-pointer
+                    hover:text-text
+                    transition-all
+                    ease-in-out
                   '
                 >
                   Load more
@@ -439,6 +463,7 @@ export default function PostCard(post: PostWithExtras) {
                   p-2
                   border
                   rounded
+                  bg-background
                 '
                 disabled={commentLoading || !user}
               />

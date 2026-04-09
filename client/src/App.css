@@ -27,7 +27,7 @@
 
     25%,
     75% {
-      background-color: color-mix(in srgb, var(--color-secondary) 30%, transparent);
+      background-color: color-mix(in srgb, var(--color-background) 30%, transparent);
     }
   }
 }
@@ -40,4 +40,5 @@ html,
 body,
 #root {
   height: 100%;
+  background-color: var(--color-background);
 }
