@@ -158,7 +158,6 @@ export default function PostCard(post: PostWithExtras) {
             col-start-1
             col-end-2
             rounded-full
-            
           '
         >
           <img
@@ -212,7 +211,6 @@ export default function PostCard(post: PostWithExtras) {
         <Link //Title
           to={`/post/${post.id}`}
           className='
-          font-bold
           text-text
           col-span-3
           col-start-1
@@ -225,6 +223,7 @@ export default function PostCard(post: PostWithExtras) {
           text-text
           text-[18px]
           font-inter
+          font-bold
             '
           >
             {post.title}
