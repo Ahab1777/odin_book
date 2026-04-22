@@ -27,6 +27,7 @@ export default function Navbar() {
     >
       <div
         className='
+          box-border
           mx-auto
           flex
           items-center
@@ -34,6 +35,7 @@ export default function Navbar() {
           px-8
           py-5
           gap-6
+
         '
       >
         <div
@@ -75,7 +77,7 @@ export default function Navbar() {
             flex
             items-center
             gap-4
-            text-base
+            text-base 
           '
           aria-label='Main navigation'
         >
@@ -122,7 +124,7 @@ export default function Navbar() {
               hover:shadow-clickable
               hover: border-accent/50
               ${isActive ?
-                'border-accent/50 bg-accent/60 border shadow-clickable' : 'font-normal'}
+                'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
             `
             }
           >
@@ -132,12 +134,25 @@ export default function Navbar() {
           localStorage.getItem('isDemo') === 'true' ? null : (
             <NavLink
               to='/new-post'
-              className={({ isActive }) =>
-                `
-                hover:underline
-                ${isActive ? '' : 'font-thin'}
+            className={({ isActive }) =>
               `
-              }
+            hover:border-accent/50
+              hover:bg-accent/20
+              transition-all
+              ease-in
+              box-border
+              text-center
+              w-30
+              px-3
+              py-1
+              rounded-2xl
+              hover:border
+              hover:shadow-clickable
+              hover: border-accent/50
+              ${isActive ?
+                'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
+            `
+            }
             >
               New Post
             </NavLink>
@@ -146,8 +161,21 @@ export default function Navbar() {
             to='/community'
             className={({ isActive }) =>
               `
-              hover:underline
-              ${isActive ? '' : 'font-thin'}
+            hover:border-accent/50
+              hover:bg-accent/20
+              transition-all
+              ease-in
+              box-border
+              text-center
+              w-30
+              px-3
+              py-1
+              rounded-2xl
+              hover:border
+              hover:shadow-clickable
+              hover: border-accent/50
+              ${isActive ?
+                'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
             `
             }
           >
@@ -167,9 +195,11 @@ export default function Navbar() {
               <NavLink to={`/profile/${user.id}`}>
                 <span
                   className='
-                    text-sm
+                  text-sm
+                  hover:underline
+                  
                   '
-                >
+                  >
                   Hi, {currentUser?.username}
                 </span>
               </NavLink>
@@ -177,12 +207,21 @@ export default function Navbar() {
                 type='button'
                 onClick={handleLogout}
                 className='
-                  px-4
-                  py-2
-                  rounded-full
+                hover:border-accent/50
+                  hover:bg-accent/20
                   border
-                  border-black/20
-                  hover:bg-black/5
+                  border-transparent
+                  transition-all
+                  ease-in
+                  box-border
+                  text-center
+                  w-30
+                  px-3
+                  py-2
+                  rounded-2xl
+                  hover:border
+                  hover:shadow-clickable
+                  hover:cursor-pointer
                 '
               >
                 Log out

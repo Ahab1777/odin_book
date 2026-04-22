@@ -19,6 +19,7 @@ Profile
 Home
     [] Display likes and comments in main page
     [] Home page post's pagination
+    [] Navbar for small screens - dropdown?
 
 Posts
     [] Delete post
