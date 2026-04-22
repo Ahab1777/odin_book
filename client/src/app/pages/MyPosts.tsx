@@ -95,18 +95,33 @@ export default function MyPosts() {
             {postIndex.map((post) => (
               <UserPostCard key={post.id} {...post} />
             ))}
-            <div className='pagination-controls mt-4'>
+            <div
+              className='
+              mt-4
+              flex
+              justify-center
+              gap-4
+              w-full
+              mb-4
+              '
+            >
               <button
                 onClick={() => setPostsPage((prev) => Math.max(prev - 1, 1))}
                 disabled={!pagination.hasPreviousPage}
-                className='btn btn-primary'
+                className={`
+                  prev-next-btn
+              ${pagination.hasPreviousPage ? 'prev-next-btn-enabled' : 'prev-next-btn-disabled'}
+              `}
               >
                 Previous
               </button>
               <button
                 onClick={() => setPostsPage((prev) => prev + 1)}
                 disabled={!pagination.hasNextPage}
-                className='btn btn-primary'
+                className={`
+                  prev-next-btn
+              ${pagination.hasNextPage ? 'prev-next-btn-enabled' : 'prev-next-btn-disabled'}
+              `}
               >
                 Next
               </button>

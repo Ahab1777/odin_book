@@ -99,6 +99,8 @@ export default function Navbar() {
               hover:border
               hover:shadow-clickable
               hover: border-accent/50
+              active:scale-99
+              active:shadow-sm              
               ${isActive ?
                 'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
             `
@@ -123,6 +125,8 @@ export default function Navbar() {
               hover:border
               hover:shadow-clickable
               hover: border-accent/50
+              active:scale-99
+              active:shadow-sm 
               ${isActive ?
                 'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
             `
@@ -149,6 +153,8 @@ export default function Navbar() {
               hover:border
               hover:shadow-clickable
               hover: border-accent/50
+              active:scale-99
+              active:shadow-sm               
               ${isActive ?
                 'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
             `
@@ -174,6 +180,8 @@ export default function Navbar() {
               hover:border
               hover:shadow-clickable
               hover: border-accent/50
+              active:scale-99
+              active:shadow-sm               
               ${isActive ?
                 'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
             `
@@ -222,6 +230,8 @@ export default function Navbar() {
                   hover:border
                   hover:shadow-clickable
                   hover:cursor-pointer
+                  active:scale-99
+                  active:shadow-sm                   
                 '
               >
                 Log out
@@ -238,6 +248,8 @@ export default function Navbar() {
                   border
                   border-black/20
                   hover:bg-black/5
+                  active:scale-99
+                  active:shadow-sm                   
                 '
               >
                 Log in
@@ -251,6 +263,8 @@ export default function Navbar() {
                   bg-black
                   text-white
                   hover:bg-black/80
+                  active:scale-99
+                  active:shadow-sm                   
                 '
               >
                 Sign up

@@ -19,6 +19,8 @@ export default function UserPostCard(post: UserPostCardContent) {
         max-w-[500px]
         w-full
         font-funnel
+        active:scale-99
+        active:shadow-sm        
       '
     >
       <article>

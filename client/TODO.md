@@ -28,3 +28,4 @@ Posts
 
 
 Miscellaneous 
+    [] Add global footer

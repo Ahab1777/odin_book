@@ -130,6 +130,8 @@ export default function PostCard(post: PostWithExtras) {
     hover:shadow-clickable
     transition-all
     ease-in
+    [&:has(a:active)]:active:scale-99
+    [&:has(a:active)]:active:shadow-sm
     bg-surface
     border
     border-accent/30
@@ -278,6 +280,8 @@ export default function PostCard(post: PostWithExtras) {
                 transition-all
                 ease-in-out
                 cursor-pointer
+                active:scale-99
+                active:shadow-sm                  
                 ${isLiked ? 'text-red-600' : 'text-white'}
               `}
               title={isLiked ? 'Unlike' : 'Like'}
@@ -303,6 +307,8 @@ export default function PostCard(post: PostWithExtras) {
                 transition-all
                 ease-in-out
                 cursor-pointer
+                active:scale-99
+                active:shadow-sm                  
               '
               aria-expanded={showComments}
               title='Toggle comments'
