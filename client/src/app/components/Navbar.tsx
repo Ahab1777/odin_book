@@ -64,10 +64,9 @@ export default function Navbar() {
             </span>
             <span
               className='
-                font-medium
+                font-normal
               '
             >
-              OdinBook
             </span>
           </Link>
         </div>
