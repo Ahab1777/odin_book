@@ -53,11 +53,11 @@ body,
 /* Tailwind components */
 
 .prev-next-btn {
-  @apply border transition-all ease-in box-border text-center w-30 px-3 py-1 rounded-2xl border-accent/50 shadow-clickable;
+  @apply border transition-all ease-in box-border text-center w-30 px-3 py-1 rounded-2xl border-accent/50 shadow-clickable ;
 }
 
 .prev-next-btn-enabled {
-  @apply hover:cursor-pointer hover:border-accent/50 hover:bg-accent/20 hover:border hover:shadow-clickable active:scale-95 active:bg-accent
+  @apply hover:cursor-pointer hover:border-accent/50 hover:bg-accent/20 hover:border hover:shadow-clickable active:scale-95 active:bg-accent active:shadow-sm;
 }
 
 .prev-next-btn-disabled {
