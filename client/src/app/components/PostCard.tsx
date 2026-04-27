@@ -252,7 +252,7 @@ export default function PostCard(post: PostWithExtras) {
           className='
             flex
             items-center
-            justify-between
+            justify-end
           '
         >
           <div

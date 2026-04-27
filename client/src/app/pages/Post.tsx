@@ -159,8 +159,25 @@ export default function Post() {
     : 0;
 
   return (
-    <article>
-      <header className="grid grid-cols-5 grid-rows-2 items-center gap-2">
+    <article
+      className="
+    bg-surface
+    border
+    border-accent/30
+    rounded-2xl
+    shadow-2xs
+    max-w-[500px]
+    w-full 
+    mx-auto
+      "
+    >
+      <header className="
+      grid 
+      grid-cols-5 
+      grid-rows-2 
+      items-center 
+      gap-2
+      ">
         <h2 className="font-bold text-brown col-span-3 row-start-1">
           {post.title}
         </h2>
