@@ -17,12 +17,15 @@ export default function Navbar() {
       w-full
       bg-surface
       text-xl
-      sticky
+      fixed
       top-0
+      left-0
+      right-0
       z-50
       shadow-highlight
       font-system
       font-extrabold
+      h-24
       '
     >
       <div

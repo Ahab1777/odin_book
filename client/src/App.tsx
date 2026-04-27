@@ -7,6 +7,7 @@ function App() {
     <>
       <Navbar />
       <div className="
+      pt-24
       app-layout
       min-h-screen
       flex
