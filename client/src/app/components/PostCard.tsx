@@ -35,6 +35,15 @@ export default function PostCard(post: PostWithExtras) {
   const [commentInput, setCommentInput] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
 
+  // Edit mode
+  const [localTitle, setLocalTitle] = useState(post.title);
+  const [localContent, setLocalContent] = useState(post.content);
+  const [editMode, setEditMode] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(post.title);
+  const [editedContent, setEditedContent] = useState(post.content);
+  const [saving, setSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+
   useEffect(() => {
     setComments((post.comments as InlineComment[]) ?? []);
   }, [post.comments]);
@@ -113,6 +122,36 @@ export default function PostCard(post: PostWithExtras) {
       console.error('Like toggle failed', err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function confirmEdit() {
+    const trimmedTitle = editedTitle.trim();
+    const trimmedContent = editedContent.trim();
+    if (trimmedTitle.length < 3 || trimmedTitle.length > 24) {
+      setEditError('Title must be between 3 and 24 characters.');
+      return;
+    }
+    if (trimmedContent.length < 10 || trimmedContent.length > 240) {
+      setEditError('Content must be between 10 and 240 characters.');
+      return;
+    }
+    setEditError(null);
+    setSaving(true);
+    try {
+      const updated = await api.put<{
+        id: string;
+        title: string;
+        content: string;
+      }>(`/post/${post.id}`, { title: trimmedTitle, content: trimmedContent });
+      setLocalTitle(updated.title);
+      setLocalContent(updated.content);
+      setEditMode(false);
+    } catch (err) {
+      console.error('Failed to update post', err);
+      setEditError('Failed to save changes. Please try again.');
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -210,37 +249,96 @@ export default function PostCard(post: PostWithExtras) {
           {new Date(post.createdAt).toLocaleString()}
         </time>
 
-        <Link //Title
-          to={`/post/${post.id}`}
-          className='
-          text-text
-          col-span-3
-          col-start-1
-          col-end-6
-          row-start-2
-          '
-        >
-          <h2
+        {editMode ? (
+          <input
+            value={editedTitle}
+            onChange={(e) => {
+              setEditedTitle(e.target.value);
+              setEditError(null);
+            }}
+            maxLength={24}
             className='
-          text-text
-          text-[18px]
-          font-inter
-          font-bold
+              col-span-3
+              col-start-1
+              col-end-6
+              row-start-2
+              w-full
+              p-1
+              border
+              border-accent/50
+              rounded
+              bg-background
+              text-text
+              text-[18px]
+              font-inter
+              font-bold
+            '
+          />
+        ) : (
+          <Link //Title
+            to={`/post/${post.id}`}
+            className='
+            text-text
+            col-span-3
+            col-start-1
+            col-end-6
+            row-start-2
             '
           >
-            {post.title}
-          </h2>
-        </Link>
+            <h2
+              className='
+            text-text
+            text-[18px]
+            font-inter
+            font-bold
+              '
+            >
+              {localTitle}
+            </h2>
+          </Link>
+        )}
       </header>
-      <p
-        className='
-      text-[16px]
-      text-text
-        wrap-break-word
-        '
-      >
-        {post.content}
-      </p>
+      {editMode ? (
+        <>
+          <textarea
+            value={editedContent}
+            onChange={(e) => {
+              setEditedContent(e.target.value);
+              setEditError(null);
+            }}
+            maxLength={240}
+            rows={4}
+            className='
+              w-full
+              mt-2
+              p-2
+              border
+              border-accent/50
+              rounded
+              bg-background
+              text-[16px]
+              text-text
+              resize-none
+            '
+          />
+          <div className='flex items-center justify-between mt-1 text-xs'>
+            {editError && <span className='text-red-500'>{editError}</span>}
+            <span className='ml-auto text-muted-text'>
+              {editedContent.length}/240
+            </span>
+          </div>
+        </>
+      ) : (
+        <p
+          className='
+        text-[16px]
+        text-text
+          wrap-break-word
+          '
+        >
+          {localContent}
+        </p>
+      )}
       <footer
         className='
           text-sm
@@ -252,11 +350,69 @@ export default function PostCard(post: PostWithExtras) {
           className='
             flex
             items-center
-            justify-end
           '
         >
+          {user &&
+            user.id === post.userId &&
+            (editMode ? (
+              <>
+                <button
+                  onClick={confirmEdit}
+                  disabled={saving}
+                  className='
+                    px-3 py-1 rounded-2xl border border-accent/50
+                    bg-accent/60 text-text text-xs font-bold
+                    hover:bg-accent/80 transition-all ease-in
+                    cursor-pointer active:scale-99 disabled:opacity-50
+                    hover:shadow-clickable
+                    active:shadow-sm
+                    '
+                >
+                  {saving ? 'Saving...' : 'Confirm'}
+                </button>
+                <button
+                  onClick={() => {
+                    setEditMode(false);
+                    setEditError(null);
+                  }}
+                  disabled={saving}
+                  className='
+                    px-3 py-1 rounded-2xl border border-accent/30
+                    text-text text-xs hover:bg-accent/20
+                    transition-all ease-in cursor-pointer
+                    active:scale-99 disabled:opacity-50
+                    ml-1.5
+                    hover:shadow-clickable
+                    active:shadow-sm
+                  '
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setEditedTitle(localTitle);
+                  setEditedContent(localContent);
+                  setEditError(null);
+                  setEditMode(true);
+                }}
+                className='
+                  px-3 py-1 rounded-2xl border border-accent/30
+                  text-text text-xs hover:bg-accent/20
+                  hover:border-accent/50 transition-all ease-in
+                  cursor-pointer active:scale-99
+                  hover:shadow-clickable
+                  active:shadow-sm
+                '
+              >
+                Edit
+              </button>
+            ))}
+
           <div
             className='
+              ml-auto
               flex
               items-center
               gap-2
@@ -339,13 +495,8 @@ export default function PostCard(post: PostWithExtras) {
             '
           >
             {comments.length === 0 ? (
-              <p
-              >
-                No comments yet.
-              </p>
+              <p>No comments yet.</p>
             ) : (
-                
-                
               <ul
                 className='
                   space-y-2
