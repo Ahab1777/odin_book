@@ -161,7 +161,7 @@ export default function UserPostCard(post: UserPostCardContent) {
     }
   }
 
-  // --- Styling and layout matches PostCard ---
+  //Styling and layout matches PostCard 
   const commentItemHeight = 72; // px per comment (approx.)
   const inputAreaHeight = 56; // px for input + button area
   const loadMoreHeight = visibleCount < comments.length ? 36 : 0;
@@ -199,6 +199,7 @@ export default function UserPostCard(post: UserPostCardContent) {
           gap-2
         '
       >
+
         {editMode ? (
           <input
             value={editedTitle}

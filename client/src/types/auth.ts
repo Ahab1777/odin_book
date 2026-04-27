@@ -28,6 +28,13 @@ export type SignupResponse = {
 
 export type PostIndexResponse = {
   posts: PostCardContent[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalPosts: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 };
 
 export type BasicUser = {
@@ -62,7 +69,7 @@ export type Like = {
   createdAt: string;
 };
 
-export type UserPostCardContent = Omit<PostCardContent, "user"> & {
+export type UserPostCardContent = Omit<PostCardContent, 'user'> & {
   comments: Comment[];
   likes: Like[];
 };

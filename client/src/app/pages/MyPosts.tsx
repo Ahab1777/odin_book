@@ -57,6 +57,7 @@ export default function MyPosts() {
     <main
       className='
       font-funnel
+      min-h-screen
       '
     >
       <section
@@ -84,9 +85,13 @@ export default function MyPosts() {
         localStorage.getItem('isDemo') === 'true' ? (
           'Sorry, demo users cannot create posts!'
         ) : isLoading ? (
-          <p>Loading your posts...</p>
+            <p
+              className='
+                   text-center
+              '
+            >Loading your posts...</p>
         ) : error ? (
-          <p className='text-red-600'>{error}</p>
+          <p className='text-red-600 text-center'>{error}</p>
         ) : postIndex.length === 0 ? (
           'You have no posts yet'
         ) : (
