@@ -377,7 +377,11 @@ export async function getUserPosts(req: Request, res: Response): Promise<void> {
     skip: offset,
     take: limit,
     include: {
-      comments: true,
+      comments: {
+        include: {
+          user: { select: { id: true, username: true } },
+        },
+      },
       likes: true,
     },
   });
