@@ -51,7 +51,7 @@ export default function MyPosts() {
     return () => {
       cancelled = true;
     };
-  }, [postsPage, pagination]);
+  }, [postsPage]);
 
   return (
     <main

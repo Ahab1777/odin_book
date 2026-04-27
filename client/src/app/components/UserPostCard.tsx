@@ -297,7 +297,16 @@ export default function UserPostCard(post: UserPostCardContent) {
                   setEditError(null);
                   setEditMode(true);
                 }}
-                className='px-3 py-1 rounded-2xl border border-accent/30 text-text text-xs hover:bg-accent/20 hover:border-accent/50 transition-all ease-in cursor-pointer active:scale-99 hover:shadow-clickable active:shadow-sm'
+                className='
+                  px-3 py-1 rounded-2xl border border-accent/30
+                  text-text text-xs hover:bg-accent/20
+                  hover:border-accent/50 transition-all ease-in
+                  cursor-pointer active:scale-99
+                  hover:shadow-clickable
+                  active:shadow-sm
+                  shadow-clickable
+                  bg-background
+                '
               >
                 Edit
               </button>

@@ -206,7 +206,7 @@ export default function PostCard(post: PostWithExtras) {
             rounded-full
             border
             border-accent/30
-            hover:shadow-clickable
+            hover:brightness-125
             transition-all
             ease-out
             duration-200
@@ -404,6 +404,8 @@ export default function PostCard(post: PostWithExtras) {
                   cursor-pointer active:scale-99
                   hover:shadow-clickable
                   active:shadow-sm
+                  shadow-clickable
+                  bg-background
                 '
               >
                 Edit
