@@ -88,23 +88,9 @@ export default function Navbar() {
             end
             className={({ isActive }) =>
               `
-            hover:border-accent/50
-              hover:bg-accent/20
-              transition-all
-              ease-in
-              box-border
-              text-center
-              w-30
-              px-3
-              py-1
-              rounded-2xl
-              hover:border
-              hover:shadow-clickable
-              hover: border-accent/50
-              active:scale-99
-              active:shadow-sm              
+              navbar-link       
               ${isActive ?
-                'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
+                'navbar-link-active' : 'font-normal'}
             `
             }
           >
@@ -114,23 +100,9 @@ export default function Navbar() {
             to='/my-posts'
             className={({ isActive }) =>
               `
-            hover:border-accent/50
-              hover:bg-accent/20
-              transition-all
-              ease-in
-              box-border
-              text-center
-              w-30
-              px-3
-              py-1
-              rounded-2xl
-              hover:border
-              hover:shadow-clickable
-              hover: border-accent/50
-              active:scale-99
-              active:shadow-sm 
+              navbar-link       
               ${isActive ?
-                'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
+                'navbar-link-active' : 'font-normal'}
             `
             }
           >
@@ -142,23 +114,9 @@ export default function Navbar() {
               to='/new-post'
             className={({ isActive }) =>
               `
-            hover:border-accent/50
-              hover:bg-accent/20
-              transition-all
-              ease-in
-              box-border
-              text-center
-              w-30
-              px-3
-              py-1
-              rounded-2xl
-              hover:border
-              hover:shadow-clickable
-              hover: border-accent/50
-              active:scale-99
-              active:shadow-sm               
+              navbar-link       
               ${isActive ?
-                'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
+                'navbar-link-active' : 'font-normal'}
             `
             }
             >
@@ -169,23 +127,9 @@ export default function Navbar() {
             to='/community'
             className={({ isActive }) =>
               `
-            hover:border-accent/50
-              hover:bg-accent/20
-              transition-all
-              ease-in
-              box-border
-              text-center
-              w-30
-              px-3
-              py-1
-              rounded-2xl
-              hover:border
-              hover:shadow-clickable
-              hover: border-accent/50
-              active:scale-99
-              active:shadow-sm               
+              navbar-link              
               ${isActive ?
-                'border-accent/50 bg-accent/60 border shadow-clickable font-bold' : 'font-normal'}
+                'navbar-link-active' : 'font-normal'}
             `
             }
           >

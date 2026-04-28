@@ -13,19 +13,21 @@ Community
 Profile
     [] Provide basic profile pictures to choose from
     [x] Edit bio
-    [] Post pagination at profile page
+    [x] Post pagination at profile page
 
 
 Home
-    [] Display likes and comments in main page
+    [x] Display likes and comments in main page
     [] Home page post's pagination
-    [] Navbar for small screens - dropdown?
 
 Posts
     [] Delete post
     [] Like post
     [] Comment post
 
+Navbar
+    [] Display name and logout design
+    [] Navbar for small screens - dropdown?
 
 Miscellaneous 
     [] Add global footer

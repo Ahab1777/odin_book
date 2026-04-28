@@ -27,7 +27,11 @@
 
     25%,
     75% {
-      background-color: color-mix(in srgb, var(--color-background) 30%, transparent);
+      background-color: color-mix(
+        in srgb,
+        var(--color-background) 30%,
+        transparent
+      );
     }
   }
 }
@@ -40,7 +44,9 @@
 @theme {
   --font-funnel: Funnel;
   --font-inter: Inter;
-  --font-system: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-system:
+    ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 html,
@@ -53,7 +59,7 @@ body,
 /* Tailwind components */
 
 .prev-next-btn {
-  @apply border transition-all ease-in box-border text-center w-30 px-3 py-1 rounded-2xl border-accent/50 shadow-clickable ;
+  @apply border transition-all ease-in box-border text-center w-30 px-3 py-1 rounded-2xl border-accent/50 shadow-clickable flex items-center justify-center;
 }
 
 .prev-next-btn-enabled {
@@ -63,3 +69,13 @@ body,
 .prev-next-btn-disabled {
   @apply opacity-50 cursor-not-allowed pointer-events-none;
 }
+
+.navbar-link {
+  @apply flex items-center justify-center hover:border-accent/50 hover:bg-accent/20 transition-all ease-in box-border text-center w-30 px-3 py-1 rounded-2xl hover:border hover:shadow-clickable active:scale-99 active:shadow-sm border-0 border-accent/50;
+}
+
+.navbar-link-active {
+  @apply border-accent/50 bg-accent/60 border shadow-clickable font-bold;
+}
+
+

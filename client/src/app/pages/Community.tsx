@@ -2,14 +2,24 @@ import { Outlet, NavLink } from "react-router";
 
 export default function Community() {
   return (
-    <main>
+    <main
+      className="
+    min-h-screen
+      "
+    >
       <header>
-        <nav className="flex justify-center gap-4 py-4 border-2">
+        <nav className="
+        flex
+        justify-center
+        gap-4
+        py-8
+        min-h-32
+        ">
           <NavLink
             to="/community"
             end
             className={({ isActive }) =>
-              `hover:underline ${isActive ? "font-semibold" : ""}`
+              `navbar-link ${isActive ? "navbar-link-active" : "font-normal"}`
             }
           >
             Friends
@@ -18,8 +28,9 @@ export default function Community() {
             to="/community/pending"
             end
             className={({ isActive }) =>
-              `hover:underline ${isActive ? "font-semibold" : ""}`
+              `navbar-link ${isActive ? "navbar-link-active" : "font-normal"}`
             }
+
           >
             Pending Requests
           </NavLink>
@@ -27,8 +38,9 @@ export default function Community() {
             to="/community/unknown"
             end
             className={({ isActive }) =>
-              `hover:underline ${isActive ? "font-semibold" : ""}`
+              `navbar-link ${isActive ? "navbar-link-active" : "font-normal"}`
             }
+
           >
             Unknown Users
           </NavLink>
