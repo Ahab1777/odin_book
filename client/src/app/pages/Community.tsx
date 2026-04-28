@@ -5,6 +5,9 @@ export default function Community() {
     <main
       className="
     min-h-screen
+    mx-auto
+    justify-center
+    items-center
       "
     >
       <header>

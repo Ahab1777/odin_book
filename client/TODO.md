@@ -9,6 +9,7 @@ Community
     [x] FriendCard should take user to user's profile
     [x] add pagination to community tabs
     [] User search
+    [] hover animation for cards
 
 Profile
     [] Provide basic profile pictures to choose from

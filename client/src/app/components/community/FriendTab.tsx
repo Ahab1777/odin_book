@@ -79,7 +79,7 @@ export default function FriendsTab() {
       ) : (
                 <div
                   className='
-                grid grid-cols-1 sm:grid-cols-2 gap-4
+                grid grid-cols-1 grid-rows-10 sm:grid-cols-2 sm:grid-rows-5 gap-2 sm:h-100
                   '
                 >
           {friends.map((friend) => (
