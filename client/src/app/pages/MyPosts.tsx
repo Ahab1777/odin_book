@@ -85,15 +85,23 @@ export default function MyPosts() {
         localStorage.getItem('isDemo') === 'true' ? (
           'Sorry, demo users cannot create posts!'
         ) : isLoading ? (
-            <p
-              className='
+          <p
+            className='
                    text-center
               '
-            >Loading your posts...</p>
+          >
+            Loading your posts...
+          </p>
         ) : error ? (
           <p className='text-red-600 text-center'>{error}</p>
         ) : postIndex.length === 0 ? (
-          'You have no posts yet'
+          <p
+            className='
+              text-center
+                '
+          >
+            You have no posts yet
+          </p>
         ) : (
           //Posts container
           <>

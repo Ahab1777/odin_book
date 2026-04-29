@@ -1,7 +1,9 @@
 import { Link, NavLink, useNavigate } from 'react-router';
+import { useState } from 'react';
 import { useAuth } from '../auth';
 
 export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const { user, isLoading, logout } = useAuth();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
@@ -35,48 +37,34 @@ export default function Navbar() {
           flex
           items-center
           justify-between
-          px-8
+          px-4
           py-5
           gap-6
-
         '
       >
-        <div
-          className='
-            flex
-            items-center
-            gap-2
-            
-          '
-        >
-          <Link
-            to='/'
-            className='
-              flex
-              items-center
-              gap-2
-              
-            '
+        {/* Hamburger*/}
+        <div className='lg:hidden flex items-center'>
+          <button
+            aria-label='Open navigation menu'
+            className='focus:outline-none'
+            onClick={() => setMenuOpen((open) => !open)}
           >
-            <span
-              className='
-                font-semibold
-              '
-            >
-              OB
-            </span>
-            <span
-              className='
-                font-normal
-              '
-            >
-            </span>
-          </Link>
+            <svg width='32' height='32' fill='currentColor' viewBox='0 0 20 20'>
+              <path
+                fillRule='evenodd'
+                d='M3 6h14M3 10h14M3 14h14'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+              />
+            </svg>
+          </button>
         </div>
-
+        {/* Nav links - desktop */}
         <nav
           className='
-            flex
+            hidden
+            lg:flex
             items-center
             gap-4
             text-base 
@@ -89,8 +77,7 @@ export default function Navbar() {
             className={({ isActive }) =>
               `
               navbar-link       
-              ${isActive ?
-                'navbar-link-active' : 'font-normal'}
+              ${isActive ? 'navbar-link-active' : 'font-normal'}
             `
             }
           >
@@ -101,8 +88,7 @@ export default function Navbar() {
             className={({ isActive }) =>
               `
               navbar-link       
-              ${isActive ?
-                'navbar-link-active' : 'font-normal'}
+              ${isActive ? 'navbar-link-active' : 'font-normal'}
             `
             }
           >
@@ -112,13 +98,12 @@ export default function Navbar() {
           localStorage.getItem('isDemo') === 'true' ? null : (
             <NavLink
               to='/new-post'
-            className={({ isActive }) =>
+              className={({ isActive }) =>
+                `
+                navbar-link       
+                ${isActive ? 'navbar-link-active' : 'font-normal'}
               `
-              navbar-link       
-              ${isActive ?
-                'navbar-link-active' : 'font-normal'}
-            `
-            }
+              }
             >
               New Post
             </NavLink>
@@ -128,14 +113,58 @@ export default function Navbar() {
             className={({ isActive }) =>
               `
               navbar-link              
-              ${isActive ?
-                'navbar-link-active' : 'font-normal'}
+              ${isActive ? 'navbar-link-active' : 'font-normal'}
             `
             }
           >
             Community
           </NavLink>
         </nav>
+        {/* Nav links - mobile dropdown */}
+        {menuOpen && (
+          <div className='absolute top-24 left-0 w-full bg-surface shadow-lg flex flex-col items-start px-4 py-4 gap-2 lg:hidden z-50 transition-all ease-in-out h-52 justify-between'>
+            <NavLink
+              to='/'
+              end
+              className={({ isActive }) =>
+                `h-10 navbar-link w-full py-2 px-2 rounded ${isActive ? 'navbar-link-active' : 'font-normal'}`
+              }
+              onClick={() => setMenuOpen(false)}
+            >
+              Home
+            </NavLink>
+            <NavLink
+              to='/my-posts'
+              className={({ isActive }) =>
+                `h-10 navbar-link w-full py-2 px-2 rounded ${isActive ? 'navbar-link-active' : 'font-normal'}`
+              }
+              onClick={() => setMenuOpen(false)}
+            >
+              My Posts
+            </NavLink>
+            {typeof window !== 'undefined' &&
+            localStorage.getItem('isDemo') === 'true' ? null : (
+              <NavLink
+                to='/new-post'
+                className={({ isActive }) =>
+                  `h-10 navbar-link w-full py-2 px-2 rounded ${isActive ? 'navbar-link-active' : 'font-normal'}`
+                }
+                onClick={() => setMenuOpen(false)}
+              >
+                New Post
+              </NavLink>
+            )}
+            <NavLink
+              to='/community'
+              className={({ isActive }) =>
+                `h-10 navbar-link w-full py-2 px-2 rounded ${isActive ? 'navbar-link-active' : 'font-normal'}`
+              }
+              onClick={() => setMenuOpen(false)}
+            >
+              Community
+            </NavLink>
+          </div>
+        )}
 
         <div
           className='
@@ -154,7 +183,7 @@ export default function Navbar() {
                   prev-next-btn
                   prev-next-btn-enabled
                   '
-                  >
+                >
                   <b> {currentUser?.username}</b>
                 </span>
               </NavLink>

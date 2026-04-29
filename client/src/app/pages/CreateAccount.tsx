@@ -130,7 +130,7 @@ export default function CreateAccount() {
               <input
                 type='text'
                 value={username}
-                maxLength={24}
+                maxLength={12}
                 onChange={(e) => setUsername(e.target.value)}
                 className='
                   bg-background

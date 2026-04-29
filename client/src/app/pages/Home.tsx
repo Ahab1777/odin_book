@@ -86,7 +86,11 @@ export default function Home() {
         ) : error ? (
           <p className='text-red-600 text-center'>{error}</p>
         ) : postIndex.length === 0 ? (
-          'You have no posts yet'
+              <p
+                className='
+              text-center
+                '
+              >You have no posts yet</p>
         ) : (
           <>
             {postIndex.map((post) => (

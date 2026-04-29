@@ -20,9 +20,9 @@ export const signupValidation = [
   body("username")
     .isLength({
       min: 3,
-      max: 24
+      max: 12
     })
-    .withMessage("Username must be between 3 and 24 characters")
+    .withMessage("Username must be between 3 and 12 characters")
     .trim()
     .custom(async (username) => {
       const user = await userService.findByUsernameForSignUp(username);
