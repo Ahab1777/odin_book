@@ -8,7 +8,27 @@ export default function FriendCard(user: BasicUser) {
       className='
       '
     >
-      <article className='flex items-center justify-between rounded-md border border-black/10 bg-white px-4 py-3 shadow-sm min-w-85 max-w-100'>
+      <article className='
+                  flex 
+                  items-center 
+                  justify-between 
+                  rounded-md 
+                  border 
+                  border-black/10 
+                  bg-white 
+                  px-4 
+                  py-3 
+                  transition-all
+                  shadow-sm 
+                  min-w-85 
+                  max-w-100
+                  hover:border
+                  hover:shadow-clickable
+                  hover:cursor-pointer
+                  hover:bg-primary/20
+                  active:scale-99
+                  active:shadow-sm
+                  '>
         <span className='font-medium text-brown'>{user.username}</span>
         <img
           src={user.avatar}

@@ -150,11 +150,12 @@ export default function Navbar() {
                 <span
                   className='
                   text-sm
-                  hover:underline
-                  
+                  font-normal
+                  prev-next-btn
+                  prev-next-btn-enabled
                   '
                   >
-                  Hi, {currentUser?.username}
+                  <b> {currentUser?.username}</b>
                 </span>
               </NavLink>
               <button
@@ -162,10 +163,11 @@ export default function Navbar() {
                 onClick={handleLogout}
                 className='
                 hover:border-accent/50
-                  hover:bg-accent/20
+                  hover:bg-accent/30
                   border
                   border-transparent
                   transition-all
+                  font-medium
                   ease-in
                   box-border
                   text-center
@@ -188,12 +190,21 @@ export default function Navbar() {
               <Link
                 to='/login'
                 className='
-                  px-4
-                  py-2
-                  rounded-full
+                hover:border-accent/50
+                  hover:bg-accent/30
                   border
-                  border-black/20
-                  hover:bg-black/5
+                  border-transparent
+                  transition-all
+                  ease-in
+                  box-border
+                  text-center
+                  w-30
+                  px-3
+                  py-2
+                  rounded-2xl
+                  hover:border
+                  hover:shadow-clickable
+                  hover:cursor-pointer
                   active:scale-99
                   active:shadow-sm                   
                 '

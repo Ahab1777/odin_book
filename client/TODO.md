@@ -22,9 +22,9 @@ Home
     [] Home page post's pagination
 
 Posts
-    [] Delete post
-    [] Like post
-    [] Comment post
+    [x] Delete post
+    [x] Like post
+    [x] Comment post
 
 Navbar
     [] Display name and logout design

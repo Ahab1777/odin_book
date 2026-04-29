@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import type { PendingRequestsResponse } from "../../../types/community";
-import { api } from "../../../lib/api";
-import type { BasicUser } from "../../../types/auth";
-import PendingCard from "./PendingCard";
+import { useEffect, useState } from 'react';
+import type { PendingRequestsResponse } from '../../../types/community';
+import { api } from '../../../lib/api';
+import type { BasicUser } from '../../../types/auth';
+import PendingCard from './PendingCard';
 
 export default function PendingTab() {
   const [pendingRequests, setPendingRequests] = useState<BasicUser[]>([]);
@@ -19,7 +19,7 @@ export default function PendingTab() {
     async function loadPendingRequests() {
       try {
         const res = await api.get<PendingRequestsResponse>(
-          `/friend/requests/incoming?page=${page}&limit=${limit}`,
+          `/friend/requests/incoming?page=${page}&limit=${limit}`
         );
         if (!cancelled) {
           setPendingRequests(res.pendingRequests);
@@ -29,7 +29,7 @@ export default function PendingTab() {
       } catch (err: unknown) {
         if (!cancelled) {
           const error = err as Error;
-          setError(error.message || "Failed to load pending requests");
+          setError(error.message || 'Failed to load pending requests');
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -57,65 +57,91 @@ export default function PendingTab() {
   };
 
   return (
-    <>
-      {typeof window !== "undefined" &&
-      localStorage.getItem("isDemo") === "true" ? (
-        "Demo user cannot befriend users"
+    <div
+      className='
+    font-funnel
+      '
+    >
+      {typeof window !== 'undefined' &&
+      localStorage.getItem('isDemo') === 'true' ? (
+        'Demo user cannot befriend users'
       ) : isLoading ? (
-        <p>Loading pending friendships...</p>
+        <p
+          className='
+          text-center
+            '
+        >
+          Loading pending friendships...
+        </p>
       ) : error ? (
-        <p className="text-red-600">{error}</p>
+        <p className='text-red-600 text-center'>{error}</p>
       ) : pendingRequests.length === 0 ? (
-        <p className="text-red-600">You have no pending requests</p>
+        <p className='text-red-600 text-center'>You have no pending requests</p>
       ) : (
-        pendingRequests.map((request) => (
-          <PendingCard
-            key={request.id}
-            {...request}
-            onRequestUpdate={handleRequestUpdate}
-          />
-        ))
+        <div
+          className='
+                grid grid-cols-1 grid-rows-10 sm:grid-cols-2 sm:grid-rows-5 gap-2 sm:h-100
+                  '
+        >
+          {pendingRequests.map((request) => (
+            <PendingCard
+              key={request.id}
+              {...request}
+              onRequestUpdate={handleRequestUpdate}
+            />
+          ))}
+        </div>
       )}
-      <div className="flex justify-center gap-4">
+      <div
+        className='
+      flex
+      justify-center
+      gap-4
+      py-4
+      '
+      >
         <button
           onClick={handlePreviousPage}
           disabled={!hasPreviousPage}
-          className={`px-4 py-2 text-lg font-bold  transition-transform ${
-            hasPreviousPage
-              ? "bg-blue-500 text-white hover:scale-110"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
+          className={` 
+            prev-next-btn
+            ${
+              hasPreviousPage
+                ? 'prev-next-btn-enabled'
+                : 'prev-next-btn-disabled'
+            }`}
         >
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
+            xmlns='http://www.w3.org/2000/svg'
+            viewBox='0 0 24 24'
+            width='24'
+            height='24'
           >
-            <title>arrow-left-bold</title>
-            <path d="M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z" />
+            <title>Previous page</title>
+            <path d='M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z' />
           </svg>
         </button>
         <button
           onClick={handleNextPage}
           disabled={!hasNextPage}
-          className={`px-4 py-2 text-lg font-bold  transition-transform ${
-            hasNextPage
-              ? "bg-blue-500 text-white hover:scale-110"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
+          className={`
+            prev-next-btn
+            
+            ${
+              hasNextPage ? 'prev-next-btn-enabled' : 'prev-next-btn-disabled'
+            }`}
         >
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
+            xmlns='http://www.w3.org/2000/svg'
+            viewBox='0 0 24 24'
+            width='24'
+            height='24'
           >
-            <title>arrow-right-bold</title>
-            <path d="M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z" />
+            <title>Next page</title>
+            <path d='M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z' />
           </svg>
         </button>
       </div>
-    </>
+    </div>
   );
 }

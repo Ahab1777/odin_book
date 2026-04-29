@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import type { UnknownUsersResponse } from "../../../types/community";
-import { api } from "../../../lib/api";
-import type { BasicUser } from "../../../types/auth";
-import UnknownCard from "./UnknownCard";
+import { useEffect, useState } from 'react';
+import type { UnknownUsersResponse } from '../../../types/community';
+import { api } from '../../../lib/api';
+import type { BasicUser } from '../../../types/auth';
+import UnknownCard from './UnknownCard';
 
 export default function UnknownTab() {
   const [unknownUsers, setUnknownUsers] = useState<BasicUser[]>([]);
@@ -19,7 +19,7 @@ export default function UnknownTab() {
     async function loadUnknownUsers() {
       try {
         const res = await api.get<UnknownUsersResponse>(
-          `/friend/unknown?page=${page}&limit=${limit}`,
+          `/friend/unknown?page=${page}&limit=${limit}`
         );
         if (!cancelled) {
           setUnknownUsers(res.unknownUsers);
@@ -29,7 +29,7 @@ export default function UnknownTab() {
       } catch (err: unknown) {
         if (!cancelled) {
           const error = err as Error;
-          setError(error.message || "Failed to load user list");
+          setError(error.message || 'Failed to load user list');
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -57,62 +57,93 @@ export default function UnknownTab() {
   };
 
   return (
-    <>
-      {isLoading ? (
-        <p>Loading unknown users...</p>
+    <div
+      className='
+    font-funnel
+      '
+    >
+      {typeof window !== 'undefined' &&
+      localStorage.getItem('isDemo') === 'true' ? (
+        'Demo user cannot befriend users'
+      ) : isLoading ? (
+        <p
+          className='
+          text-center
+            '
+        >
+          Loading unknown users...
+        </p>
       ) : error ? (
-        <p className="text-red-600">{error}</p>
+        <p className='text-red-600 text-center'>{error}</p>
       ) : unknownUsers.length === 0 ? (
-        <p className="text-red-600">There are no potential new friends</p>
+        <p className='text-red-600 text-center'>
+          There are no potential new friends
+        </p>
       ) : (
-        unknownUsers.map((user) => (
-          <UnknownCard
-            key={user.id}
-            {...user}
-            onRequestUpdate={handleRequestUpdate}
-          />
-        ))
+        <div
+          className='
+                grid grid-cols-1 grid-rows-10 sm:grid-cols-2 sm:grid-rows-5 gap-2 sm:h-100
+                  '
+        >
+          {unknownUsers.map((user) => (
+            <UnknownCard
+              key={user.id}
+              {...user}
+              onRequestUpdate={handleRequestUpdate}
+            />
+          ))}
+        </div>
       )}
-      <div className="flex justify-center gap-4">
+      <div
+        className='
+      flex
+      justify-center
+      gap-4
+      py-4
+      '
+      >
         <button
           onClick={handlePreviousPage}
           disabled={!hasPreviousPage}
-          className={`px-4 py-2 text-lg font-bold  transition-transform ${
-            hasPreviousPage
-              ? "bg-blue-500 text-white hover:scale-110"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
+          className={` 
+            prev-next-btn
+            ${
+              hasPreviousPage
+                ? 'prev-next-btn-enabled'
+                : 'prev-next-btn-disabled'
+            }`}
         >
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
+            xmlns='http://www.w3.org/2000/svg'
+            viewBox='0 0 24 24'
+            width='24'
+            height='24'
           >
-            <title>arrow-left-bold</title>
-            <path d="M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z" />
+            <title>Previous page</title>
+            <path d='M20,9V15H12V19.84L4.16,12L12,4.16V9H20Z' />
           </svg>
         </button>
         <button
           onClick={handleNextPage}
           disabled={!hasNextPage}
-          className={`px-4 py-2 text-lg font-bold  transition-transform ${
-            hasNextPage
-              ? "bg-blue-500 text-white hover:scale-110"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
+          className={`
+            prev-next-btn
+            
+            ${
+              hasNextPage ? 'prev-next-btn-enabled' : 'prev-next-btn-disabled'
+            }`}
         >
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
+            xmlns='http://www.w3.org/2000/svg'
+            viewBox='0 0 24 24'
+            width='24'
+            height='24'
           >
-            <title>arrow-right-bold</title>
-            <path d="M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z" />
+            <title>Next page</title>
+            <path d='M4,15V9H12V4.16L19.84,12L12,19.84V15H4Z' />
           </svg>
         </button>
       </div>
-    </>
+    </div>
   );
 }

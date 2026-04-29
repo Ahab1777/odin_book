@@ -18,8 +18,11 @@ export const signupValidation = [
       if (user) throw new Error("Email already registered");
     }),
   body("username")
-    .isLength({ min: 3 })
-    .withMessage("Username must be at least 3 characters")
+    .isLength({
+      min: 3,
+      max: 24
+    })
+    .withMessage("Username must be between 3 and 24 characters")
     .trim()
     .custom(async (username) => {
       const user = await userService.findByUsernameForSignUp(username);
