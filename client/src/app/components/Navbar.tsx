@@ -43,7 +43,11 @@ export default function Navbar() {
         '
       >
         {/* Hamburger*/}
-        <div className='lg:hidden flex items-center'>
+        <div className='
+        lg:hidden
+        flex
+        items-center
+        '>
           <button
             aria-label='Open navigation menu'
             className='focus:outline-none'
@@ -121,8 +125,13 @@ export default function Navbar() {
           </NavLink>
         </nav>
         {/* Nav links - mobile dropdown */}
-        {menuOpen && (
-          <div className='absolute top-24 left-0 w-full bg-surface shadow-lg flex flex-col items-start px-4 py-4 gap-2 lg:hidden z-50 transition-all ease-in-out h-52 justify-between'>
+        {(
+          <div
+            className={
+              `absolute top-24 left-0 w-full bg-surface shadow-lg flex flex-col items-start px-4 py-4 gap-2 lg:hidden z-50 transition-all ease-in-out justify-between ` +
+              (menuOpen ? 'h-52' : 'h-0')
+            }
+          >
             <NavLink
               to='/'
               end
